@@ -1,18 +1,19 @@
 语言：中文 | [English](https://github.com/xyming108/sulv-hugo-papermod/blob/main/static/README_EN.md)
 
 > 该主题根据Hugo PaperMod主题修改而来: https://github.com/adityatelange/hugo-PaperMod
+> 原项目作者: https://github.com/xyming108/sulv-hugo-papermod
 
-### [博客DEMO](https://xyming108.github.io/)
+### [博客DEMO](https://yourname.github.io/) <!-- 修改为你的演示地址 -->
 
 ## 1. git clone 拉取代码
 
-① 用`git clone`的方式拉取代码至桌面，此时会在桌面生成sulv-hugo-papermod目录
+① 用`git clone`的方式拉取代码至桌面，此时会在桌面生成项目目录
 
-② 进入到sulv-hugo-papermod目录，输入`git submodule update --init`，表示拉取themes/hugo-PaperMod/下的子模块，里面放的是官方主题
+② 进入到项目目录，输入`git submodule update --init`，表示拉取themes/hugo-PaperMod/下的子模块，里面放的是官方主题
 
 ## 2. 启动界面
 
-③ 把目录定位到sulv-hugo-papermod下，在终端输入`hugo server -D`，在浏览器输入：localhost:1313 即可看到现成的博客模板。
+③ 把目录定位到项目目录下，在终端输入`hugo server -D`，在浏览器输入：localhost:1313 即可看到现成的博客模板。
 
 ## 3. 修改信息
 
