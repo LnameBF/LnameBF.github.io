@@ -1,6 +1,6 @@
-baseURL: https://yourname.github.io/ # 修改为你的GitHub Pages地址
+baseURL: https://lnamebf.github.io/ # 修改为你的GitHub Pages地址
 languageCode: zh # en-us
-title: Your Blog Title # 修改为你的博客标题
+title: wait`s blog # 修改为你的博客标题
 theme: hugo-PaperMod  # 主题名字，和themes文件夹下的一致
 
 enableInlineShortcodes: true
@@ -96,7 +96,7 @@ outputs:
 params:
   env: production # to enable google analytics, opengraph, twitter-cards and schema.
   description: ""
-  author: YourName # 修改为你的名字
+  author: Wait # 修改为你的名字
   # author: ["Me", "You"] # multiple authors
 
   # Social 配置 - 用于设置社交媒体相关的元数据
@@ -148,7 +148,7 @@ params:
 
   socialIcons:
     - name: github
-      url: "https://github.com/yourname" # 修改为您的 GitHub 链接
+      url: "https://github.com/LnameBF/LnameBF.github.io.git" # 修改为您的 GitHub 链接
     - name: twitter
       url: "img/twitter.png"
     - name: facebook
@@ -167,7 +167,7 @@ params:
       url: "index.xml"
 
   label: # 左上角图标
-    text: "Your Blog Title" # 修改为您的博客标题
+    text: "wait`s blog" # 修改为您的博客标题
     icon: "img/Q.gif"
     iconHeight: 35
 
