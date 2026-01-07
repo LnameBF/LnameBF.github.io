@@ -6,6 +6,23 @@
     <description>Recent content in 📚文章 on wait`s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh</language>
-    <lastBuildDate>Wed, 07 Jan 2026 18:23:26 +0800</lastBuildDate><atom:link href="https://www.heiok.top/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 07 Jan 2026 20:41:46 +0800</lastBuildDate><atom:link href="https://www.heiok.top/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程</title>
+      <link>https://www.heiok.top/posts/tutorial/macos_homebrew/</link>
+      <pubDate>Wed, 07 Jan 2026 20:41:46 +0800</pubDate>
+      
+      <guid>https://www.heiok.top/posts/tutorial/macos_homebrew/</guid>
+      <description>&lt;h2 id=&#34;homebrew笔记&#34;&gt;Homebrew笔记&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://i-blog.csdnimg.cn/direct/6130dc8c429e43f6993239736763a11a.png&#34; alt=&#34;在这里插入图片描述&#34;  /&gt;
+&lt;/p&gt;
+&lt;h3 id=&#34;1-介绍&#34;&gt;1. 介绍&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;官网：&lt;/strong&gt; &lt;a href=&#34;https://brew.sh/&#34;&gt;&lt;strong&gt;https://brew.sh/&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;对于习惯了使用命令来完成一切的程序员来说，安装软件这种小事，自然是能够用命令解决，就不用图形界面选择。但是在 &lt;code&gt;Linux&lt;/code&gt; 中，我们有 &lt;code&gt;yum&lt;/code&gt;、&lt;code&gt;apt&lt;/code&gt;、&lt;code&gt;dnf&lt;/code&gt;、&lt;code&gt;pkg&lt;/code&gt;等命令来完成软件的安装，&lt;code&gt;macOS&lt;/code&gt; 却并未为我们提供一个好用的包管理器，帮助我们更好的使用 &lt;code&gt;macOS&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;好在，虽然官方没有提供，我们却可以使用 Homebrew 这一神器，来完成类似的工作，就如同 &lt;code&gt;Homebrew&lt;/code&gt; 的 Slogan ：&amp;ldquo;The missing package manager for macOS (or Linux)&amp;rdquo;&lt;/p&gt;</description>
+    </item>
+    
   </channel>
 </rss>

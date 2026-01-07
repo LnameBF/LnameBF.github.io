@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程 | wait`s blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="Homebrew笔记
+
+
+1. 介绍
+
+官网： https://brew.sh/
+
+对于习惯了使用命令来完成一切的程序员来说，安装软件这种小事，自然是能够用命令解决，就不用图形界面选择。但是在 Linux 中，我们有 yum、apt、dnf、pkg等命令来完成软件的安装，macOS 却并未为我们提供一个好用的包管理器，帮助我们更好的使用 macOS。
+好在，虽然官方没有提供，我们却可以使用 Homebrew 这一神器，来完成类似的工作，就如同 Homebrew 的 Slogan ：&ldquo;The missing package manager for macOS (or Linux)&rdquo;">
+<meta name="author" content="wait">
+<link rel="canonical" href="https://www.heiok.top/posts/tutorial/macos_homebrew/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="apple-touch-icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="mask-icon" href="https://www.heiok.top/img/thinks.jpg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://www.heiok.top/posts/tutorial/macos_homebrew/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程" />
+<meta property="og:description" content="Homebrew笔记
+
+
+1. 介绍
+
+官网： https://brew.sh/
+
+对于习惯了使用命令来完成一切的程序员来说，安装软件这种小事，自然是能够用命令解决，就不用图形界面选择。但是在 Linux 中，我们有 yum、apt、dnf、pkg等命令来完成软件的安装，macOS 却并未为我们提供一个好用的包管理器，帮助我们更好的使用 macOS。
+好在，虽然官方没有提供，我们却可以使用 Homebrew 这一神器，来完成类似的工作，就如同 Homebrew 的 Slogan ：&ldquo;The missing package manager for macOS (or Linux)&rdquo;" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.heiok.top/posts/tutorial/macos_homebrew/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-01-07T20:41:46+08:00" />
+<meta property="article:modified_time" content="2026-01-07T20:41:46+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"/>
+<meta name="twitter:description" content="Homebrew笔记
+
+
+1. 介绍
+
+官网： https://brew.sh/
+
+对于习惯了使用命令来完成一切的程序员来说，安装软件这种小事，自然是能够用命令解决，就不用图形界面选择。但是在 Linux 中，我们有 yum、apt、dnf、pkg等命令来完成软件的安装，macOS 却并未为我们提供一个好用的包管理器，帮助我们更好的使用 macOS。
+好在，虽然官方没有提供，我们却可以使用 Homebrew 这一神器，来完成类似的工作，就如同 Homebrew 的 Slogan ：&ldquo;The missing package manager for macOS (or Linux)&rdquo;"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://www.heiok.top/posts/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程",
+      "item": "https://www.heiok.top/posts/tutorial/macos_homebrew/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程",
+  "name": "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程",
+  "description": "Homebrew笔记 1. 介绍 官网： https://brew.sh/\n对于习惯了使用命令来完成一切的程序员来说，安装软件这种小事，自然是能够用命令解决，就不用图形界面选择。但是在 Linux 中，我们有 yum、apt、dnf、pkg等命令来完成软件的安装，macOS 却并未为我们提供一个好用的包管理器，帮助我们更好的使用 macOS。\n好在，虽然官方没有提供，我们却可以使用 Homebrew 这一神器，来完成类似的工作，就如同 Homebrew 的 Slogan ：\u0026ldquo;The missing package manager for macOS (or Linux)\u0026rdquo;\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "Homebrew笔记 1. 介绍 官网： https://brew.sh/\n对于习惯了使用命令来完成一切的程序员来说，安装软件这种小事，自然是能够用命令解决，就不用图形界面选择。但是在 Linux 中，我们有 yum、apt、dnf、pkg等命令来完成软件的安装，macOS 却并未为我们提供一个好用的包管理器，帮助我们更好的使用 macOS。\n好在，虽然官方没有提供，我们却可以使用 Homebrew 这一神器，来完成类似的工作，就如同 Homebrew 的 Slogan ：“The missing package manager for macOS (or Linux)”\nHomebrew 由开发者 Max Howell 开发，并基于 BSD 开源，是一个非常方便的包管理器工具。在早期， Homebrew 仅有 macOS 的版本，后续随着用户的增多，Homebrew 还提供了 Linux 的版本，帮助开发者在 Linux 同样使用 Homebrew 来配置环境。\n1.1 组成部分 Homebrew 是一款包管理工具，目前支持 macOS 和 linux 系统。主要有四个部分组成: brew、homebrew-core 、homebrew-cask、homebrew-bottles。\n名称 说明 brew Homebrew 源代码仓库 homebrew-core Homebrew 核心源 homebrew-cask 提供 macOS 应用和大型二进制文件的安装 homebrew-bottles 预编译二进制软件包 1.2 核心概念 在正式介绍 Homebrew 的使用之前，我先为你介绍一下 Homebrew 中的一些核心的概念，了解这些概念，就可以帮助你更好的去使用 Homebrew。\n词汇 含义 formula (e) 安装包的描述文件，formulae 为复数 cellar 安装好后所在的目录 keg 具体某个包所在的目录，keg 是 cellar 的子目录 bottle 预先编译好的包，不需要现场下载编译源码，速度会快很多；官方库中的包大多都是通过 bottle 方式安装 tap 下载源，可以类比于 Linux 下的包管理器 repository cask 安装 macOS native 应用的扩展，你也可以理解为有图形化界面的应用。 bundle 描述 Homebrew 依赖的扩展 其中，最关键的是 tap 、cask，我们在后续会经常用到。\n2. 安装 复制下方命令到终端一键执行即可，我这里用的第一个，是一个知乎博主分享的。\n苹果电脑 常规安装脚本（推荐 完全体 几分钟安装完成）：\n/bin/zsh -c \"$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)\" 苹果电脑 极速安装脚本（精简版 几秒钟安装完成）：\n/bin/zsh -c \"$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)\" speed 苹果电脑 卸载脚本：\n/bin/zsh -c \"$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)\" 常见错误 去下方地址查看\nhttps://gitee.com/cunkai/HomebrewCN/blob/master/error.md Linux电脑 安装脚本：\nrm Homebrew.sh ; wget https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh ; bash Homebrew.sh Linux电脑 卸载脚本：\nrm HomebrewUninstall.sh ; wget https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh ; bash HomebrewUninstall.sh 3. 更换为国内镜像源 本教程以更改中科大源为例。\n中科大源地址 ：https://mirrors.ustc.edu.cn/\nHomebrew 源使用帮助 http://mirrors.ustc.edu.cn/help/brew.git.html Homebrew Core 源使用帮助 http://mirrors.ustc.edu.cn/help/homebrew-core.git.html Homebrew Cask 源使用帮助 http://mirrors.ustc.edu.cn/help/homebrew-cask.git.html Homebrew Bottles 源使用帮助 http://mirrors.ustc.edu.cn/help/homebrew-bottles.html 最终效果查看，最下面的两行 origin 表示，按照 3.1 教程演示即可\n# 切换当前工作目录到 Homebrew 的仓库目录 cd \"$(brew --repo)\" #显示当前工作目录的路径 pwd # 查看当前 Git 仓库所配置的远程仓库的详细信息 git remote -v git remote -v 命令用于查看当前 Git 仓库的远程仓库信息。\n输出结果显示 origin https://mirrors.ustc.edu.cn/brew.git (fetch) 和 origin https://mirrors.ustc.edu.cn/brew.git (push) 。这表明当前 Homebrew 仓库的远程源（名为origin）的 URL 是 https://mirrors.ustc.edu.cn/brew.git 。(fetch)表示从这个 URL 拉取代码更新，(push)表示向这个 URL 推送代码更改。\n以上为最终效果，大家最后有时间看就行\n3.1 更换 brew.git 源 执行下方命令，并看到 ORIGNN 地址已经更新\n# 切换到 Homebrew 的仓库目录 cd \"$(brew --repo)\" # 设置 Homebrew 仓库的远程源 URL 为中国科学技术大学的镜像地址 git remote set-url origin https://mirrors.ustc.edu.cn/brew.git # 显示当前 Homebrew 的配置信息，如各种配置参数，如版本号、安装路径、镜像地址等 brew config 重置为官方镜像：\ncd \"$(brew --repo)\" git remote set-url origin https://github.com/Homebrew/brew.git 3.2 更换 homebrew-core.git 源 通过下方命令发现错误，这个错误信息表明 Git 认为在 “/opt/homebrew/Library/Taps/homebrew/homebrew-core” 这个路径下的仓库所有权存在可疑情况。这通常是由于安全机制引起的，Git 可能担心该仓库不是在安全的环境下或者可能存在恶意操作的风险。\ncd \"$(brew --repo)/Library/Taps/homebrew/homebrew-core\" git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-core.git 按照要求执行命令，这个命令会将指定的目录添加到 Git 的安全目录列表中，告诉 Git 这个目录是安全的，可以进行操作。这样，在后续执行与这个仓库相关的 Git 操作时，就不会再出现这个错误了。\ngit config --global --add safe.directory /opt/homebrew/Library/Taps/homebrew/homebrew-core git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-core.git # 重置为官方地址： cd \"$(brew --repo)/Library/Taps/homebrew/homebrew-core\" git remote set-url origin https://github.com/Homebrew/homebrew-core 默认不安装 cask 有需要的可以替换（Homebrew cask 软件仓库，提供 macOS 应用和大型二进制文件），这个我没弄，我就不演示了。\ncd \"$(brew --repo)\"/Library/Taps/homebrew/homebrew-cask git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-cask.git # git remote set-url origin git://mirrors.ustc.edu.cn/homebrew-cask.git # 重置为官方地址： cd \"$(brew --repo)\"/Library/Taps/homebrew/homebrew-cask git remote set-url origin https://github.com/Homebrew/homebrew-cask 3.3 替换 Homebrew-bottles 源 用以下命令查看终端使用的是 Bash 还是 Zsh\necho $SHELL bash 用户 echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' \u003e\u003e ~/.bash_profile source ~/.bash_profile zsh 用户 echo 'export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles' \u003e\u003e ~/.zshrc source ~/.zshrc brew4.x 系列有个 api 加速环境变量，是如下命令。阿里云镜像 是上下两个变量HOMEBREW_BOTTLE_DOMAIN 和 HOMEBREW_API_DOMAIN 都有的，只需要吧里面的 ustc 换成 aliyun即可 。然后这里我使用中科大 api 加速。后续 Homebrew 在使用 API 时会通过中科大的镜像加速地址来提高访问速度。\nbash 用户 echo 'export HOMEBREW_API_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles/api'\u003e\u003e~/.bash_profile source ~/.bash_profile zsh 用户 echo 'export HOMEBREW_API_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles/api'\u003e\u003e~/.zshrc source ~/.zshrc 4. 常用命令 4.1 安装卸载软件 brew --version 或者 brew -v 显示 brew 版本信息 brew install 安装指定软件 brew uninstall 卸载指定软件 brew list 显示所有的已安装的软件 brew search text 搜索本地远程仓库的软件，已安装会显示绿色的勾 brew search /text/ 使用正则表达式搜软件 brew info 显示指定软件信息 brew reinstall 重新安装指定软件，先卸载后安装 brew install --build-from-source 源码安装指定软件，可以给定指定参数 brew commands 列出所有可用命令 4.2 升级软件相关 brew update 自动升级 homebrew （从 github 下载最新版本） brew outdated 检测已经过时的软件 brew upgrade 升级所有已过时的软件，即列出的以过时软件 brew upgrade 升级指定的软件 brew pin 禁止指定软件升级 brew unpin 解锁禁止升级 brew upgrade --all 升级所有的软件包，包括未清理干净的旧版本的包 brew edit 编辑软件，不会的情况下慎用 brew tap 列出本地资源仓库，其中 homebrew 是默认仓库，其它都是第三方仓库 brew tap 添加第三方仓库，命名的规则按照 github 来定的。使用 brew untap 删除仓库 brew deps 查看指定软件依赖于哪些软件 brew uses 查看指定软件被哪些软件所依赖 4.3 清理相关 homebrew 再升级软件时候不会清理相关的旧版本，在软件升级后我们可以使用如下命令清理\nbrew cleanup -n 列出需要清理的内容 brew cleanup 清理指定的软件过时包 brew cleanup 清理所有的过时软件 brew unistall 卸载指定软件 brew unistall --force 彻底卸载指定软件，包括旧版本 通过 brew 安装的文件会自动设置环境变量，所以不用担心命令行不能启动的问题。\n比如安装好了 gradle，即可运行 gradle -v\n4.4 管理后台服务 macOS 使用 launchctl 命令加载开机自动运行的服务，brew service 可以简化 lauchctl 的操作。\n以 MySQL 为例，使用 launchctl 启动:\nln -sfv /usr/local/opt/mysql/*.plist ~/Library/LaunchAgents launchctl load ~/Library/LaunchAgents/homebrew.mxcl.mysql.plist 如使用 brew service 可以简化为:\nbrew services start mysql services 常用命令 brew services list # 查看使用brew安装的服务列表 brew services run formula|–all # 启动服务（仅启动不注册） brew services start formula|–all # 启动服务，并注册 brew services stop formula|–all # 停止服务，并取消注册 brew services restart formula|–all # 重启服务，并注册 brew services cleanup # 清除已卸载应用的无用的配置 配置文件目录 /Library/LaunchDaemons # 开机自启，需要sudo ~/Library/LaunchAgents # 用户登录后自启 以 homebrew.mxcl.kafka.plist 为例：\n\u003c?xml version=\"1.0\" encoding=\"UTF-8\"?\u003e \u003c!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\"\u003e \u003cplist version=\"1.0\"\u003e \u003cdict\u003e \u003ckey\u003eLabel\u003c/key\u003e \u003cstring\u003ehomebrew.mxcl.kafka\u003c/string\u003e \u003ckey\u003eWorkingDirectory\u003c/key\u003e \u003cstring\u003e/usr/local\u003c/string\u003e \u003ckey\u003eProgramArguments\u003c/key\u003e \u003carray\u003e \u003cstring\u003e/usr/local/opt/kafka/bin/kafka-server-start\u003c/string\u003e \u003cstring\u003e/usr/local/etc/kafka/server.properties\u003c/string\u003e \u003c/array\u003e \u003ckey\u003eRunAtLoad\u003c/key\u003e \u003ctrue/\u003e \u003ckey\u003eKeepAlive\u003c/key\u003e \u003ctrue/\u003e \u003ckey\u003eStandardErrorPath\u003c/key\u003e \u003cstring\u003e/usr/local/var/log/kafka/kafka_output.log\u003c/string\u003e \u003ckey\u003eStandardOutPath\u003c/key\u003e \u003cstring\u003e/usr/local/var/log/kafka/kafka_output.log\u003c/string\u003e \u003c/dict\u003e \u003c/plist\u003e 在这里可以找到服务路径、启动参数、日志路径等\n4.5 brew cask Homebrew Cask 是 Homebrew 的扩展，借助它可以方便地在 macOS 上安装图形界面程序，即我们常用的各类应用。Homebrew 中文含义为自制、自酿酒，Cask 中文含义为桶、木桶，桶装酒是一种成品，也就是说每一个 homebrew cask 都可以直接使用的，比如 Atom 的 Cask 名称为 atom，那么就可以使用如下命令安装：\nbrew cask install atom 甚至也可以提交新的 Cask，比如假设有桌面客户端少数派，则用 brew cask create sspai 创建新的名称为 sspai 的 Cask，当然还要提供官网下载链接、官方主页、应用版本等信息，可以参照 官方教程，此处就不再细说。\n安装 Homebrew Cask【以后新版不需要安装】\n安装好 brew 后，就可以执行命令 brew tap caskroom/cask 获取 Homebrew Cask。\n注意：\nCaskroom 的 Git 地址在 2018 年 5 月 25 日从 https://github.com/caskroom/homebrew-cask 迁移到了 https://github.com/Homebrew/homebrew-cask\n所以，以后就不需要安装 Homebrew Cask\n4.6 使用 Homebrew Cask github 使用：https://github.com/Homebrew/homebrew-cask/blob/master/USAGE.md\nbrew cask install 安装指定图形界面软件 brew cask uninstall 卸载软件 brew cask uninstall --force 卸载软件，带参数 brew cask search text 搜索软件 brew cask list 列出所有通过 cask 安装的软件 其它可以参考：https://github.com/Homebrew/homebrew-cask/blob/master/USAGE.md 举例可安装的软件\n# 安装chrome brew cask install google-chrome # 安装LaunchRocket brew cask install launchrocket 5. 图像化工具 cakebrew 官方地址 ：https://www.cakebrew.com/\nGithub 仓库地址 ：https://github.com/brunophilipe/Cakebrew\n点击上方导航栏的 Download，再点击 Download Now 就下载安装包，然后解压的程序拖到应用程序即可。\n或者通过 Homebrew 命令安装：\nbrew install --cask cakebrew 打开后，有点不太稳定，显示不了界面\n大家可以到网上搜搜使用教程，比命令行方便些。\n参考 https://zhuanlan.zhihu.com/p/111014448 安装 https://sspai.com/post/56009#! 1.2 核心概念、3 https://blog.csdn.net/Amio_/article/details/109694893 1.1 组成部分 https://cloud.tencent.com/developer/article/1867824 https://zhuanlan.zhihu.com/p/366354601 介绍 Homebrew 图形化工具 cakebrew ",
+  "wordCount" : "3266",
+  "inLanguage": "zh",
+  "datePublished": "2026-01-07T20:41:46+08:00",
+  "dateModified": "2026-01-07T20:41:46+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "wait"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.heiok.top/posts/tutorial/macos_homebrew/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wait`s blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.heiok.top/img/thinks.jpg"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://www.heiok.top/" accesskey="h" title="wait`s blog (Alt + H)">
+            <img src="https://www.heiok.top/img/Q.gif" alt="logo" aria-label="logo"
+                 height="35">wait`s blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://www.heiok.top/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/posts" title="📚 文章">
+                <span>📚 文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/archives/" title="⏱️ 时间轴">
+                <span>⏱️ 时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/about" title="🙋🏻‍♂️ 关于">
+                <span>🙋🏻‍♂️ 关于</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/links" title="🤝 友链">
+                <span>🤝 友链</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            <div class="breadcrumbs"><a href="https://www.heiok.top/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://www.heiok.top/posts/">📚文章</a></div>
+            <h1 class="post-title">
+                MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程
+            </h1>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2026-01-07
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>3266字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>7分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>wait
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    <span id="post_meta_style_8">
+                        <span class="fa fa-commenting-o"></span>
+                        <span>
+                            <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js"></script>
+                            <script>
+                                let url = document.documentURI
+                                
+                                let dnsUrl = "https://www.heiok.top/"
+                                let urlSplit = url.split(dnsUrl)
+                                let finalUrl = urlSplit[1]
+                                if (finalUrl[0] !== '/') {
+                                    finalUrl = '/'+finalUrl
+                                }
+                                twikoo.getCommentsCount({
+                                    envId:  null , 
+                                region:  null , 
+                                urls: [ 
+                                    
+                                    finalUrl,
+                                ],
+                                    includeReply: false 
+                                }).then(function (res) {
+                                    let count = res[0].count
+                                    const obj = document.getElementById("comment_count");
+                                    obj.innerText = count
+                                    
+                                    
+                                    
+                                }).catch(function (err) {
+                                    
+                                    console.error(err);
+                                });
+                            </script>
+                            <span id="comment_count"></span>
+                        </span>
+                    </span>
+                </span>
+
+</div>
+        </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#homebrew%e7%ac%94%e8%ae%b0" aria-label="Homebrew笔记">Homebrew笔记</a><ul>
+                        
+                <li>
+                    <a href="#1-%e4%bb%8b%e7%bb%8d" aria-label="1. 介绍">1. 介绍</a><ul>
+                        
+                <li>
+                    <a href="#11-%e7%bb%84%e6%88%90%e9%83%a8%e5%88%86" aria-label="1.1 组成部分">1.1 组成部分</a></li>
+                <li>
+                    <a href="#12-%e6%a0%b8%e5%bf%83%e6%a6%82%e5%bf%b5" aria-label="1.2 核心概念">1.2 核心概念</a></li></ul>
+                </li>
+                <li>
+                    <a href="#2-%e5%ae%89%e8%a3%85" aria-label="2. 安装">2. 安装</a></li>
+                <li>
+                    <a href="#3-%e6%9b%b4%e6%8d%a2%e4%b8%ba%e5%9b%bd%e5%86%85%e9%95%9c%e5%83%8f%e6%ba%90" aria-label="3. 更换为国内镜像源">3. 更换为国内镜像源</a><ul>
+                        
+                <li>
+                    <a href="#31-%e6%9b%b4%e6%8d%a2-brewgit-%e6%ba%90" aria-label="3.1 更换 brew.git 源">3.1 更换 brew.git 源</a></li>
+                <li>
+                    <a href="#32-%e6%9b%b4%e6%8d%a2-homebrew-coregit-%e6%ba%90" aria-label="3.2 更换 homebrew-core.git 源">3.2 更换 homebrew-core.git 源</a></li>
+                <li>
+                    <a href="#33-%e6%9b%bf%e6%8d%a2-homebrew-bottles-%e6%ba%90" aria-label="3.3 替换 Homebrew-bottles 源">3.3 替换 Homebrew-bottles 源</a></li></ul>
+                </li>
+                <li>
+                    <a href="#4-%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4" aria-label="4. 常用命令">4. 常用命令</a><ul>
+                        
+                <li>
+                    <a href="#41-%e5%ae%89%e8%a3%85%e5%8d%b8%e8%bd%bd%e8%bd%af%e4%bb%b6" aria-label="4.1 安装卸载软件">4.1 安装卸载软件</a></li>
+                <li>
+                    <a href="#42-%e5%8d%87%e7%ba%a7%e8%bd%af%e4%bb%b6%e7%9b%b8%e5%85%b3" aria-label="4.2 升级软件相关">4.2 升级软件相关</a></li>
+                <li>
+                    <a href="#43-%e6%b8%85%e7%90%86%e7%9b%b8%e5%85%b3" aria-label="4.3 清理相关">4.3 清理相关</a></li>
+                <li>
+                    <a href="#44-%e7%ae%a1%e7%90%86%e5%90%8e%e5%8f%b0%e6%9c%8d%e5%8a%a1" aria-label="4.4 管理后台服务">4.4 管理后台服务</a></li>
+                <li>
+                    <a href="#45-brew-cask" aria-label="4.5 brew cask">4.5 brew cask</a></li>
+                <li>
+                    <a href="#46-%e4%bd%bf%e7%94%a8-homebrew-cask" aria-label="4.6 使用 Homebrew Cask">4.6 使用 Homebrew Cask</a></li></ul>
+                </li>
+                <li>
+                    <a href="#5-%e5%9b%be%e5%83%8f%e5%8c%96%e5%b7%a5%e5%85%b7-cakebrew" aria-label="5. 图像化工具 cakebrew">5. 图像化工具 cakebrew</a></li>
+                <li>
+                    <a href="#%e5%8f%82%e8%80%83" aria-label="参考">参考</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        if (elements) {
+            activeElement = Array.from(elements).find((element) => {
+                if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                    (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                    return element;
+                }
+            }) || activeElement
+
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                if (element === activeElement){
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+                }
+            })
+        }
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h2 id="homebrew笔记">Homebrew笔记<a hidden class="anchor" aria-hidden="true" href="#homebrew笔记">#</a></h2>
+<p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/6130dc8c429e43f6993239736763a11a.png" alt="在这里插入图片描述"  />
+</p>
+<h3 id="1-介绍">1. 介绍<a hidden class="anchor" aria-hidden="true" href="#1-介绍">#</a></h3>
+<blockquote>
+<p><strong>官网：</strong> <a href="https://brew.sh/"><strong>https://brew.sh/</strong></a></p>
+</blockquote>
+<p>对于习惯了使用命令来完成一切的程序员来说，安装软件这种小事，自然是能够用命令解决，就不用图形界面选择。但是在 <code>Linux</code> 中，我们有 <code>yum</code>、<code>apt</code>、<code>dnf</code>、<code>pkg</code>等命令来完成软件的安装，<code>macOS</code> 却并未为我们提供一个好用的包管理器，帮助我们更好的使用 <code>macOS</code>。</p>
+<p>好在，虽然官方没有提供，我们却可以使用 Homebrew 这一神器，来完成类似的工作，就如同 <code>Homebrew</code> 的 Slogan ：&ldquo;The missing package manager for macOS (or Linux)&rdquo;</p>
+<p><code>Homebrew</code> 由开发者 Max Howell 开发，并基于 BSD 开源，是一个非常方便的包管理器工具。在早期， <code>Homebrew</code> 仅有 <code>macOS</code> 的版本，后续随着用户的增多，<code>Homebrew</code> 还提供了 <code>Linux</code> 的版本，帮助开发者在 Linux 同样使用 <code>Homebrew</code> 来配置环境。</p>
+<h4 id="11-组成部分">1.1 组成部分<a hidden class="anchor" aria-hidden="true" href="#11-组成部分">#</a></h4>
+<p><code>Homebrew</code> 是一款包管理工具，目前支持 <code>macOS</code> 和 <code>linux</code> 系统。主要有四个部分组成: <code>brew</code>、<code>homebrew-core</code> 、<code>homebrew-cask</code>、<code>homebrew-bottles</code>。</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">名称</th>
+          <th style="text-align: left">说明</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>brew</strong></td>
+          <td style="text-align: left">Homebrew 源代码仓库</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>homebrew-core</strong></td>
+          <td style="text-align: left">Homebrew 核心源</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>homebrew-cask</strong></td>
+          <td style="text-align: left">提供 macOS 应用和大型二进制文件的安装</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>homebrew-bottles</strong></td>
+          <td style="text-align: left">预编译二进制软件包</td>
+      </tr>
+  </tbody>
+</table>
+<h4 id="12-核心概念">1.2 核心概念<a hidden class="anchor" aria-hidden="true" href="#12-核心概念">#</a></h4>
+<p>在正式介绍 <code>Homebrew</code> 的使用之前，我先为你介绍一下 <code>Homebrew</code> 中的一些核心的概念，了解这些概念，就可以帮助你更好的去使用 <code>Homebrew</code>。</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">词汇</th>
+          <th style="text-align: left">含义</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left"><strong>formula (e)</strong></td>
+          <td style="text-align: left">安装包的描述文件，formulae 为复数</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>cellar</strong></td>
+          <td style="text-align: left">安装好后所在的目录</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>keg</strong></td>
+          <td style="text-align: left">具体某个包所在的目录，keg 是 cellar 的子目录</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>bottle</strong></td>
+          <td style="text-align: left">预先编译好的包，不需要现场下载编译源码，速度会快很多；官方库中的包大多都是通过 bottle 方式安装</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>tap</strong></td>
+          <td style="text-align: left">下载源，可以类比于 Linux 下的包管理器 repository</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>cask</strong></td>
+          <td style="text-align: left">安装 macOS native 应用的扩展，你也可以理解为有图形化界面的应用。</td>
+      </tr>
+      <tr>
+          <td style="text-align: left"><strong>bundle</strong></td>
+          <td style="text-align: left">描述 Homebrew 依赖的扩展</td>
+      </tr>
+  </tbody>
+</table>
+<p>其中，最关键的是 <code>tap</code> 、<code>cask</code>，我们在后续会经常用到。</p>
+<h3 id="2-安装">2. 安装<a hidden class="anchor" aria-hidden="true" href="#2-安装">#</a></h3>
+<p>复制下方命令到终端一键执行即可，我这里用的第一个，是一个知乎博主分享的。</p>
+<p><strong>苹果电脑 常规安装脚本（推荐 完全体 几分钟安装完成）</strong>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/bin/zsh -c &#34;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&#34;
+</span></span></code></pre></div><p><strong>苹果电脑 极速安装脚本（精简版 几秒钟安装完成）：</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/bin/zsh -c &#34;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)&#34; speed
+</span></span></code></pre></div><p><strong>苹果电脑 卸载脚本：</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/bin/zsh -c &#34;$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh)&#34;
+</span></span></code></pre></div><p><strong>常见错误</strong> 去下方<a href="https://link.zhihu.com/?target=https%3A//gitee.com/cunkai/HomebrewCN/blob/master/error.md">地址</a>查看</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>https://gitee.com/cunkai/HomebrewCN/blob/master/error.md
+</span></span></code></pre></div><p><strong>Linux电脑</strong> 安装脚本：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>rm Homebrew.sh ; wget https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh ; bash Homebrew.sh
+</span></span></code></pre></div><p><strong>Linux电脑</strong> 卸载脚本：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>rm HomebrewUninstall.sh ; wget https://gitee.com/cunkai/HomebrewCN/raw/master/HomebrewUninstall.sh ; bash HomebrewUninstall.sh
+</span></span></code></pre></div><h3 id="3-更换为国内镜像源">3. 更换为国内镜像源<a hidden class="anchor" aria-hidden="true" href="#3-更换为国内镜像源">#</a></h3>
+<p>本教程以更改中科大源为例。</p>
+<p><strong>中科大源地址</strong> ：<a href="https://mirrors.ustc.edu.cn/">https://mirrors.ustc.edu.cn/</a></p>
+<ul>
+<li><code>Homebrew</code> 源使用帮助 <a href="http://mirrors.ustc.edu.cn/help/brew.git.html">http://mirrors.ustc.edu.cn/help/brew.git.html</a></li>
+<li><code>Homebrew Core</code> 源使用帮助 <a href="http://mirrors.ustc.edu.cn/help/homebrew-core.git.html">http://mirrors.ustc.edu.cn/help/homebrew-core.git.html</a></li>
+<li><code>Homebrew Cask</code> 源使用帮助 <a href="http://mirrors.ustc.edu.cn/help/homebrew-cask.git.html">http://mirrors.ustc.edu.cn/help/homebrew-cask.git.html</a></li>
+<li><code>Homebrew Bottles</code> 源使用帮助 <a href="http://mirrors.ustc.edu.cn/help/homebrew-bottles.html">http://mirrors.ustc.edu.cn/help/homebrew-bottles.html</a></li>
+</ul>
+<p>最终效果查看，最下面的两行 <code>origin</code> 表示，按照 <code>3.1</code> 教程演示即可</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># 切换当前工作目录到 Homebrew 的仓库目录
+</span></span><span style="display:flex;"><span>cd &#34;$(brew --repo)&#34; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#显示当前工作目录的路径
+</span></span><span style="display:flex;"><span>pwd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 查看当前 Git 仓库所配置的远程仓库的详细信息
+</span></span><span style="display:flex;"><span>git remote -v
+</span></span></code></pre></div><p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/927fb0376b9b42eabf59c19848477656.png" alt="在这里插入图片描述"  />
+</p>
+<p><code>git remote -v</code> 命令用于查看当前 <code>Git</code> 仓库的远程仓库信息。</p>
+<p>输出结果显示 <code>origin https://mirrors.ustc.edu.cn/brew.git (fetch)</code> 和 <code>origin https://mirrors.ustc.edu.cn/brew.git (push)</code> 。这表明当前 <code>Homebrew</code> 仓库的远程源（名为<code>origin</code>）的 <code>URL</code> 是 <code>https://mirrors.ustc.edu.cn/brew.git</code> 。<code>(fetch)</code>表示从这个 <code>URL</code> 拉取代码更新，<code>(push)</code>表示向这个 <code>URL</code> 推送代码更改。</p>
+<p><strong>以上为最终效果，大家最后有时间看就行</strong></p>
+<h4 id="31-更换-brewgit-源">3.1 更换 brew.git 源<a hidden class="anchor" aria-hidden="true" href="#31-更换-brewgit-源">#</a></h4>
+<p>执行下方命令，并看到 <code>ORIGNN</code> 地址已经更新</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># 切换到 Homebrew 的仓库目录
+</span></span><span style="display:flex;"><span>cd &#34;$(brew --repo)&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 设置 Homebrew 仓库的远程源 URL 为中国科学技术大学的镜像地址
+</span></span><span style="display:flex;"><span>git remote set-url origin https://mirrors.ustc.edu.cn/brew.git
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 显示当前 Homebrew 的配置信息，如各种配置参数，如版本号、安装路径、镜像地址等
+</span></span><span style="display:flex;"><span>brew config
+</span></span></code></pre></div><p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/81dba4170f694034a57376976c998b2a.png" alt="在这里插入图片描述"  />
+</p>
+<p>重置为官方镜像：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cd &#34;$(brew --repo)&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>git remote set-url origin https://github.com/Homebrew/brew.git
+</span></span></code></pre></div><h4 id="32-更换-homebrew-coregit-源">3.2 更换 homebrew-core.git 源<a hidden class="anchor" aria-hidden="true" href="#32-更换-homebrew-coregit-源">#</a></h4>
+<p>通过下方命令发现错误，这个错误信息表明 <code>Git</code> 认为在 &ldquo;<code>/opt/homebrew/Library/Taps/homebrew/homebrew-core</code>&rdquo; 这个路径下的仓库所有权存在可疑情况。这通常是由于安全机制引起的，<code>Git</code> 可能担心该仓库不是在安全的环境下或者可能存在恶意操作的风险。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cd &#34;$(brew --repo)/Library/Taps/homebrew/homebrew-core&#34;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-core.git
+</span></span></code></pre></div><p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/eb2b257552c746a09291dc225c2f2865.png" alt="在这里插入图片描述"  />
+</p>
+<p>按照要求执行命令，这个命令会将指定的目录添加到 <code>Git</code> 的安全目录列表中，告诉 <code>Git</code> 这个目录是安全的，可以进行操作。这样，在后续执行与这个仓库相关的 <code>Git</code> 操作时，就不会再出现这个错误了。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>git config --global --add safe.directory /opt/homebrew/Library/Taps/homebrew/homebrew-core
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-core.git
+</span></span></code></pre></div><p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/3d552d8914014c9ebd8f6dedb279cc8f.png" alt="在这里插入图片描述"  />
+</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># 重置为官方地址：
+</span></span><span style="display:flex;"><span>cd &#34;$(brew --repo)/Library/Taps/homebrew/homebrew-core&#34;
+</span></span><span style="display:flex;"><span>git remote set-url origin https://github.com/Homebrew/homebrew-core
+</span></span></code></pre></div><p>默认不安装 <code>cask</code> 有需要的可以替换（<code>Homebrew cask</code> 软件仓库，提供 <code>macOS</code> 应用和大型二进制文件），这个我没弄，我就不演示了。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cd &#34;$(brew --repo)&#34;/Library/Taps/homebrew/homebrew-cask
+</span></span><span style="display:flex;"><span>git remote set-url origin https://mirrors.ustc.edu.cn/homebrew-cask.git
+</span></span><span style="display:flex;"><span># git remote set-url origin git://mirrors.ustc.edu.cn/homebrew-cask.git
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 重置为官方地址：
+</span></span><span style="display:flex;"><span>cd &#34;$(brew --repo)&#34;/Library/Taps/homebrew/homebrew-cask
+</span></span><span style="display:flex;"><span>git remote set-url origin https://github.com/Homebrew/homebrew-cask
+</span></span></code></pre></div><h4 id="33-替换-homebrew-bottles-源">3.3 替换 Homebrew-bottles 源<a hidden class="anchor" aria-hidden="true" href="#33-替换-homebrew-bottles-源">#</a></h4>
+<p>用以下命令查看终端使用的是 <code>Bash</code> 还是 <code>Zsh</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>echo $SHELL
+</span></span></code></pre></div><p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/e9c942258fa047fda38abf01377c3afa.png" alt="在这里插入图片描述"  />
+</p>
+<ul>
+<li><code>bash</code> 用户</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles&#39;</span> <span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">~/.</span>bash_profile
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>source <span style="color:#f92672">~/.</span>bash_profile
+</span></span></code></pre></div><ul>
+<li><code>zsh</code> 用户</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles&#39;</span> <span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">~/.</span>zshrc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>source <span style="color:#f92672">~/.</span>zshrc
+</span></span></code></pre></div><p><code>brew4.x</code> 系列有个 <code>api</code> 加速环境变量，是如下命令。<strong>阿里云镜像</strong> 是上下两个变量<code>HOMEBREW_BOTTLE_DOMAIN</code> 和 <code>HOMEBREW_API_DOMAIN</code> 都有的，只需要吧里面的 <code>ustc</code> 换成 <code>aliyun</code>即可 。然后这里我使用中科大 <code>api</code> 加速。后续 <code>Homebrew</code> 在使用 <code>API</code> 时会通过中科大的镜像加速地址来提高访问速度。</p>
+<ul>
+<li><code>bash</code> 用户</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;export HOMEBREW_API_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles/api&#39;</span><span style="color:#f92672">&gt;&gt;~/.</span>bash_profile
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>source <span style="color:#f92672">~/.</span>bash_profile
+</span></span></code></pre></div><ul>
+<li><code>zsh</code> 用户</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;export HOMEBREW_API_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles/api&#39;</span><span style="color:#f92672">&gt;&gt;~/.</span>zshrc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>source <span style="color:#f92672">~/.</span>zshrc
+</span></span></code></pre></div><h3 id="4-常用命令">4. 常用命令<a hidden class="anchor" aria-hidden="true" href="#4-常用命令">#</a></h3>
+<h4 id="41-安装卸载软件">4.1 安装卸载软件<a hidden class="anchor" aria-hidden="true" href="#41-安装卸载软件">#</a></h4>
+<ol>
+<li><code>brew --version</code> 或者 <code>brew -v</code> 显示 <code>brew</code> 版本信息</li>
+<li><code>brew install &lt;formula&gt;</code> 安装指定软件</li>
+<li><code>brew uninstall &lt;formula&gt;</code> 卸载指定软件</li>
+<li><code>brew list</code> 显示所有的已安装的软件</li>
+<li><code>brew search text</code> 搜索本地远程仓库的软件，已安装会显示绿色的勾</li>
+<li><code>brew search /text/</code> 使用正则表达式搜软件</li>
+<li><code>brew info &lt;formula&gt;</code> 显示指定软件信息</li>
+<li><code>brew reinstall &lt;formula&gt;</code> 重新安装指定软件，先卸载后安装</li>
+<li><code>brew install &lt;formula&gt; --build-from-source</code> 源码安装指定软件，可以给定指定参数</li>
+<li><code>brew commands</code> 列出所有可用命令</li>
+</ol>
+<h4 id="42-升级软件相关">4.2 升级软件相关<a hidden class="anchor" aria-hidden="true" href="#42-升级软件相关">#</a></h4>
+<ol>
+<li><code>brew update</code> 自动升级 homebrew （从 github 下载最新版本）</li>
+<li><code>brew outdated</code> 检测已经过时的软件</li>
+<li><code>brew upgrade</code> 升级所有已过时的软件，即列出的以过时软件</li>
+<li><code>brew upgrade &lt;formula&gt;</code> 升级指定的软件</li>
+<li><code>brew pin &lt;formula&gt;</code> 禁止指定软件升级</li>
+<li><code>brew unpin &lt;formula&gt;</code> 解锁禁止升级</li>
+<li><code>brew upgrade --all</code> 升级所有的软件包，包括未清理干净的旧版本的包</li>
+<li><code>brew edit &lt;formula&gt;</code> 编辑软件，不会的情况下慎用</li>
+<li><code>brew tap</code> 列出本地资源仓库，其中 homebrew 是默认仓库，其它都是第三方仓库</li>
+<li><code>brew tap &lt;user/repo&gt;</code> 添加第三方仓库，命名的规则按照 github 来定的。<a href="https://links.jianshu.com/go?to=https%3A%2F%2Fdocs.brew.sh%2FTaps">使用</a></li>
+<li><code>brew untap &lt;user/repo&gt;</code> 删除仓库</li>
+<li><code>brew deps &lt;formula&gt;</code> 查看指定软件依赖于哪些软件</li>
+<li><code>brew uses &lt;formula&gt;</code> 查看指定软件被哪些软件所依赖</li>
+</ol>
+<h4 id="43-清理相关">4.3 清理相关<a hidden class="anchor" aria-hidden="true" href="#43-清理相关">#</a></h4>
+<p><code>homebrew</code> 再升级软件时候不会清理相关的旧版本，在软件升级后我们可以使用如下命令清理</p>
+<ol>
+<li><code>brew cleanup -n</code> 列出需要清理的内容</li>
+<li><code>brew cleanup &lt;formula&gt;</code> 清理指定的软件过时包</li>
+<li><code>brew cleanup</code> 清理所有的过时软件</li>
+<li><code>brew unistall &lt;formula&gt;</code> 卸载指定软件</li>
+<li><code>brew unistall &lt;fromula&gt; --force</code> 彻底卸载指定软件，包括旧版本</li>
+</ol>
+<p>通过 <code>brew</code> 安装的文件会自动设置环境变量，所以不用担心命令行不能启动的问题。<br>
+比如安装好了 <code>gradle</code>，即可运行 <code>gradle -v</code></p>
+<h4 id="44-管理后台服务">4.4 管理后台服务<a hidden class="anchor" aria-hidden="true" href="#44-管理后台服务">#</a></h4>
+<p><code>macOS</code> 使用 <code>launchctl</code> 命令加载开机自动运行的服务，<code>brew service</code> 可以简化 <code>lauchctl</code> 的操作。</p>
+<p>以 <code>&lt;font style=&quot;color:#ECAA04;&quot;&gt;MySQL&lt;/font&gt;</code> 为例，使用 <code>&lt;font style=&quot;color:#ECAA04;&quot;&gt;launchctl&lt;/font&gt;</code> 启动:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span>ln <span style="color:#f92672">-</span>sfv <span style="color:#f92672">/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span>opt<span style="color:#f92672">/</span>mysql<span style="color:#f92672">/*.</span>plist <span style="color:#f92672">~/</span>Library<span style="color:#f92672">/</span>LaunchAgents
+</span></span><span style="display:flex;"><span>launchctl load <span style="color:#f92672">~/</span>Library<span style="color:#f92672">/</span>LaunchAgents<span style="color:#f92672">/</span>homebrew<span style="color:#f92672">.</span>mxcl<span style="color:#f92672">.</span>mysql<span style="color:#f92672">.</span>plist
+</span></span></code></pre></div><p>如使用 <code>brew service</code> 可以简化为:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>brew services start mysql
+</span></span></code></pre></div><ul>
+<li><code>services</code> 常用命令</li>
+</ul>
+<ol>
+<li><code>brew services list</code> # 查看使用brew安装的服务列表</li>
+<li><code>brew services run formula|</code>&ndash;all # 启动服务（仅启动不注册）</li>
+<li><code>brew services start formula|</code>&ndash;all # 启动服务，并注册</li>
+<li><code>brew services stop formula|</code>&ndash;all # 停止服务，并取消注册</li>
+<li><code>brew services restart formula|</code>&ndash;all # 重启服务，并注册</li>
+<li><code>brew services cleanup</code> # 清除已卸载应用的无用的配置</li>
+</ol>
+<ul>
+<li>配置文件目录</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>/Library/LaunchDaemons # 开机自启，需要sudo
+</span></span><span style="display:flex;"><span>~/Library/LaunchAgents # 用户登录后自启
+</span></span></code></pre></div><p>以 <code>homebrew.mxcl.kafka.plist</code> 为例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">&lt;</span><span style="color:#960050;background-color:#1e0010">?</span>xml version<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1.0&#34;</span> encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;UTF-8&#34;</span><span style="color:#960050;background-color:#1e0010">?</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;!</span>DOCTYPE plist PUBLIC <span style="color:#e6db74">&#34;-//Apple//DTD PLIST 1.0//EN&#34;</span> <span style="color:#e6db74">&#34;http://www.apple.com/DTDs/PropertyList-1.0.dtd&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;</span>plist version<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;1.0&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;</span>dict<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>key<span style="color:#f92672">&gt;</span><span style="color:#a6e22e">Label</span><span style="color:#f92672">&lt;/</span>key<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>string<span style="color:#f92672">&gt;</span>homebrew<span style="color:#f92672">.</span>mxcl<span style="color:#f92672">.</span>kafka<span style="color:#f92672">&lt;/</span>string<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>key<span style="color:#f92672">&gt;</span>WorkingDirectory<span style="color:#f92672">&lt;/</span>key<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>string<span style="color:#f92672">&gt;/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">&lt;/</span>string<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>key<span style="color:#f92672">&gt;</span>ProgramArguments<span style="color:#f92672">&lt;/</span>key<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>array<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;</span>string<span style="color:#f92672">&gt;/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span>opt<span style="color:#f92672">/</span>kafka<span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>kafka<span style="color:#f92672">-</span>server<span style="color:#f92672">-</span>start<span style="color:#f92672">&lt;/</span>string<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&lt;</span>string<span style="color:#f92672">&gt;/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span>etc<span style="color:#f92672">/</span>kafka<span style="color:#f92672">/</span>server<span style="color:#f92672">.</span>properties<span style="color:#f92672">&lt;/</span>string<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;/</span>array<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>key<span style="color:#f92672">&gt;</span>RunAtLoad<span style="color:#f92672">&lt;/</span>key<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>true<span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>key<span style="color:#f92672">&gt;</span>KeepAlive<span style="color:#f92672">&lt;/</span>key<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>true<span style="color:#f92672">/&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>key<span style="color:#f92672">&gt;</span>StandardErrorPath<span style="color:#f92672">&lt;/</span>key<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>string<span style="color:#f92672">&gt;/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>log<span style="color:#f92672">/</span>kafka<span style="color:#f92672">/</span>kafka_output<span style="color:#f92672">.</span>log<span style="color:#f92672">&lt;/</span>string<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>key<span style="color:#f92672">&gt;</span>StandardOutPath<span style="color:#f92672">&lt;/</span>key<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&lt;</span>string<span style="color:#f92672">&gt;/</span>usr<span style="color:#f92672">/</span>local<span style="color:#f92672">/</span><span style="color:#66d9ef">var</span><span style="color:#f92672">/</span>log<span style="color:#f92672">/</span>kafka<span style="color:#f92672">/</span>kafka_output<span style="color:#f92672">.</span>log<span style="color:#f92672">&lt;/</span>string<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;/</span>dict<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/</span>plist<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>在这里可以找到服务路径、启动参数、日志路径等</p>
+<h4 id="45-brew-cask">4.5 brew cask<a hidden class="anchor" aria-hidden="true" href="#45-brew-cask">#</a></h4>
+<p><code>Homebrew Cask</code> 是 <code>Homebrew</code> 的扩展，借助它可以方便地在 <code>macOS</code> 上安装图形界面程序，即我们常用的各类应用。<code>Homebrew</code> 中文含义为自制、自酿酒，<code>Cask</code> 中文含义为桶、木桶，桶装酒是一种成品，也就是说每一个 <code>homebrew cask</code> 都可以直接使用的，比如 <code>Atom</code> 的 <code>Cask</code> 名称为 <code>atom</code>，那么就可以使用如下命令安装：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>brew cask install atom
+</span></span></code></pre></div><p>甚至也可以提交新的 <code>Cask</code>，比如假设有桌面客户端少数派，则用 <code>brew cask create sspai</code> 创建新的名称为 <code>sspai</code> 的 <code>Cask</code>，当然还要提供官网下载链接、官方主页、应用版本等信息，可以参照 <a href="https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2FHomebrew%2Fhomebrew-cask%2Fblob%2Fmaster%2FCONTRIBUTING.md">官方教程</a>，此处就不再细说。</p>
+<blockquote>
+<p><strong>安装 Homebrew Cask【以后新版不需要安装】</strong><br>
+安装好 brew 后，就可以执行命令 <code>brew tap caskroom/cask</code> 获取 Homebrew Cask。</p>
+<p><strong>注意：</strong><br>
+Caskroom 的 Git 地址在 2018 年 5 月 25 日从 <a href="https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2Fcaskroom%2Fhomebrew-cask">https://github.com/caskroom/homebrew-cask</a> 迁移到了 <a href="https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2FHomebrew%2Fhomebrew-cask">https://github.com/Homebrew/homebrew-cask</a><br>
+所以，以后就不需要安装 Homebrew Cask</p>
+</blockquote>
+<h4 id="46-使用-homebrew-cask">4.6 使用 Homebrew Cask<a hidden class="anchor" aria-hidden="true" href="#46-使用-homebrew-cask">#</a></h4>
+<p><code>github</code> 使用：<a href="https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2FHomebrew%2Fhomebrew-cask%2Fblob%2Fmaster%2FUSAGE.md">https://github.com/Homebrew/homebrew-cask/blob/master/USAGE.md</a></p>
+<ol>
+<li><code>brew cask install &lt;formula&gt;</code> 安装指定图形界面软件</li>
+<li><code>brew cask uninstall &lt;formula&gt;</code> 卸载软件</li>
+<li><code>brew cask uninstall --force &lt;formula&gt;</code> 卸载软件，带参数</li>
+<li><code>brew cask search text</code> 搜索软件</li>
+<li><code>brew cask list</code> 列出所有通过 cask 安装的软件</li>
+<li>其它可以参考：<a href="https://links.jianshu.com/go?to=https%3A%2F%2Fgithub.com%2FHomebrew%2Fhomebrew-cask%2Fblob%2Fmaster%2FUSAGE.md">https://github.com/Homebrew/homebrew-cask/blob/master/USAGE.md</a></li>
+</ol>
+<p>举例可安装的软件</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># 安装chrome
+</span></span><span style="display:flex;"><span>brew cask install google-chrome
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 安装LaunchRocket
+</span></span><span style="display:flex;"><span>brew cask install launchrocket
+</span></span></code></pre></div><h3 id="5-图像化工具-cakebrew">5. 图像化工具 cakebrew<a hidden class="anchor" aria-hidden="true" href="#5-图像化工具-cakebrew">#</a></h3>
+<p><strong>官方地址</strong> ：<a href="https://www.cakebrew.com/">https://www.cakebrew.com/</a></p>
+<p><code>Github</code> <strong>仓库地址</strong> ：<a href="https://github.com/brunophilipe/Cakebrew">https://github.com/brunophilipe/Cakebrew</a></p>
+<p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/b9cec48762634451979b939d087ef14d.png" alt="在这里插入图片描述"  />
+</p>
+<p>点击上方导航栏的 <code>Download</code>，再点击 <code>Download Now</code> 就下载安装包，然后解压的程序拖到应用程序即可。</p>
+<p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/6f95833ce98b4773ba9afdfe4b829079.png" alt="在这里插入图片描述"  />
+</p>
+<p>或者通过 <code>Homebrew</code> 命令安装：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>brew install --cask cakebrew
+</span></span></code></pre></div><p>打开后，有点不太稳定，显示不了界面</p>
+<p><img loading="lazy" src="https://i-blog.csdnimg.cn/direct/4551fbb3cae24de8b34e9c5b109f5431.png" alt="在这里插入图片描述"  />
+</p>
+<p>大家可以到网上搜搜使用教程，比命令行方便些。</p>
+<h3 id="参考">参考<a hidden class="anchor" aria-hidden="true" href="#参考">#</a></h3>
+<blockquote>
+<ol>
+<li><a href="https://zhuanlan.zhihu.com/p/111014448">https://zhuanlan.zhihu.com/p/111014448</a> 安装</li>
+<li><a href="https://sspai.com/post/56009#!">https://sspai.com/post/56009#!</a> 1.2 核心概念、3</li>
+<li><a href="https://blog.csdn.net/Amio_/article/details/109694893">https://blog.csdn.net/Amio_/article/details/109694893</a> 1.1 组成部分</li>
+<li><a href="https://cloud.tencent.com/developer/article/1867824">https://cloud.tencent.com/developer/article/1867824</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/366354601">https://zhuanlan.zhihu.com/p/366354601</a> 介绍 Homebrew 图形化工具 cakebrew</li>
+</ol>
+</blockquote>
+
+
+        </div>
+        <div class="post-reward">
+            <div style="padding: 0 0 0 0; margin: 0 0 0 0; width: 100%; font-size:16px; text-align: center;">
+                <div id="QR" style="opacity: 0;">
+                    <div id="wechat" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="wechat_qr" src="https://www.heiok.top/img/thinks.jpg" alt="wechat_pay"></a>
+                        <p>微信</p>
+                    </div>
+                    <div id="alipay" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="alipay_qr" src="https://www.heiok.top/img/thinks.jpg" alt="alipay"></a>
+                        <p>支付宝</p>
+                    </div>
+                </div>
+                <button id="rewardButton"
+                        onclick="
+                    var qr = document.getElementById('QR');
+                    if (qr.style.opacity === '0') {
+                        qr.style.opacity='1';
+                    } else {
+                        qr.style.opacity='0'
+                    }"
+                >
+                    <span>🧧 鼓励</span>
+                </button>
+            </div>
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="next" href="https://www.heiok.top/posts/blog/mysql_op_base/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Mysql</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程 on twitter"
+       href="https://twitter.com/intent/tweet/?text=MacOS%e4%b8%8aHomebrew%20%e5%ae%89%e8%a3%85%e3%80%81%e9%85%8d%e7%bd%ae%e3%80%81%e6%9b%b4%e6%94%b9%e5%9b%bd%e5%86%85%e9%95%9c%e5%83%8f%e6%ba%90%e5%8f%8a%e4%bd%bf%e7%94%a8%e6%95%99%e7%a8%8b&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmacos_homebrew%2f&amp;hashtags=">
+    <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程 on linkedin"
+       href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmacos_homebrew%2f&amp;title=MacOS%e4%b8%8aHomebrew%20%e5%ae%89%e8%a3%85%e3%80%81%e9%85%8d%e7%bd%ae%e3%80%81%e6%9b%b4%e6%94%b9%e5%9b%bd%e5%86%85%e9%95%9c%e5%83%8f%e6%ba%90%e5%8f%8a%e4%bd%bf%e7%94%a8%e6%95%99%e7%a8%8b&amp;summary=MacOS%e4%b8%8aHomebrew%20%e5%ae%89%e8%a3%85%e3%80%81%e9%85%8d%e7%bd%ae%e3%80%81%e6%9b%b4%e6%94%b9%e5%9b%bd%e5%86%85%e9%95%9c%e5%83%8f%e6%ba%90%e5%8f%8a%e4%bd%bf%e7%94%a8%e6%95%99%e7%a8%8b&amp;source=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmacos_homebrew%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程 on reddit"
+       href="https://reddit.com/submit?url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmacos_homebrew%2f&title=MacOS%e4%b8%8aHomebrew%20%e5%ae%89%e8%a3%85%e3%80%81%e9%85%8d%e7%bd%ae%e3%80%81%e6%9b%b4%e6%94%b9%e5%9b%bd%e5%86%85%e9%95%9c%e5%83%8f%e6%ba%90%e5%8f%8a%e4%bd%bf%e7%94%a8%e6%95%99%e7%a8%8b">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程 on facebook"
+       href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmacos_homebrew%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程 on whatsapp"
+       href="https://api.whatsapp.com/send?text=MacOS%e4%b8%8aHomebrew%20%e5%ae%89%e8%a3%85%e3%80%81%e9%85%8d%e7%bd%ae%e3%80%81%e6%9b%b4%e6%94%b9%e5%9b%bd%e5%86%85%e9%95%9c%e5%83%8f%e6%ba%90%e5%8f%8a%e4%bd%bf%e7%94%a8%e6%95%99%e7%a8%8b%20-%20https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmacos_homebrew%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程 on telegram"
+       href="https://telegram.me/share/url?text=MacOS%e4%b8%8aHomebrew%20%e5%ae%89%e8%a3%85%e3%80%81%e9%85%8d%e7%bd%ae%e3%80%81%e6%9b%b4%e6%94%b9%e5%9b%bd%e5%86%85%e9%95%9c%e5%83%8f%e6%ba%90%e5%8f%8a%e4%bd%bf%e7%94%a8%e6%95%99%e7%a8%8b&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmacos_homebrew%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+        </footer>
+    </div>
+
+<style>
+    .comments_details summary::marker {
+        font-size: 20px;
+        content: '👉展开评论';
+        color: var(--content);
+    }
+    .comments_details[open] summary::marker{
+        font-size: 20px;
+        content: '👇关闭评论';
+        color: var(--content);
+    }
+</style>
+
+
+<div>
+    <details class="comments_details">
+        <summary style="cursor: pointer; margin: 50px 0 20px 0;width: 130px;">
+            <span style="font-size: 20px;color: var(--content);">...</span>
+        </summary>
+        <div id="tcomment"></div>
+    </details>
+    <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js">
+    </script>
+    <script>
+        twikoo.init({
+            envId:  null ,
+        el: "#tcomment",
+            lang: 'zh-CN',
+            region:  null ,
+        path: window.TWIKOO_MAGIC_PATH||window.location.pathname,
+        })
+    </script>
+</div>
+</article>
+</main>
+
+<footer class="footer">
+    <span>
+        Copyright
+        &copy;
+        2020-2026
+        <a href="https://www.heiok.top/" style="color:#939393;">wait`s blog</a>
+        All Rights Reserved
+    </span>
+    <a href="https://beian.miit.gov.cn/" target="_blank" style="color:#939393;">蜀ICP备2023024013号</a>&nbsp;
+    <span>
+        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=null"
+           style="display:inline-block;text-decoration:none;height:20px;color:#939393;">
+            <img src="" style="float:left;margin: 0px 5px 0px 0px;"/>
+            
+        </a>
+    </span>
+    <span id="busuanzi_container">
+        <span class="fa fa-user"></span> <span id="busuanzi_value_site_uv"></span>
+        <span class="fa fa-eye"></span> <span id="busuanzi_value_site_pv"></span>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '复制';
+
+        function copyingDone() {
+            copybutton.innerText = '已复制！';
+            setTimeout(() => {
+                copybutton.innerText = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+</body>
+
+</html>
