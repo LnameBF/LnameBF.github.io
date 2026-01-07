@@ -130,8 +130,8 @@ params:
   profileMode:
     enabled: true
     title: (〃'▽'〃)
-    subtitle:
-    # subtitle: "🧨学而时习之，不亦说乎？有朋自远方来，不亦乐乎？<br/>👇联系方式"
+    # subtitle:
+    subtitle: "🧨学而时习之，不亦说乎？有朋自远方来，不亦乐乎？<br/>👇联系方式"
     imageUrl: "img/Q.gif"
     imageTitle:
     imageWidth: 150
@@ -149,22 +149,22 @@ params:
   socialIcons:
     - name: github
       url: "https://github.com/LnameBF/LnameBF.github.io.git" # 修改为您的 GitHub 链接
-    - name: twitter
-      url: "img/twitter.png"
-    - name: facebook
-      url: "https://www.facebook.com/profile.php?id=yourid" # 修改为您的 Facebook 链接
-    - name: instagram
-      url: "img/instagram.png"
+    # - name: twitter
+    #   url: "img/twitter.png"
+    # - name: facebook
+    #   url: "https://www.facebook.com/profile.php?id=yourid" # 修改为您的 Facebook 链接
+    # - name: instagram
+    #   url: "img/instagram.png"
     - name: QQ
       url: "img/qq.png"
-    - name: WeChat
-      url: "img/wechat.png"
-    - name: bilibili
-      url: "https://space.bilibili.com/yourid" # 修改为您的 Bilibili 链接
+    # - name: WeChat
+    #   url: "img/wechat.png"
+    # - name: bilibili
+    #   url: "https://space.bilibili.com/yourid" # 修改为您的 Bilibili 链接
     - name: email
       url: "mailto:youremail@example.com" # 修改为您的邮箱
-    - name: RSS
-      url: "index.xml"
+    # - name: RSS
+    #   url: "index.xml"
 
   label: # 左上角图标
     text: "wait`s blog" # 修改为您的博客标题

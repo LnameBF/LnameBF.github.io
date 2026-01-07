@@ -39,7 +39,7 @@ jobs:
           # <username>替换成自己的用户名
           external_repository: LnameBF/LnameBF.github.io
           # 现在默认分支都用main，比如用的是master分支，则改为master
-          publish_branch: main
+          publish_branch: hugo-pages
           publish_dir: ./public
           # 可选配置, 每次博客更新后, 本仓库会自动往<username>.github.io仓库提交一次更新后的网站内容
           # 添加该项配置后, <username>.github.io仓库的提交信息就会使用本仓库的提交信息
