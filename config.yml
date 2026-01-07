@@ -1,4 +1,4 @@
-baseURL: https://lnamebf.github.io/ # 修改为你的GitHub Pages地址
+baseURL: https://www.heiok.top/ # 修改为你的GitHub Pages地址
 languageCode: zh # en-us
 title: wait`s blog # 修改为你的博客标题
 theme: hugo-PaperMod  # 主题名字，和themes文件夹下的一致
@@ -162,7 +162,7 @@ params:
     # - name: bilibili
     #   url: "https://space.bilibili.com/yourid" # 修改为您的 Bilibili 链接
     - name: email
-      url: "mailto:youremail@example.com" # 修改为您的邮箱
+      url: "mailto:3198354433@qq.com" # 修改为您的邮箱
     # - name: RSS
     #   url: "index.xml"
 
