@@ -6,6 +6,7 @@
 {{- else }}
 <meta name="robots" content="noindex, nofollow">
 {{- end }}
+<meta name="referrer" content="no-referrer">
 
 {{- /* Title */}}
 <title>{{ if .IsHome }}{{ else }}{{ if .Title }}{{ .Title }} | {{ end }}{{ end }}{{ site.Title }}</title>
