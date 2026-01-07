@@ -1,5 +1,5 @@
 ---
-title: "Git"
+title: "Mysql"
 date: 2026-01-07T18:23:26+08:00
 lastmod: 2026-01-07T18:23:26+08:00
 author: ["Wait"]
