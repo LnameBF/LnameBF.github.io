@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://lnamebf.github.io/sitemap.xml
