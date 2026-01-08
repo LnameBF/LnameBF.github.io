@@ -1,7 +1,7 @@
 ---
 title: "🤝友链"
 layout: links
-date: 2021-11-06T15:15:53+08:00
+date: 2026-01-06T15:15:53+08:00
 description: 
 draft: false
 hidemeta: true
@@ -34,9 +34,9 @@ showbreadcrumbs: false
 
 |        |                                   |
 | ------ | --------------------------------- |
-| 名称： | Sulv's Blog                       |
-| 网址： | https://www.sulvblog.cn           |
-| 图标： | https://www.sulvblog.cn/img/Q.gif |
+| 名称： | Wait's Blog                       |
+| 网址： | https://www.heiok.top/           |
+| 图标： | https://www.heiok.top/img/Q.gif |
 | 描述： | 一个记录技术、阅读、生活的博客    |
 
 </div>
@@ -49,9 +49,9 @@ showbreadcrumbs: false
 
 <br/>
 
-<div style="font-size: 20px;">👉Hugo博客交流群</div>
+<!-- <div style="font-size: 20px;">👉Hugo博客交流群</div> -->
 
-> 787018782
+<!-- > 787018782 -->
 
 
 
