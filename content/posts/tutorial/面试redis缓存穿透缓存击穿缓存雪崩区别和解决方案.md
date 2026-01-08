@@ -8,7 +8,7 @@ keywords:
 categories:  # 没有分类界面可以不填写
 - 
 tags: # 标签
-- 文章
+- tutorial
 description: "【面试】redis缓存穿透、缓存击穿、缓存雪崩区别和解决方案"
 weight:
 slug: ""
