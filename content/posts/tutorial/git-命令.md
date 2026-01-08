@@ -1,15 +1,15 @@
 ---
-title: "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"
-date: 2026-01-07T20:41:46+08:00
-lastmod: 2026-01-07T20:41:46+08:00
+title: "Git 命令"
+date: 2026-01-08T16:37:49+08:00
+lastmod: 2026-01-08T16:37:49+08:00
 author: ["wait"]
 keywords: 
 - 
-categories: # 没有分类界面可以不填写
+categories:  # 没有分类界面可以不填写
 - 
 tags: # 标签
-- 教程
-description: "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"
+- 文章
+description: "Git 操作记录"
 weight:
 slug: ""
 draft: false # 是否为草稿
@@ -28,7 +28,14 @@ cover:
     alt: ""
     relative: false
 ---
-Homebrew笔记 
-----------------------------------------
 
-内容
+
+## Git rebase
+git rebase -i 提交id ,操作提交id后的提交 ，参数：
+修改提交信息：将pick替换为reword    
+合并提交：将多个pick替换为squash 
+删除提交：直接删除对应的行。
+注意：删除至少需要保留一行pick，
+需要删除所有的提交可以使用 
+1. git reset --hard 提交id ，如果已经提交到远端，可以使用git push --force 强制提交
+2. git rebase --onto 提交id  删除提交id后所有的提交

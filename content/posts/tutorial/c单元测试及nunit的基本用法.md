@@ -1,0 +1,106 @@
+---
+title: "【C#】单元测试及NUnit的基本用法"
+date: 2026-01-08T16:37:49+08:00
+lastmod: 2026-01-08T16:37:49+08:00
+author: ["wait"]
+keywords: 
+- 
+categories:  # 没有分类界面可以不填写
+- 
+tags: # 标签
+- 文章
+description: "【C#】单元测试及NUnit的基本用法"
+weight:
+slug: ""
+draft: false # 是否为草稿
+comments: true # 本页面是否显示评论
+reward: true # 打赏
+mermaid: true #是否开启mermaid
+showToc: true # 显示目录
+TocOpen: true # 自动展开目录
+hidemeta: false # 是否隐藏文章的元信息，如发布日期、作者等
+disableShare: true # 底部不显示分享栏
+showbreadcrumbs: true #顶部显示路径
+cover:
+    image: "" #图片路径例如：posts/tech/123/123.png
+    zoom: # 图片大小，例如填写 50% 表示原图像的一半大小
+    caption: "" #图片底部描述
+    alt: ""
+    relative: false
+---
+
+#### 单元测试
+
+单元测试（Unit Testing）是针对程序弄块（软件设计的最小单位）来进行正确性检验的测试工作。单元测试通常由软件开发人员编写，用于确保他们了所写的代码匹配软件需求和遵循开发目标。
+
+单元测试的优点：
+
+1. 适应变更。允许程序员在未来重构代码，并确保模块依然工作正确。
+2. 简化集成。采用自底向上的测试路径，消除程序单元的不可靠，使集成测试变得更简单。
+3. 文档记录。借助于查看单元测试提供的功能和单元测试中如何使用程序单元，开发人员可以直观的理解程序单元的基础API。
+4. 表达设计。在测试驱动开发的软件实践中，单元测试可以取代正式的设计。开发人员编写单元测试用于展示软件需求或者软件缺陷，然后，开发人员遵循测试要求编写最简单的代码去满足它，直到测试得以通过。
+
+####NUnit测试框架
+
+.Net平台下有多种测试工具，[NUnit](www.nunit.org)为C#开发的开源测试框架，广泛用于.Net平台的单元测试和回归测试中。
+
+详细的使用方法可以参考：<https://github.com/nunit/docs/wiki>
+
+下面介绍在Visual Studio中的最轻量级的使用方法。
+
+#####1.安装
+
+在Visual Studio菜单栏 "工具------\>扩展和更新------\>联机"，搜索"nunit"，结果如下。安装`NUnit 3 Test Adapter`、`NUnit VS Templates`和`Test Generator NUnit extension`三个扩展。  
+![在这里插入图片描述](https://i-blog.csdnimg.cn/blog_migrate/f5c2bf6dfb8c4e3895271d8c5e5b383a.png)
+
+##### 2.创建测试项目
+
+一开始需要在已有的解决方案中创建新的测试项目，因为不想把任何测试与生产的代码一起发布。菜单栏点击"文件 ------\> 添加 ------\> 新建项目 ------\> Visual C# ------\> 测试"。
+
+在项目的引用栏中添加`nunit.framework`引用。
+
+以类为单位创建测试文件，对于MVP的设计模式，可以对View的接口进行Mock，可以参考教程[An Introduction to testing with the Model-View-Presenter pattern for Web Forms Development](https://www.developerfusion.com/article/145904/an-introduction-to-testing-with-the-modelviewpresenter-pattern-for-web-forms-development/)。
+
+典型的测试文件格式如下所示。
+
+```prism language-csharp
+namespace JMelt.Tests
+{
+    using JMelt.Models;
+
+    [TestFixture]
+    public class TestMyCustom
+    {
+        [SetUp]
+        public void Initialize()
+        {
+            //这里写运行每一个测试用例时需要初始化的代码
+        }
+
+        /// <summary>
+        /// 测试 custom.ini 配置信息的读取
+        /// </summary>
+        [Test]
+        public void TestReadIniFile()
+        {
+            var length = MyCustom.CustomConfig.Count;
+            Assert.That(length, Is.EqualTo(10), "custom.ini read error");
+        }
+```
+
+**属性解释：**
+> `[TestFixture]`: 标识测试类。  
+> `[SetUp]`: 标识测试用例初始化函数，每个测试用例运行都会执行一次。  
+> `[Test]`: 标识测试用例。  
+> `[TearDown]`: 标识测试用例资源释放函数。
+
+##### 3.运行测试
+
+在菜单栏打开"测试 ------\> 窗口 ------\> 测试资源管理器"，在测试资源管理器中可以运行所有的测试用例。
+> ***参考资料***
+>
+> 1. [https://zh.wikipedia.org/wiki/单元测试](https://zh.wikipedia.org/wiki/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95)
+> 2. <https://www.cnblogs.com/zwt-blog/p/5788222.html>
+> 3. <http://www.51testing.com/html/54/n-3725154.html>
+> 4. <https://github.com/nunit/docs/wiki/NUnit-Documentation>
+

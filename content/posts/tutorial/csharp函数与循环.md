@@ -1,15 +1,15 @@
 ---
-title: "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"
-date: 2026-01-07T20:41:46+08:00
-lastmod: 2026-01-07T20:41:46+08:00
+title: "CSharp函数与循环"
+date: 2026-01-08T16:37:49+08:00
+lastmod: 2026-01-08T16:37:49+08:00
 author: ["wait"]
 keywords: 
 - 
-categories: # 没有分类界面可以不填写
+categories:  # 没有分类界面可以不填写
 - 
 tags: # 标签
-- 教程
-description: "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"
+- 文章
+description: "CSharp函数与循环"
 weight:
 slug: ""
 draft: false # 是否为草稿
@@ -28,7 +28,7 @@ cover:
     alt: ""
     relative: false
 ---
-Homebrew笔记 
-----------------------------------------
 
-内容
+### [.NET6.0的变化](https://learn.microsoft.com/zh-cn/dotnet/core/tutorials/top-level-templates)
+### [C# 标识符命名规则和约定](https://learn.microsoft.com/zh-cn/dotnet/csharp/fundamentals/coding-style/identifier-names)
+

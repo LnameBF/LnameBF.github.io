@@ -1,15 +1,15 @@
 ---
-title: "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"
-date: 2026-01-07T20:41:46+08:00
-lastmod: 2026-01-07T20:41:46+08:00
+title: "domain service应不应该直接调用repository"
+date: 2026-01-08T16:37:48+08:00
+lastmod: 2026-01-08T16:37:48+08:00
 author: ["wait"]
 keywords: 
 - 
-categories: # 没有分类界面可以不填写
+categories:  # 没有分类界面可以不填写
 - 
 tags: # 标签
-- 教程
-description: "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"
+- 文章
+description: "domain service应不应该直接调用repository"
 weight:
 slug: ""
 draft: false # 是否为草稿
@@ -28,7 +28,6 @@ cover:
     alt: ""
     relative: false
 ---
-Homebrew笔记 
-----------------------------------------
 
-内容
+[相关链接](https://cloud.tencent.com/developer/article/1803939)
+https://gitcode.com/gh_mirrors/an/AnotherRedisDesktopManager/releases/v1.6.6

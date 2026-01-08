@@ -1,15 +1,15 @@
 ---
-title: "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"
-date: 2026-01-07T20:41:46+08:00
-lastmod: 2026-01-07T20:41:46+08:00
+title: "前段页面无法显示图片，https，图片提示403"
+date: 2026-01-08T16:37:48+08:00
+lastmod: 2026-01-08T16:37:48+08:00
 author: ["wait"]
 keywords: 
 - 
-categories: # 没有分类界面可以不填写
+categories:  # 没有分类界面可以不填写
 - 
 tags: # 标签
-- 教程
-description: "MacOS上Homebrew 安装、配置、更改国内镜像源及使用教程"
+- 文章
+description: "前段页面无法显示图片，https，图片提示403"
 weight:
 slug: ""
 draft: false # 是否为草稿
@@ -28,7 +28,9 @@ cover:
     alt: ""
     relative: false
 ---
-Homebrew笔记 
-----------------------------------------
 
-内容
+添加 
+```
+<meta name="referrer" content="no-referrer">
+```
+到vue项目下的index.html 的head 中
