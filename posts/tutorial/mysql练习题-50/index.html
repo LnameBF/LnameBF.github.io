@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<meta name="referrer" content="no-referrer">
+<title>Mysql练习题-50 | wait`s blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="
+本文汇总了不同版本的SQL面试50题的题目，删去了重复内容，并根据涉及知识点进行分类，按照由易到难、相似题放在一起的思路进行排序并重新编号。适合sql新手按知识点学习/检测自己的
+
+学习效果。
+
+
+我使用软件是MySQL8.0，使用其他数据库软件，代码写法可能略有不同。文中给出的是我的解答，算是最近学习的小结。数据分析新手，欢迎交流指正（特别是52、53题，有没有什么更好的思路呢）。">
+<meta name="author" content="wait">
+<link rel="canonical" href="https://www.heiok.top/posts/tutorial/mysql%E7%BB%83%E4%B9%A0%E9%A2%98-50/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="apple-touch-icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="mask-icon" href="https://www.heiok.top/img/thinks.jpg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://www.heiok.top/posts/tutorial/mysql%E7%BB%83%E4%B9%A0%E9%A2%98-50/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="Mysql练习题-50" />
+<meta property="og:description" content="
+本文汇总了不同版本的SQL面试50题的题目，删去了重复内容，并根据涉及知识点进行分类，按照由易到难、相似题放在一起的思路进行排序并重新编号。适合sql新手按知识点学习/检测自己的
+
+学习效果。
+
+
+我使用软件是MySQL8.0，使用其他数据库软件，代码写法可能略有不同。文中给出的是我的解答，算是最近学习的小结。数据分析新手，欢迎交流指正（特别是52、53题，有没有什么更好的思路呢）。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.heiok.top/posts/tutorial/mysql%E7%BB%83%E4%B9%A0%E9%A2%98-50/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-01-08T16:37:49+08:00" />
+<meta property="article:modified_time" content="2026-01-08T16:37:49+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Mysql练习题-50"/>
+<meta name="twitter:description" content="
+本文汇总了不同版本的SQL面试50题的题目，删去了重复内容，并根据涉及知识点进行分类，按照由易到难、相似题放在一起的思路进行排序并重新编号。适合sql新手按知识点学习/检测自己的
+
+学习效果。
+
+
+我使用软件是MySQL8.0，使用其他数据库软件，代码写法可能略有不同。文中给出的是我的解答，算是最近学习的小结。数据分析新手，欢迎交流指正（特别是52、53题，有没有什么更好的思路呢）。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://www.heiok.top/posts/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Mysql练习题-50",
+      "item": "https://www.heiok.top/posts/tutorial/mysql%E7%BB%83%E4%B9%A0%E9%A2%98-50/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Mysql练习题-50",
+  "name": "Mysql练习题-50",
+  "description": " 本文汇总了不同版本的SQL面试50题的题目，删去了重复内容，并根据涉及知识点进行分类，按照由易到难、相似题放在一起的思路进行排序并重新编号。适合sql新手按知识点学习/检测自己的 学习效果。\n我使用软件是MySQL8.0，使用其他数据库软件，代码写法可能略有不同。文中给出的是我的解答，算是最近学习的小结。数据分析新手，欢迎交流指正（特别是52、53题，有没有什么更好的思路呢）。\n",
+  "keywords": [
+    
+  ],
+  "articleBody": " 本文汇总了不同版本的SQL面试50题的题目，删去了重复内容，并根据涉及知识点进行分类，按照由易到难、相似题放在一起的思路进行排序并重新编号。适合sql新手按知识点学习/检测自己的 学习效果。\n我使用软件是MySQL8.0，使用其他数据库软件，代码写法可能略有不同。文中给出的是我的解答，算是最近学习的小结。数据分析新手，欢迎交流指正（特别是52、53题，有没有什么更好的思路呢）。\n原始表和汇总后的53道题目分类如下所示。创建原始表非本文重点，代码放在文章最后，有需要的小伙伴可以先跳到最后。\n【Like】\nlike与%的三种用法：’%字符’/’%字符%’/‘字符%’ 查询「李」姓老师的数量 【Like】 -- 1. 查询「李」姓老师的数量 select count(*) from teacher where tname like '李%'; 查询名字中含有「风」字的学生信息【Like】 -- 2. 查询名字中含有「风」字的学生信息 select * from student where sname like '%风%'; 【聚合函数、group by和where的相爱相杀】\n1.聚合函数sum/avg/count/max/min经常与好基友group by搭配使用\n2.在使用group by时，select后面只能放\n常数（如数字/字符/时间）- 聚合函数- 聚合键（也就是group by后面的列名）； 因此，在使用group by时，千万不要在select后面放聚合键以外的列名！ 3.where函数后面不能直接使用聚合函数！（考虑放在having后面/变成子查询放在where后面）\n查询男生、女生人数【聚合函数】 -- 3. 查询男生、女生人数 select ssex, count(*) from student group by ssex; 查询课程编号为02的总成绩【聚合函数】 -- 4. 查询课程编号为02的总成绩 select cno, sum(score) from sc group by cno having cno='02'; 查询每门课程的平均成绩，结果按平均成绩降序排列，平均成绩相同时，按课程编号升序排列【聚合函数】 -- 5. 查询每门课程的平均成绩，结果按平均成绩降序排列，平均成绩相同时，按课程编号升序排列 select cno, avg(score) as avg_score from sc group by cno order by avg_score desc, cno; 求每门课程的学生人数 【聚合函数】 -- 6. 求每门课程的学生人数 select cno, count(sno) as student_number from sc group by cno; 统计每门课程的学生选修人数（超过 5 人的课程才统计）【聚合函数】 -- 7. 统计每门课程的学生选修人数（超过 5 人的课程才统计） select cno, count(*) as student_number from sc group by cno having count(*)\u003e5 order by student_number desc, cno; 检索至少选修两门课程的学生学号 【聚合函数】 -- 8. 检索至少选修两门课程的学生学号 select sno from sc group by sno having count(cno)\u003e=2; 【子查询】\n1.select的结果列全部来自同一张表（而select的条件列来自不同表里），考虑子查询；\nselect的结果列来自多张表，考虑联结\n2.子查询与in/not in是好基友\n3.“所有/全部/都\"类型的查询可以考虑not in求补集\n查询在 SC 表存在成绩的学生信息【子查询】 -- 9. 查询在 SC 表存在成绩的学生信息 select * from student where sno in (select sno from sc); 查询不存在\" 01 “课程但存在” 02 “课程的情况【子查询】 -- 10. 查询不存在\" 01 \"课程但存在\" 02 \"课程的情况 select * from sc where sno not in (select sno from sc where cno =01) and sno in (select sno from sc where cno=02); 查询同时存在” 01 “课程和” 02 “课程的情况【子查询】 -- 11. 查询同时存在\" 01 \"课程和\" 02 \"课程的情况 select * from student where sno in(select sno from sc where cno='01') and sno in (select sno from sc where cno='02'); 查询出只选修两门课程的学生学号和姓名【子查询】 -- 12. 查询出只选修两门课程的学生学号和姓名 select sno, sname from student where sno in (select sno from sc group by sno having count(cno)=2); 查询没有学全所有课程的同学的信息 【子查询】 -- 13. 查询没有学全所有课程的同学的信息 -- 注意：用子查询求所有课程数而不是直接写3；student表中有没选课的学生 select * from student where sno not in (select sno from sc group by sno having count(cno)=(select count(*) from course)); 查询选修了全部课程的学生信息【子查询】 -- 14. 查询选修了全部课程的学生信息 select * from student where sno in (select sno from sc group by sno having count(cno)=(select count(cno) from course)); 查询所有课程成绩均小于60分的学号、姓名【子查询】 -- 15. 查询所有课程成绩均小于60分的学号、姓名 /* 思路：先选出有课程成绩\u003e=60分的学号，再用not in求补集得到所有成绩均\u003c60的学号； 注意student表里有未选课的学生！*/ select sno, sname from student where sno not in (select distinct sno from sc where score\u003e=60) and sno in (select distinct sno from sc); 查询课程编号为 01 且课程成绩在 80 分以上的学生的学号和姓名【子查询】 -- 16. 查询课程编号为 01 且课程成绩在 80 分以上的学生的学号和姓名 select sno, sname from student where sno in (select sno from sc where cno='01' and score\u003e80); 查询学过「张三」老师授课的同学的信息 【子查询】 -- 17. 查询学过「张三」老师授课的同学的信息 -- 四表串联查询。法1： select * from student where sno in (select sno from sc, course, teacher where teacher.tname='张三' and course.tno=teacher.tno and sc.cno=course.cno); -- 经过试验，即使张三教了不止一门课，也可用使用等号的法1求出所有结果 -- 法2：直接套三个子查询也可以，但是过于冗长，当子查询串联的表比较多时，比较推荐法1用where和等号代替一部分子查询 select * from student where sno in (select sno from sc where cno in (select cno from course where tno= (select tno from teacher where tname='张三'))); 查询没学过\"张三\"老师讲授的任一门课程的学生姓名 【子查询】 -- 18. 查询没学过\"张三\"老师讲授的任一门课程的学生姓名 -- 思路：先求出学过张三老师课程的学生，再在student表里面求补集。注意有没选课任何课的学生。 select sname from student where sno not in (select sno from sc, course, teacher where teacher.tname='张三' and course.tno=teacher.tno and sc.cno=course.cno); 查询至少有一门课与学号为” 01 “的同学所学相同的同学的信息 【子查询】 -- 19. 查询至少有一门课与学号为\" 01 \"的同学所学相同的同学的信息 -- 注意：记得排除学号为“01”的同学本人 select * from student where sno in (select distinct sno from sc where cno in (select cno from sc where sno='01')and sno \u003c\u003e'01'); 查询和” 01 “号的同学学习的课程完全相同的其他同学的信息【子查询】 -- 20. 查询和\" 01 \"号的同学学习的课程完全相同的其他同学的信息 -- 思路：条件一（表a）：在19题选出至少一门课相同的同学的基础上（in子查询），与01同学选课相同的科目数=01同学的总科目数 -- 条件二（表b）：选课总数与01同学的选课总数也相同 -- 接下来的步骤，表a与表b相交求学号，再结合student表求信息 select * from student where sno in (select a.sno from -- 条件一：在19题选出至少一门课相同的同学的基础上（in子查询），与01同学选课相同的科目数=01同学的总科目数 (select sno, count(cno) from sc where cno in (select cno from sc where sno=01) group by sno having count(cno)=(select count(cno) from sc where sno=01) and sno \u003c\u003e01) a inner join -- 条件二：选课总数与01同学的选课总数也相同 (select sno, count(sno) from sc group by sno having count(sno)=(select count(cno) from sc where sno=01) and sno \u003c\u003e01) b on a.sno=b.sno) 查询不同课程成绩相同的学生的学生编号、课程编号、学生成绩 【子查询】 -- 21. 查询不同课程成绩相同的学生的学生编号、课程编号、学生成绩 /* 注意：题目本身有歧义，我的理解是找出选了不止一门课，且自己所有课程分数相同的学生。 思路：条件1：该学生总选课数\u003e1 条件2：满足1，且该学生所有课程分数最大值=最小值，即可保证所有课程分数相等 */ select * from sc where sno in (select sno from sc group by sno having min(score)=max(score) and count(*)\u003e1); 【联结：inner join/outer join】\n下面一张图就足以说明联结join的各种情况了- SQL面试50题只用到了inner join、简单的outer join(即 left join/right join)、三表联结 检索” 01 “课程分数小于 60，按分数降序排列的学生信息【inner join】 -- 22. 检索\" 01 \"课程分数小于 60，按分数降序排列的学生信息 /* 我的疑问：实际上下面两种方法都可以写联结，我的习惯是用法1，后面的联结题也都是这样写的。 但是有没有大神可以从效能或是什么其他角度讲解一下哪种联结的写法比较好？*/ -- 法1： select b.*, a.score from sc as a inner join student as b on a.sno=b.sno where a.cno='01' and a.score\u003c60 order by a.score desc; -- 法2：先子查询再联结 select a.*, b.score from student as a inner join (select sno, score from sc where cno='01' and score\u003c60) as b on a.sno=b.sno order by b.score desc; 查询不及格的课程及学生名，学号，按课程号从大到小排列【inner join】 -- 23. 查询不及格的课程及学生名，学号，按课程号从大到小排列 select a.cno, b.sname, b.sno from sc as a inner join student as b on a.sno=b.sno where a.score\u003c60 order by a.cno desc; 查询课程名称为「数学」，且分数低于 60 的学生姓名和分数 【inner join】 -- 24. 查询课程名称为「数学」，且分数低于 60 的学生姓名和分数 select b.sname, a.score from sc as a inner join student as b on a.sno=b.sno where a.score\u003c60 and a.cno =(select cno from course where cname='数学'); 查询平均成绩大于等于 85 的所有学生的学号、姓名和平均成绩 【inner join】 -- 25. 查询平均成绩大于等于 85 的所有学生的学号、姓名和平均成绩 select a.sno, b.sname, avg(a.score) from sc as a inner join student as b on a.sno=b.sno group by a.sno having avg(a.score)\u003e=85; 查询不同老师所教不同课程平均分从高到低显示【inner join】 -- 26. 查询不同老师所教不同课程平均分从高到低显示 select b.tno, a.cno, avg(a.score) from sc as a inner join course as b on a.cno=b.cno group by a.cno order by avg(a.score) desc; 查询平均成绩大于等于 60 分的同学的学生编号和学生姓名和平均成绩【inner join】 -- 27. 查询平均成绩大于等于 60 分的同学的学生编号和学生姓名和平均成绩 select a.sno, b.sname, avg(a.score) from sc as a inner join student as b on a.sno=b.sno group by a.sno having avg(a.score)\u003e=60; 28.查询两门及其以上不及格课程的同学的学号，姓名及其平均成绩【inner join】\n-- 28.查询两门及其以上不及格课程的同学的学号，姓名及其平均成绩 select a.sno, b.sname, avg(a.score) from sc as a inner join student as b on a.sno=b.sno where a.score\u003c60 group by a.sno having count(a.score)\u003e=2; 查询同名同性学生名单，并统计同名同性人数【inner join】 -- 29. 查询同名同性学生名单，并统计同名同性人数 /* 思路：同时将姓名和性别2个字段作为分组依据并计数，超过1就说明有重复 注意：原student表中无同名同性别学生，想检验答案的正确性，可以自己添加记录 */ select a.*, b.student_number from student as a inner join (select sname, ssex, count(*) as student_number from student group by sname, ssex having count(*)\u003e1) as b on a.sname=b.sname and a.ssex=b.ssex; 查询所有学生的课程及分数情况（存在学生没成绩，没选课的情况）【outer join】 -- 30. 查询所有学生的课程及分数情况（存在学生没成绩，没选课的情况） -- 思路：需要将student表中非两表交集的部分也显示出来，用outer join select a.sno, a.sname, b.cno, b.score from student as a left join sc as b on a.sno=b.sno; 查询所有同学的学生编号、学生姓名、选课总数、所有课程的总成绩。(没成绩的显示为 null )【outer join】 -- 31. 查询所有同学的学生编号、学生姓名、选课总数、所有课程的总成绩(没成绩的显示为 null ) select b.sno, b.sname, count(a.score), sum(a.score) from sc as a right join student as b on a.sno=b.sno group by a.sno; 查询存在” 01 “课程但可能不存在” 02 “课程的情况(不存在时显示为 null )【outer join】 -- 32. 查询存在\" 01 \"课程但可能不存在\" 02 \"课程的情况(不存在时显示为 null ) -- 思路：1.在sc表中选出临时表a（存在\" 01 \"课程），临时表b（存在\" 02 \"课程）； 2. a left join b select a.*, b.cno, b.score from (select * from sc where cno='01') as a left join (select * from sc where cno='02') as b on a.sno=b.sno; 查询任何一门课程成绩在 70 分以上的姓名、课程名称和分数【三表联结】 -- 33. 查询任何一门课程成绩在 70 分以上的姓名、课程名称和分数 -- 法1：where 与等号 select sname, cname, score from student, course, sc where student.sno=sc.sno and course.cno=sc.cno and score\u003e70; -- 法2 inner join*2 select a.sname, c.cname, b.score from student as a inner join (select * from sc where score\u003e70) as b on a.sno=b.sno inner join course as c on b.cno=c.cno; 查询” 01 “课程比” 02 “课程成绩高的学生的信息及课程分数【三表联结】 -- 34. 查询\" 01 \"课程比\" 02 \"课程成绩高的学生的信息及课程分数 /* 思路：1.在sc表中选出临时表b（\" 01 \"课程），临时表c（\" 02 \"课程）; 2.ab表相交条件：学生号相同且a表成绩\u003eb表成绩 3.再与student表相交 */ select a.*, b.score as '01', c.score as '02' from student as a inner join (select * from sc where cno='01') as b on a.sno=b.sno inner join (select * from sc where cno='02') as c on b.sno=c.sno and b.score\u003ec.score; 【limit易错点】\nlimit m,n 表示从第m+1条记录开始，共选n条记录，如limit 1,2 选的是第2、3条记录（很容易误以为是选1、2条记录）- limit n 表示选择前n条记录，是limit 0,n 的省略 成绩不重复，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩【limit】 -- 35. 成绩不重复，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩 /* 思路：1.表联结：可以用inner join；也可以用where+等号 2.成绩最高：成绩降序排列后limit 1；成绩不重复，也可以用max*/ -- 法1：where+等号+limit select student.*, sc.score from sc, course, teacher,student where teacher.tname='张三' and course.tno=teacher.tno and course.cno=sc.cno and student.sno=sc.sno order by sc.score desc limit 1; -- 法2：where+等号+max select student.*, max(sc.score) as max_score from sc, course, teacher,student where teacher.tname='张三' and course.tno=teacher.tno and course.cno=sc.cno and student.sno=sc.sno; -- 法3 inner join+limit select a.*, b.score from sc as b inner join student as a on a.sno=b.sno where b.cno=(select cno from course where tno=(select tno from teacher where tname='张三')) order by b.score desc limit 1; -- 法4 inner join+max select a.*, max(b.score) as max_score from sc as b inner join student as a on a.sno=b.sno where b.cno=(select cno from course where tno=(select tno from teacher where tname='张三')); 成绩有重复的情况下，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩【limit】 -- 36. 成绩有重复的情况下，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩 /* 思路：1.student表与sc表联结为临时表a；2.用limit/max，求出张三老师所授课程的课程号与最高分为临时表b 3.求表a表b的交集，条件是课程号、成绩与b相等。 */ -- 法1：limit select a.* from (select student.*, sc.cno, sc.score from student, sc where student.sno=sc.sno) as a inner join (select cno, score from sc where cno=(select cno from course, teacher where teacher.tname='张三' and course.tno=teacher.tno )order by score desc limit 1) as b on a.cno=b.cno and a.score=b.score; -- 法2：max select a.* from (select student.*, sc.cno, sc.score from student, sc where student.sno=sc.sno) as a inner join (select cno, max(score) as score from sc where cno= (select cno from teacher, course where teacher.tname='张三' and teacher.tno=course.tno) group by cno) as b on a.cno=b.cno and a.score=b.score; 【窗口函数 rank/dense_rank/row_number】\nrank/dense_rank/row_number等窗口函数只能写在select后面，不能直接写在where后面，要筛选窗口函数的结果列时，先写子查询，再用where+列别名完成 按各科成绩进行排序，并显示排名，Score 重复时保留名次空缺【窗口函数】 --37. 按各科成绩进行排序，并显示排名，Score 重复时保留名次空缺 select *, rank() over (partition by cno order by score desc) as ranking from sc; 按各科成绩进行排序，并显示排名，Score 重复时合并名次【窗口函数】 -- 38. 按各科成绩进行排序，并显示排名，Score 重复时合并名次 select *, dense_rank() over (partition by cno order by score desc) as ranking from sc; 查询学生的总成绩，并进行排名，总分重复时保留名次空缺【窗口函数】 -- 39. 查询学生的总成绩，并进行排名，总分重复时保留名次空缺 select sno, sum(score), rank() over (order by sum(score) desc) as ranking from sc group by sno; 查询学生的总成绩，并进行排名，总分重复时不保留名次空缺【窗口函数】 -- 40. 查询学生的总成绩，并进行排名，总分重复时不保留名次空缺 select sno, sum(score), dense_rank() over (order by sum(score) desc) as ranking from sc group by sno; 查询每门功成绩最好的前两名【窗口函数】 -- 41. 查询每门功成绩最好的前两名 /* 思路：“成绩最好的前两名”我的理解是在有成绩重复的时候，保留名次空缺，即用rank分科排名，名次\u003c=2。 比如有2个人或者3个人并列第一，这种方法就能将这2个人/3个人都选出来。 3个人并列的情况中，我没有用limit2的原因是似乎没有恰当理由删去1个明明考了最高成绩的学生。 注意：rank函数只能用在select后面，不能用在where后面，所以要先写子查询，为子查询、rank函数结果分别起别名，再筛选名次\u003c=2 */ select * from (select *, rank() over(partition by cno order by score desc) as ranking from sc) as a where ranking \u003c=2; 查询各科成绩前三名的记录【窗口函数】 -- 42. 查询各科成绩前三名的记录 /* 思路：“成绩前三” 我的理解是出现成绩并列，不保留名次空缺。因此用dense_rank分科排名，名次\u003c=3。 注意：dense_rank函数只能用在select后面，不能用在where后面，所以要先写子查询，为子查询、dense_rank函数结果分别起别名，再筛选名次\u003c=3 */ select * from (select *, dense_rank() over(partition by cno order by score desc) as ranking from sc) as a where ranking \u003c=3; 查询所有课程成绩第2名到第3名的学生信息及该课程成绩【窗口函数】 -- 43. 查询所有课程成绩第2名到第3名的学生信息及该课程成绩 -- 思路：同42，用dense_rank, 名次in (2,3) select a.*, b.cno, b.score, b.ranking from student a inner join (select *, dense_rank() over (partition by cno order by score desc) ranking from sc ) b on a.sno=b.sno where ranking in (2,3); 【case】case 结合聚合函数来旋转行列字段是一种常用技巧\n44.按平均成绩从高到低显示所有学生的所有课程的成绩以及平均成绩【case】\n-- 44.按平均成绩从高到低显示所有学生的所有课程的成绩以及平均成绩 /* 注意：1.case 结合聚合函数来旋转行列字段是一种常用技巧 2.else null不能写为else 0，因为0代表选了课但是得了0分 3.student表里面有没有选课的学生 */ select b.sno, a.avg_score, a.01, a.02, a.03 from (select sno, avg(score) as avg_score, max(case when cno='01' then score else null end) as '01', max(case when cno='02' then score else null end) as '02', max(case when cno='03' then score else null end) as '03' from sc group by sno) as a right join student as b on a.sno=b.sno; 使用分段[100-85]，[85-70]，[70-60]，[\u003c60]来统计各科成绩，分别统计各分数段人数：课程ID和课程名称【case】 -- 45. 使用分段[100-85]，[85-70]，[70-60]，[\u003c60]来统计各科成绩，分别统计各分数段人数：课程ID和课程名称 -- 思路：要计数产生多个新的列，考虑用case+sum来完成 select a.cno, b.cname, sum(case when a.score\u003e=85 then 1 else 0 end) as '[100-85]', sum(case when a.score\u003e=70 and a.score\u003c85 then 1 else 0 end) as '[85-70]', sum(case when a.score\u003e=60 and a.score\u003c70 then 1 else 0 end) as '[70-60]', sum(case when a.score\u003c60 then 1 else 0 end) as '[\u003c60]' from sc as a inner join course as b on a.cno=b.cno group by a.cno; 查询各科成绩最高分、最低分和平均分：以如下形式显示：课程 ID ，课程 name ，最高分，最低分，平均分，及格率，中等率，优良率，优秀率。及格为\u003e=60，中等为：70-80，优良为：80-90，优秀为：\u003e=90 【case】 -- 46. 查询各科成绩最高分、最低分和平均分：以如下形式显示：课程 ID ，课程 name ，最高分，最低分，平均分，及格率，中等率，优良率，优秀率。及格为\u003e=60，中等为：70-80，优良为：80-90，优秀为：\u003e=90 -- 思路：1.用case+sum计数 2.分数比率=1.的结果/选课人数 select a.cno '课程ID', b.cname '课程name', max(a.score) '最高分', min(a.score) '最低分', avg(a.score) '平均分', sum(case when a.score\u003e=60 then 1 else 0 end)/count(a.score) '及格率', sum(case when a.score\u003e=70 and a.score\u003c80 then 1 else 0 end)/count(a.score) '中等率', sum(case when a.score\u003e=80 and a.score\u003c90 then 1 else 0 end)/count(a.score) '优良率', sum(case when a.score\u003e=90 then 1 else 0 end)/count(a.score) '优秀率' from sc a inner join course b on a.cno=b.cno group by a.cno; 统计各科成绩各分数段人数：课程编号，课程名称，[100-85]，[85-70]，[70-60]，[60-0] 及所占百分比【case】 -- 47. 统计各科成绩各分数段人数：课程编号，课程名称，[100-85]，[85-70]，[70-60]，[60-0] 及所占百分比 -- 思路同46 select a.cno, b.cname, sum(case when a.score\u003e=85 then 1 else 0 end) as '[100-85]人数', sum(case when a.score\u003e=70 and a.score\u003c85 then 1 else 0 end) as '[85-70]人数', sum(case when a.score\u003e=60 and a.score\u003c70 then 1 else 0 end) as '[70-60]人数', sum(case when a.score\u003c60 then 1 else 0 end) as '[60-0]人数', sum(case when a.score\u003e=85 then 1 else 0 end)/count(a.sno) as '[100-85]百分比', sum(case when a.score\u003e=70 and a.score\u003c85 then 1 else 0 end)/count(a.sno) as '[85-70]百分比', sum(case when a.score\u003e=60 and a.score\u003c70 then 1 else 0 end)/count(a.sno) as '[70-60]百分比', sum(case when a.score\u003c60 then 1 else 0 end)/count(a.sno) as '[60-0]百分比' from sc as a inner join course as b on a.cno=b.cno group by a.cno; 【时间函数】\n在mysql里计算时间差：\n日期差：datediff(time终, time始)- 指定时间差：timestampdiff(timestamp, time始, time终) 令人崩溃的一点是，即便是如此相近的两个时间差函数，其后面时间参数的顺序居然是相反的，如果计算结果出现了负数，考虑参数写反的可能性。 查询各学生的年龄，只按年份来算【时间函数】 -- 48. 查询各学生的年龄，只按年份来算 -- 思路：year函数分别求出current_date和sage的年，相减即可 select sno, sname, year(current_date())-year(sage) as age from student; 按照出生日期来算，当前月日 \u003c 出生年月的月日则，年龄减一【时间函数】 -- 49. 按照出生日期来算，当前月日 \u003c 出生年月的月日则，年龄减一 -- 思路：使用timestampdiff()求差，将时间戳设置为年即可 Select sno, sname, timestampdiff(year, sage, current_date()) as age from student; 查询本月过生日的学生【时间函数】 -- 50. 查询本月过生日的学生 -- 思路：month函数分别求出current_date和sage的月份，相同即可 select sno, sname, sage from student where month(sage)=month(current_date()); 查询下月过生日的学生【时间函数】 -- 51. 查询下月过生日的学生 -- 思路参见50 select sno, sname, sage from student where month(sage)=month(current_date())+1; 查询本周过生日的学生【时间函数】* -- 52. 查询本周过生日的学生 /* 思路：1.replace将生日中的年换为今天的年，计算同学的生日在本年是第几周； 2.求出今天是本年的第几周 3.若相等，则符合条件 注意：这种方法存在问题，1月第一周和12月最后一周可能跨年，倒置结果出错。欢迎提供更好的方案。*/ select sno, sname, sage from student where week(replace(sage, year(sage), year(current_date())), 1) = week(current_date(),1); 查询下周过生日的学生【时间函数】* -- 53. 查询下周过生日的学生 -- 思路和存在问题参见52 select sno, sname, sage from student where week(replace(sage, year(sage), year(current_date())), 1) = week(current_date(),1)+1; 【创建原始表】\n插入数据 怕出错的话，可以先start transaction; 确认数据插入无误后再commit; -- 创建数据库exercise create database exercise; -- 使用数据库exercise use exercise; -- 创建学生表student create table student (Sno varchar(10) not null, Sname varchar(10) , Sage date , Ssex varchar(10) , primary key (Sno)); start transaction; insert into student values ('01', '赵雷', '1990-01-01', '男'); insert into student values ('02', '钱电', '1990-12-21', '男'); insert into student values ('03', '孙风', '1990-05-20', '男'); insert into student values ('04', '李云', '1990-08-06', '男'); insert into student values ('05', '周梅', '1991-12-01', '女'); insert into student values ('06', '吴兰', '1992-03-01', '女'); insert into student values ('07', '郑竹', '1989-07-01', '女'); insert into student values ('08', '王菊', '1990-01-20', '女'); commit; -- 创建科目表course create table course (Cno varchar(10) not null, Cname varchar(10) , Tno varchar(10) , primary key (Cno)); start transaction; insert into course values ('01', '语文', '02'); insert into course values ('02', '数学', '01'); insert into course values ('03', '英语', '03'); commit; -- 创建教师表teacher create table teacher (Tno varchar(10) not null, Tname varchar(10) , primary key (Tno)); strat transaction; insert into teacher values ('01', '张三'); insert into teacher values ('02', '李四'); insert into teacher values ('03', '王五'); commit; -- 创建成绩表 sc create table sc (Sno varchar (10) , Cno varchar (10) , score decimal(18,1), primary key (Sno, Cno)); start transaction; insert into SC values('01' , '01' , 80); insert into SC values('01' , '02' , 90); insert into SC values('01' , '03' , 99); insert into SC values('02' , '01' , 70); insert into SC values('02' , '02' , 60); insert into SC values('02' , '03' , 80); insert into SC values('03' , '01' , 80); insert into SC values('03' , '02' , 80); insert into SC values('03' , '03' , 80); insert into SC values('04' , '01' , 50); insert into SC values('04' , '02' , 30); insert into SC values('04' , '03' , 20); insert into SC values('05' , '01' , 76); insert into SC values('05' , '02' , 87); insert into SC values('06' , '01' , 31); insert into SC values('06' , '03' , 34); insert into SC values('07' , '02' , 89); insert into SC values('07' , '03' , 98); commit; ",
+  "wordCount" : "9188",
+  "inLanguage": "zh",
+  "datePublished": "2026-01-08T16:37:49+08:00",
+  "dateModified": "2026-01-08T16:37:49+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "wait"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.heiok.top/posts/tutorial/mysql%E7%BB%83%E4%B9%A0%E9%A2%98-50/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wait`s blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.heiok.top/img/thinks.jpg"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://www.heiok.top/" accesskey="h" title="wait`s blog (Alt + H)">
+            <img src="https://www.heiok.top/img/Q.gif" alt="logo" aria-label="logo"
+                 height="35">wait`s blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://www.heiok.top/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/posts" title="📚 文章">
+                <span>📚 文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/archives/" title="⏱️ 时间轴">
+                <span>⏱️ 时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/about" title="🙋🏻‍♂️ 关于">
+                <span>🙋🏻‍♂️ 关于</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/links" title="🤝 友链">
+                <span>🤝 友链</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            <div class="breadcrumbs"><a href="https://www.heiok.top/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://www.heiok.top/posts/">📚文章</a></div>
+            <h1 class="post-title">
+                Mysql练习题-50
+            </h1>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2026-01-08
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>9188字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>19分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>wait
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    <span id="post_meta_style_8">
+                        <span class="fa fa-commenting-o"></span>
+                        <span>
+                            <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js"></script>
+                            <script>
+                                let url = document.documentURI
+                                
+                                let dnsUrl = "https://www.heiok.top/"
+                                let urlSplit = url.split(dnsUrl)
+                                let finalUrl = urlSplit[1]
+                                if (finalUrl[0] !== '/') {
+                                    finalUrl = '/'+finalUrl
+                                }
+                                twikoo.getCommentsCount({
+                                    envId:  null , 
+                                region:  null , 
+                                urls: [ 
+                                    
+                                    finalUrl,
+                                ],
+                                    includeReply: false 
+                                }).then(function (res) {
+                                    let count = res[0].count
+                                    const obj = document.getElementById("comment_count");
+                                    obj.innerText = count
+                                    
+                                    
+                                    
+                                }).catch(function (err) {
+                                    
+                                    console.error(err);
+                                });
+                            </script>
+                            <span id="comment_count"></span>
+                        </span>
+                    </span>
+                </span>
+
+</div>
+        </header> 
+        <div class="post-content"><ol>
+<li>本文汇总了不同版本的SQL面试50题的题目，删去了重复内容，并根据涉及知识点进行分类，按照由易到难、相似题放在一起的思路进行排序并重新编号。适合sql新手按知识点学习/检测自己的</li>
+</ol>
+<p>学习效果。</p>
+<ol start="2">
+<li>
+<p>我使用软件是MySQL8.0，使用其他数据库软件，代码写法可能略有不同。文中给出的是我的解答，算是最近学习的小结。数据分析新手，欢迎交流指正（特别是52、53题，有没有什么更好的思路呢）。</p>
+</li>
+<li>
+<p>原始表和汇总后的53道题目分类如下所示。创建原始表非本文重点，代码放在文章最后，有需要的小伙伴可以先跳到最后。</p>
+</li>
+</ol>
+<p>【<strong>Like</strong>】</p>
+<ul>
+<li>like与%的三种用法：&rsquo;%字符&rsquo;/&rsquo;%字符%&rsquo;/&lsquo;字符%&rsquo;</li>
+</ul>
+<ol>
+<li>查询「李」姓老师的数量 【Like】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 1. 查询「李」姓老师的数量 select count(*) from teacher where tname like &#39;李%&#39;;
+</span></span></code></pre></div><ol start="2">
+<li>查询名字中含有「风」字的学生信息【Like】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 2. 查询名字中含有「风」字的学生信息 select * from student where sname like &#39;%风%&#39;;
+</span></span></code></pre></div><p>【<strong>聚合函数、group by和where的相爱相杀</strong>】</p>
+<p>1.聚合函数sum/avg/count/max/min经常与好基友group by搭配使用</p>
+<p>2.在使用group by时，select后面只能放</p>
+<ul>
+<li>常数（如数字/字符/时间）- 聚合函数- 聚合键（也就是group by后面的列名）；
+因此，在使用group by时，千万不要在select后面放聚合键以外的列名！</li>
+</ul>
+<p>3.where函数后面不能直接使用聚合函数！（考虑放在having后面/变成子查询放在where后面）</p>
+<ol start="3">
+<li>查询男生、女生人数【聚合函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 3. 查询男生、女生人数 select ssex, count(*) from student group by ssex;
+</span></span></code></pre></div><ol start="4">
+<li>查询课程编号为02的总成绩【聚合函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 4. 查询课程编号为02的总成绩 select cno, sum(score) from sc group by cno having cno=&#39;02&#39;;
+</span></span></code></pre></div><ol start="5">
+<li>查询每门课程的平均成绩，结果按平均成绩降序排列，平均成绩相同时，按课程编号升序排列【聚合函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 5. 查询每门课程的平均成绩，结果按平均成绩降序排列，平均成绩相同时，按课程编号升序排列 select cno, avg(score) as avg_score from sc group by cno order by avg_score desc, cno;
+</span></span></code></pre></div><ol start="6">
+<li>求每门课程的学生人数 【聚合函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 6. 求每门课程的学生人数 select cno, count(sno) as student_number from sc group by cno;
+</span></span></code></pre></div><ol start="7">
+<li>统计每门课程的学生选修人数（超过 5 人的课程才统计）【聚合函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 7. 统计每门课程的学生选修人数（超过 5 人的课程才统计） select cno, count(*) as student_number from sc group by cno having count(*)&gt;5 order by student_number desc, cno;
+</span></span></code></pre></div><ol start="8">
+<li>检索至少选修两门课程的学生学号 【聚合函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 8. 检索至少选修两门课程的学生学号 select sno from sc group by sno having count(cno)&gt;=2;
+</span></span></code></pre></div><p>【<strong>子查询</strong>】</p>
+<p>1.select的结果列全部来自同一张表（而select的条件列来自不同表里），考虑子查询；</p>
+<p>select的结果列来自多张表，考虑联结</p>
+<p>2.子查询与in/not in是好基友</p>
+<p>3.“所有/全部/都&quot;类型的查询可以考虑not in求补集</p>
+<ol start="9">
+<li>查询在 SC 表存在成绩的学生信息【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 9. 查询在 SC 表存在成绩的学生信息 select * from student where sno in (select sno from sc);
+</span></span></code></pre></div><ol start="10">
+<li>查询不存在&quot; 01 &ldquo;课程但存在&rdquo; 02 &ldquo;课程的情况【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 10. 查询不存在&#34; 01 &#34;课程但存在&#34; 02 &#34;课程的情况 select * from sc where sno not in (select sno from sc where cno =01) and sno in (select sno from sc where cno=02);
+</span></span></code></pre></div><ol start="11">
+<li>查询同时存在&rdquo; 01 &ldquo;课程和&rdquo; 02 &ldquo;课程的情况【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 11. 查询同时存在&#34; 01 &#34;课程和&#34; 02 &#34;课程的情况 select * from student where sno in(select sno from sc where cno=&#39;01&#39;) and sno in (select sno from sc where cno=&#39;02&#39;);
+</span></span></code></pre></div><ol start="12">
+<li>查询出只选修两门课程的学生学号和姓名【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 12. 查询出只选修两门课程的学生学号和姓名 select sno, sname from student where sno in (select sno from sc group by sno having count(cno)=2);
+</span></span></code></pre></div><ol start="13">
+<li>查询没有学全所有课程的同学的信息 【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 13. 查询没有学全所有课程的同学的信息 -- 注意：用子查询求所有课程数而不是直接写3；student表中有没选课的学生 select * from student where sno not in (select sno from sc group by sno having count(cno)=(select count(*) from course));
+</span></span></code></pre></div><ol start="14">
+<li>查询选修了全部课程的学生信息【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 14. 查询选修了全部课程的学生信息 select * from student where sno in (select sno from sc group by sno having count(cno)=(select count(cno) from course));
+</span></span></code></pre></div><ol start="15">
+<li>查询所有课程成绩均小于60分的学号、姓名【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 15. 查询所有课程成绩均小于60分的学号、姓名 /* 思路：先选出有课程成绩&gt;=60分的学号，再用not in求补集得到所有成绩均&lt;60的学号； 注意student表里有未选课的学生！*/ select sno, sname from student where sno not in (select distinct sno from sc where score&gt;=60) and sno in (select distinct sno from sc);
+</span></span></code></pre></div><ol start="16">
+<li>查询课程编号为 01 且课程成绩在 80 分以上的学生的学号和姓名【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 16. 查询课程编号为 01 且课程成绩在 80 分以上的学生的学号和姓名 select sno, sname from student where sno in (select sno from sc where cno=&#39;01&#39; and score&gt;80);
+</span></span></code></pre></div><ol start="17">
+<li>查询学过「张三」老师授课的同学的信息 【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 17. 查询学过「张三」老师授课的同学的信息 -- 四表串联查询。法1： select * from student where sno in (select sno from sc, course, teacher where teacher.tname=&#39;张三&#39; and course.tno=teacher.tno and sc.cno=course.cno); -- 经过试验，即使张三教了不止一门课，也可用使用等号的法1求出所有结果 -- 法2：直接套三个子查询也可以，但是过于冗长，当子查询串联的表比较多时，比较推荐法1用where和等号代替一部分子查询 select * from student where sno in (select sno from sc where cno in (select cno from course where tno= (select tno from teacher where tname=&#39;张三&#39;)));
+</span></span></code></pre></div><ol start="18">
+<li>查询没学过&quot;张三&quot;老师讲授的任一门课程的学生姓名 【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 18. 查询没学过&#34;张三&#34;老师讲授的任一门课程的学生姓名 -- 思路：先求出学过张三老师课程的学生，再在student表里面求补集。注意有没选课任何课的学生。 select sname from student where sno not in (select sno from sc, course, teacher where teacher.tname=&#39;张三&#39; and course.tno=teacher.tno and sc.cno=course.cno);
+</span></span></code></pre></div><ol start="19">
+<li>查询至少有一门课与学号为&rdquo; 01 &ldquo;的同学所学相同的同学的信息 【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 19. 查询至少有一门课与学号为&#34; 01 &#34;的同学所学相同的同学的信息 -- 注意：记得排除学号为“01”的同学本人 select * from student where sno in (select distinct sno from sc where cno in (select cno from sc where sno=&#39;01&#39;)and sno &lt;&gt;&#39;01&#39;);
+</span></span></code></pre></div><ol start="20">
+<li>查询和&rdquo; 01 &ldquo;号的同学学习的课程完全相同的其他同学的信息【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 20. 查询和&#34; 01 &#34;号的同学学习的课程完全相同的其他同学的信息 -- 思路：条件一（表a）：在19题选出至少一门课相同的同学的基础上（in子查询），与01同学选课相同的科目数=01同学的总科目数 -- 条件二（表b）：选课总数与01同学的选课总数也相同 -- 接下来的步骤，表a与表b相交求学号，再结合student表求信息 select * from student where sno in (select a.sno from -- 条件一：在19题选出至少一门课相同的同学的基础上（in子查询），与01同学选课相同的科目数=01同学的总科目数 (select sno, count(cno) from sc where cno in (select cno from sc where sno=01) group by sno having count(cno)=(select count(cno) from sc where sno=01) and sno &lt;&gt;01) a inner join -- 条件二：选课总数与01同学的选课总数也相同 (select sno, count(sno) from sc group by sno having count(sno)=(select count(cno) from sc where sno=01) and sno &lt;&gt;01) b on a.sno=b.sno)
+</span></span></code></pre></div><ol start="21">
+<li>查询不同课程成绩相同的学生的学生编号、课程编号、学生成绩 【子查询】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 21. 查询不同课程成绩相同的学生的学生编号、课程编号、学生成绩 /* 注意：题目本身有歧义，我的理解是找出选了不止一门课，且自己所有课程分数相同的学生。 思路：条件1：该学生总选课数&gt;1 条件2：满足1，且该学生所有课程分数最大值=最小值，即可保证所有课程分数相等 */ select * from sc where sno in (select sno from sc group by sno having min(score)=max(score) and count(*)&gt;1);
+</span></span></code></pre></div><p>【<strong>联结：inner join/outer join</strong>】</p>
+<ul>
+<li>下面一张图就足以说明联结join的各种情况了- SQL面试50题只用到了inner join、简单的outer join(即 left join/right join)、三表联结</li>
+</ul>
+<ol start="22">
+<li>检索&rdquo; 01 &ldquo;课程分数小于 60，按分数降序排列的学生信息【inner join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 22. 检索&#34; 01 &#34;课程分数小于 60，按分数降序排列的学生信息 /* 我的疑问：实际上下面两种方法都可以写联结，我的习惯是用法1，后面的联结题也都是这样写的。 但是有没有大神可以从效能或是什么其他角度讲解一下哪种联结的写法比较好？*/ -- 法1： select b.*, a.score from sc as a inner join student as b on a.sno=b.sno where a.cno=&#39;01&#39; and a.score&lt;60 order by a.score desc; -- 法2：先子查询再联结 select a.*, b.score from student as a inner join (select sno, score from sc where cno=&#39;01&#39; and score&lt;60) as b on a.sno=b.sno order by b.score desc;
+</span></span></code></pre></div><ol start="23">
+<li>查询不及格的课程及学生名，学号，按课程号从大到小排列【inner join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 23. 查询不及格的课程及学生名，学号，按课程号从大到小排列 select a.cno, b.sname, b.sno from sc as a inner join student as b on a.sno=b.sno where a.score&lt;60 order by a.cno desc;
+</span></span></code></pre></div><ol start="24">
+<li>查询课程名称为「数学」，且分数低于 60 的学生姓名和分数 【inner join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 24. 查询课程名称为「数学」，且分数低于 60 的学生姓名和分数 select b.sname, a.score from sc as a inner join student as b on a.sno=b.sno where a.score&lt;60 and a.cno =(select cno from course where cname=&#39;数学&#39;);
+</span></span></code></pre></div><ol start="25">
+<li>查询平均成绩大于等于 85 的所有学生的学号、姓名和平均成绩 【inner join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 25. 查询平均成绩大于等于 85 的所有学生的学号、姓名和平均成绩 select a.sno, b.sname, avg(a.score) from sc as a inner join student as b on a.sno=b.sno group by a.sno having avg(a.score)&gt;=85;
+</span></span></code></pre></div><ol start="26">
+<li>查询不同老师所教不同课程平均分从高到低显示【inner join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 26. 查询不同老师所教不同课程平均分从高到低显示 select b.tno, a.cno, avg(a.score) from sc as a inner join course as b on a.cno=b.cno group by a.cno order by avg(a.score) desc;
+</span></span></code></pre></div><ol start="27">
+<li>查询平均成绩大于等于 60 分的同学的学生编号和学生姓名和平均成绩【inner join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 27. 查询平均成绩大于等于 60 分的同学的学生编号和学生姓名和平均成绩 select a.sno, b.sname, avg(a.score) from sc as a inner join student as b on a.sno=b.sno group by a.sno having avg(a.score)&gt;=60;
+</span></span></code></pre></div><p>28.查询两门及其以上不及格课程的同学的学号，姓名及其平均成绩【inner join】</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 28.查询两门及其以上不及格课程的同学的学号，姓名及其平均成绩 select a.sno, b.sname, avg(a.score) from sc as a inner join student as b on a.sno=b.sno where a.score&lt;60 group by a.sno having count(a.score)&gt;=2;
+</span></span></code></pre></div><ol start="29">
+<li>查询同名同性学生名单，并统计同名同性人数【inner join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 29. 查询同名同性学生名单，并统计同名同性人数 /* 思路：同时将姓名和性别2个字段作为分组依据并计数，超过1就说明有重复 注意：原student表中无同名同性别学生，想检验答案的正确性，可以自己添加记录 */ select a.*, b.student_number from student as a inner join (select sname, ssex, count(*) as student_number from student group by sname, ssex having count(*)&gt;1) as b on a.sname=b.sname and a.ssex=b.ssex;
+</span></span></code></pre></div><ol start="30">
+<li>查询所有学生的课程及分数情况（存在学生没成绩，没选课的情况）【outer join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 30. 查询所有学生的课程及分数情况（存在学生没成绩，没选课的情况） -- 思路：需要将student表中非两表交集的部分也显示出来，用outer join select a.sno, a.sname, b.cno, b.score from student as a left join sc as b on a.sno=b.sno;
+</span></span></code></pre></div><ol start="31">
+<li>查询所有同学的学生编号、学生姓名、选课总数、所有课程的总成绩。(没成绩的显示为 null )【outer join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 31. 查询所有同学的学生编号、学生姓名、选课总数、所有课程的总成绩(没成绩的显示为 null ) select b.sno, b.sname, count(a.score), sum(a.score) from sc as a right join student as b on a.sno=b.sno group by a.sno;
+</span></span></code></pre></div><ol start="32">
+<li>查询存在&rdquo; 01 &ldquo;课程但可能不存在&rdquo; 02 &ldquo;课程的情况(不存在时显示为 null )【outer join】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 32. 查询存在&#34; 01 &#34;课程但可能不存在&#34; 02 &#34;课程的情况(不存在时显示为 null ) -- 思路：1.在sc表中选出临时表a（存在&#34; 01 &#34;课程），临时表b（存在&#34; 02 &#34;课程）； 2. a left join b select a.*, b.cno, b.score from (select * from sc where cno=&#39;01&#39;) as a left join (select * from sc where cno=&#39;02&#39;) as b on a.sno=b.sno;
+</span></span></code></pre></div><ol start="33">
+<li>查询任何一门课程成绩在 70 分以上的姓名、课程名称和分数【三表联结】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 33. 查询任何一门课程成绩在 70 分以上的姓名、课程名称和分数 -- 法1：where 与等号 select sname, cname, score from student, course, sc where student.sno=sc.sno and course.cno=sc.cno and score&gt;70; -- 法2 inner join*2 select a.sname, c.cname, b.score from student as a inner join (select * from sc where score&gt;70) as b on a.sno=b.sno inner join course as c on b.cno=c.cno;
+</span></span></code></pre></div><ol start="34">
+<li>查询&rdquo; 01 &ldquo;课程比&rdquo; 02 &ldquo;课程成绩高的学生的信息及课程分数【三表联结】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 34. 查询&#34; 01 &#34;课程比&#34; 02 &#34;课程成绩高的学生的信息及课程分数 /* 思路：1.在sc表中选出临时表b（&#34; 01 &#34;课程），临时表c（&#34; 02 &#34;课程）; 2.ab表相交条件：学生号相同且a表成绩&gt;b表成绩 3.再与student表相交 */ select a.*, b.score as &#39;01&#39;, c.score as &#39;02&#39; from student as a inner join (select * from sc where cno=&#39;01&#39;) as b on a.sno=b.sno inner join (select * from sc where cno=&#39;02&#39;) as c on b.sno=c.sno and b.score&gt;c.score;
+</span></span></code></pre></div><p>【limit易错点】</p>
+<ul>
+<li>limit m,n 表示从第m+1条记录开始，共选n条记录，如limit 1,2 选的是第2、3条记录（很容易误以为是选1、2条记录）- limit n 表示选择前n条记录，是limit 0,n 的省略</li>
+</ul>
+<ol start="35">
+<li>成绩不重复，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩【limit】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 35. 成绩不重复，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩 /* 思路：1.表联结：可以用inner join；也可以用where+等号 2.成绩最高：成绩降序排列后limit 1；成绩不重复，也可以用max*/ -- 法1：where+等号+limit select student.*, sc.score from sc, course, teacher,student where teacher.tname=&#39;张三&#39; and course.tno=teacher.tno and course.cno=sc.cno and student.sno=sc.sno order by sc.score desc limit 1; -- 法2：where+等号+max select student.*, max(sc.score) as max_score from sc, course, teacher,student where teacher.tname=&#39;张三&#39; and course.tno=teacher.tno and course.cno=sc.cno and student.sno=sc.sno; -- 法3 inner join+limit select a.*, b.score from sc as b inner join student as a on a.sno=b.sno where b.cno=(select cno from course where tno=(select tno from teacher where tname=&#39;张三&#39;)) order by b.score desc limit 1; -- 法4 inner join+max select a.*, max(b.score) as max_score from sc as b inner join student as a on a.sno=b.sno where b.cno=(select cno from course where tno=(select tno from teacher where tname=&#39;张三&#39;));
+</span></span></code></pre></div><ol start="36">
+<li>成绩有重复的情况下，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩【limit】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 36. 成绩有重复的情况下，查询选修「张三」老师所授课程的学生中，成绩最高的学生信息及其成绩 /* 思路：1.student表与sc表联结为临时表a；2.用limit/max，求出张三老师所授课程的课程号与最高分为临时表b 3.求表a表b的交集，条件是课程号、成绩与b相等。 */ -- 法1：limit select a.* from (select student.*, sc.cno, sc.score from student, sc where student.sno=sc.sno) as a inner join (select cno, score from sc where cno=(select cno from course, teacher where teacher.tname=&#39;张三&#39; and course.tno=teacher.tno )order by score desc limit 1) as b on a.cno=b.cno and a.score=b.score; -- 法2：max select a.* from (select student.*, sc.cno, sc.score from student, sc where student.sno=sc.sno) as a inner join (select cno, max(score) as score from sc where cno= (select cno from teacher, course where teacher.tname=&#39;张三&#39; and teacher.tno=course.tno) group by cno) as b on a.cno=b.cno and a.score=b.score;
+</span></span></code></pre></div><p>【窗口函数 rank/dense_rank/row_number】</p>
+<ul>
+<li>rank/dense_rank/row_number等窗口函数只能写在select后面，不能直接写在where后面，要筛选窗口函数的结果列时，先写子查询，再用where+列别名完成</li>
+</ul>
+<ol start="37">
+<li>按各科成绩进行排序，并显示排名，Score 重复时保留名次空缺【窗口函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>--37. 按各科成绩进行排序，并显示排名，Score 重复时保留名次空缺 select *, rank() over (partition by cno order by score desc) as ranking from sc;
+</span></span></code></pre></div><ol start="38">
+<li>按各科成绩进行排序，并显示排名，Score 重复时合并名次【窗口函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 38. 按各科成绩进行排序，并显示排名，Score 重复时合并名次 select *, dense_rank() over (partition by cno order by score desc) as ranking from sc;
+</span></span></code></pre></div><ol start="39">
+<li>查询学生的总成绩，并进行排名，总分重复时保留名次空缺【窗口函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 39. 查询学生的总成绩，并进行排名，总分重复时保留名次空缺 select sno, sum(score), rank() over (order by sum(score) desc) as ranking from sc group by sno;
+</span></span></code></pre></div><ol start="40">
+<li>查询学生的总成绩，并进行排名，总分重复时不保留名次空缺【窗口函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 40. 查询学生的总成绩，并进行排名，总分重复时不保留名次空缺 select sno, sum(score), dense_rank() over (order by sum(score) desc) as ranking from sc group by sno;
+</span></span></code></pre></div><ol start="41">
+<li>查询每门功成绩最好的前两名【窗口函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 41. 查询每门功成绩最好的前两名 /* 思路：“成绩最好的前两名”我的理解是在有成绩重复的时候，保留名次空缺，即用rank分科排名，名次&lt;=2。 比如有2个人或者3个人并列第一，这种方法就能将这2个人/3个人都选出来。 3个人并列的情况中，我没有用limit2的原因是似乎没有恰当理由删去1个明明考了最高成绩的学生。 注意：rank函数只能用在select后面，不能用在where后面，所以要先写子查询，为子查询、rank函数结果分别起别名，再筛选名次&lt;=2 */ select * from (select *, rank() over(partition by cno order by score desc) as ranking from sc) as a where ranking &lt;=2;
+</span></span></code></pre></div><ol start="42">
+<li>查询各科成绩前三名的记录【窗口函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 42. 查询各科成绩前三名的记录 /* 思路：“成绩前三” 我的理解是出现成绩并列，不保留名次空缺。因此用dense_rank分科排名，名次&lt;=3。 注意：dense_rank函数只能用在select后面，不能用在where后面，所以要先写子查询，为子查询、dense_rank函数结果分别起别名，再筛选名次&lt;=3 */ select * from (select *, dense_rank() over(partition by cno order by score desc) as ranking from sc) as a where ranking &lt;=3;
+</span></span></code></pre></div><ol start="43">
+<li>查询所有课程成绩第2名到第3名的学生信息及该课程成绩【窗口函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 43. 查询所有课程成绩第2名到第3名的学生信息及该课程成绩 -- 思路：同42，用dense_rank, 名次in (2,3) select a.*, b.cno, b.score, b.ranking from student a inner join (select *, dense_rank() over (partition by cno order by score desc) ranking from sc ) b on a.sno=b.sno where ranking in (2,3);
+</span></span></code></pre></div><p>【case】case 结合聚合函数来旋转行列字段是一种常用技巧</p>
+<p>44.按平均成绩从高到低显示所有学生的所有课程的成绩以及平均成绩【case】</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 44.按平均成绩从高到低显示所有学生的所有课程的成绩以及平均成绩 /* 注意：1.case 结合聚合函数来旋转行列字段是一种常用技巧 2.else null不能写为else 0，因为0代表选了课但是得了0分 3.student表里面有没有选课的学生 */ select b.sno, a.avg_score, a.01, a.02, a.03 from (select sno, avg(score) as avg_score, max(case when cno=&#39;01&#39; then score else null end) as &#39;01&#39;, max(case when cno=&#39;02&#39; then score else null end) as &#39;02&#39;, max(case when cno=&#39;03&#39; then score else null end) as &#39;03&#39; from sc group by sno) as a right join student as b on a.sno=b.sno;
+</span></span></code></pre></div><ol start="45">
+<li>使用分段[100-85]，[85-70]，[70-60]，[&lt;60]来统计各科成绩，分别统计各分数段人数：课程ID和课程名称【case】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 45. 使用分段[100-85]，[85-70]，[70-60]，[&lt;60]来统计各科成绩，分别统计各分数段人数：课程ID和课程名称 -- 思路：要计数产生多个新的列，考虑用case+sum来完成 select a.cno, b.cname, sum(case when a.score&gt;=85 then 1 else 0 end) as &#39;[100-85]&#39;, sum(case when a.score&gt;=70 and a.score&lt;85 then 1 else 0 end) as &#39;[85-70]&#39;, sum(case when a.score&gt;=60 and a.score&lt;70 then 1 else 0 end) as &#39;[70-60]&#39;, sum(case when a.score&lt;60 then 1 else 0 end) as &#39;[&lt;60]&#39; from sc as a inner join course as b on a.cno=b.cno group by a.cno;
+</span></span></code></pre></div><ol start="46">
+<li>查询各科成绩最高分、最低分和平均分：以如下形式显示：课程 ID ，课程 name ，最高分，最低分，平均分，及格率，中等率，优良率，优秀率。及格为&gt;=60，中等为：70-80，优良为：80-90，优秀为：&gt;=90 【case】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 46. 查询各科成绩最高分、最低分和平均分：以如下形式显示：课程 ID ，课程 name ，最高分，最低分，平均分，及格率，中等率，优良率，优秀率。及格为&gt;=60，中等为：70-80，优良为：80-90，优秀为：&gt;=90 -- 思路：1.用case+sum计数 2.分数比率=1.的结果/选课人数 select a.cno &#39;课程ID&#39;, b.cname &#39;课程name&#39;, max(a.score) &#39;最高分&#39;, min(a.score) &#39;最低分&#39;, avg(a.score) &#39;平均分&#39;, sum(case when a.score&gt;=60 then 1 else 0 end)/count(a.score) &#39;及格率&#39;, sum(case when a.score&gt;=70 and a.score&lt;80 then 1 else 0 end)/count(a.score) &#39;中等率&#39;, sum(case when a.score&gt;=80 and a.score&lt;90 then 1 else 0 end)/count(a.score) &#39;优良率&#39;, sum(case when a.score&gt;=90 then 1 else 0 end)/count(a.score) &#39;优秀率&#39; from sc a inner join course b on a.cno=b.cno group by a.cno;
+</span></span></code></pre></div><ol start="47">
+<li>统计各科成绩各分数段人数：课程编号，课程名称，[100-85]，[85-70]，[70-60]，[60-0] 及所占百分比【case】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 47. 统计各科成绩各分数段人数：课程编号，课程名称，[100-85]，[85-70]，[70-60]，[60-0] 及所占百分比 -- 思路同46 select a.cno, b.cname, sum(case when a.score&gt;=85 then 1 else 0 end) as &#39;[100-85]人数&#39;, sum(case when a.score&gt;=70 and a.score&lt;85 then 1 else 0 end) as &#39;[85-70]人数&#39;, sum(case when a.score&gt;=60 and a.score&lt;70 then 1 else 0 end) as &#39;[70-60]人数&#39;, sum(case when a.score&lt;60 then 1 else 0 end) as &#39;[60-0]人数&#39;, sum(case when a.score&gt;=85 then 1 else 0 end)/count(a.sno) as &#39;[100-85]百分比&#39;, sum(case when a.score&gt;=70 and a.score&lt;85 then 1 else 0 end)/count(a.sno) as &#39;[85-70]百分比&#39;, sum(case when a.score&gt;=60 and a.score&lt;70 then 1 else 0 end)/count(a.sno) as &#39;[70-60]百分比&#39;, sum(case when a.score&lt;60 then 1 else 0 end)/count(a.sno) as &#39;[60-0]百分比&#39; from sc as a inner join course as b on a.cno=b.cno group by a.cno;
+</span></span></code></pre></div><p>【时间函数】</p>
+<p>在mysql里计算时间差：</p>
+<ul>
+<li>日期差：datediff(time终, time始)- 指定时间差：timestampdiff(timestamp, time始, time终)
+令人崩溃的一点是，即便是如此相近的两个时间差函数，其后面时间参数的顺序居然是相反的，如果计算结果出现了负数，考虑参数写反的可能性。</li>
+</ul>
+<ol start="48">
+<li>查询各学生的年龄，只按年份来算【时间函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 48. 查询各学生的年龄，只按年份来算 -- 思路：year函数分别求出current_date和sage的年，相减即可 select sno, sname, year(current_date())-year(sage) as age from student;
+</span></span></code></pre></div><ol start="49">
+<li>按照出生日期来算，当前月日 &lt; 出生年月的月日则，年龄减一【时间函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 49. 按照出生日期来算，当前月日 &lt; 出生年月的月日则，年龄减一 -- 思路：使用timestampdiff()求差，将时间戳设置为年即可 Select sno, sname, timestampdiff(year, sage, current_date()) as age from student;
+</span></span></code></pre></div><ol start="50">
+<li>查询本月过生日的学生【时间函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 50. 查询本月过生日的学生 -- 思路：month函数分别求出current_date和sage的月份，相同即可 select sno, sname, sage from student where month(sage)=month(current_date());
+</span></span></code></pre></div><ol start="51">
+<li>查询下月过生日的学生【时间函数】</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 51. 查询下月过生日的学生 -- 思路参见50 select sno, sname, sage from student where month(sage)=month(current_date())+1;
+</span></span></code></pre></div><ol start="52">
+<li>查询本周过生日的学生【时间函数】*</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 52. 查询本周过生日的学生 /* 思路：1.replace将生日中的年换为今天的年，计算同学的生日在本年是第几周； 2.求出今天是本年的第几周 3.若相等，则符合条件 注意：这种方法存在问题，1月第一周和12月最后一周可能跨年，倒置结果出错。欢迎提供更好的方案。*/ select sno, sname, sage from student where week(replace(sage, year(sage), year(current_date())), 1) = week(current_date(),1);
+</span></span></code></pre></div><ol start="53">
+<li>查询下周过生日的学生【时间函数】*</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>-- 53. 查询下周过生日的学生 -- 思路和存在问题参见52 select sno, sname, sage from student where week(replace(sage, year(sage), year(current_date())), 1) = week(current_date(),1)+1;
+</span></span></code></pre></div><p>【创建原始表】</p>
+<ul>
+<li>插入数据 怕出错的话，可以先start transaction; 确认数据插入无误后再commit;</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-gdscript3" data-lang="gdscript3"><span style="display:flex;"><span><span style="color:#f92672">--</span> <span style="color:#960050;background-color:#1e0010">创建数据库</span>exercise create database exercise; <span style="color:#f92672">--</span> <span style="color:#960050;background-color:#1e0010">使用数据库</span>exercise use exercise; <span style="color:#f92672">--</span> <span style="color:#960050;background-color:#1e0010">创建学生表</span>student create table student (Sno varchar(<span style="color:#ae81ff">10</span>) <span style="color:#f92672">not</span> null, Sname varchar(<span style="color:#ae81ff">10</span>) , Sage date , Ssex varchar(<span style="color:#ae81ff">10</span>) , primary key (Sno)); start transaction; insert into student values (<span style="color:#e6db74">&#39;01&#39;</span>, <span style="color:#e6db74">&#39;赵雷&#39;</span>, <span style="color:#e6db74">&#39;1990-01-01&#39;</span>, <span style="color:#e6db74">&#39;男&#39;</span>); insert into student values (<span style="color:#e6db74">&#39;02&#39;</span>, <span style="color:#e6db74">&#39;钱电&#39;</span>, <span style="color:#e6db74">&#39;1990-12-21&#39;</span>, <span style="color:#e6db74">&#39;男&#39;</span>); insert into student values (<span style="color:#e6db74">&#39;03&#39;</span>, <span style="color:#e6db74">&#39;孙风&#39;</span>, <span style="color:#e6db74">&#39;1990-05-20&#39;</span>, <span style="color:#e6db74">&#39;男&#39;</span>); insert into student values (<span style="color:#e6db74">&#39;04&#39;</span>, <span style="color:#e6db74">&#39;李云&#39;</span>, <span style="color:#e6db74">&#39;1990-08-06&#39;</span>, <span style="color:#e6db74">&#39;男&#39;</span>); insert into student values (<span style="color:#e6db74">&#39;05&#39;</span>, <span style="color:#e6db74">&#39;周梅&#39;</span>, <span style="color:#e6db74">&#39;1991-12-01&#39;</span>, <span style="color:#e6db74">&#39;女&#39;</span>); insert into student values (<span style="color:#e6db74">&#39;06&#39;</span>, <span style="color:#e6db74">&#39;吴兰&#39;</span>, <span style="color:#e6db74">&#39;1992-03-01&#39;</span>, <span style="color:#e6db74">&#39;女&#39;</span>); insert into student values (<span style="color:#e6db74">&#39;07&#39;</span>, <span style="color:#e6db74">&#39;郑竹&#39;</span>, <span style="color:#e6db74">&#39;1989-07-01&#39;</span>, <span style="color:#e6db74">&#39;女&#39;</span>); insert into student values (<span style="color:#e6db74">&#39;08&#39;</span>, <span style="color:#e6db74">&#39;王菊&#39;</span>, <span style="color:#e6db74">&#39;1990-01-20&#39;</span>, <span style="color:#e6db74">&#39;女&#39;</span>); commit; <span style="color:#f92672">--</span> <span style="color:#960050;background-color:#1e0010">创建科目表</span>course create table course (Cno varchar(<span style="color:#ae81ff">10</span>) <span style="color:#f92672">not</span> null, Cname varchar(<span style="color:#ae81ff">10</span>) , Tno varchar(<span style="color:#ae81ff">10</span>) , primary key (Cno)); start transaction; insert into course values (<span style="color:#e6db74">&#39;01&#39;</span>, <span style="color:#e6db74">&#39;语文&#39;</span>, <span style="color:#e6db74">&#39;02&#39;</span>); insert into course values (<span style="color:#e6db74">&#39;02&#39;</span>, <span style="color:#e6db74">&#39;数学&#39;</span>, <span style="color:#e6db74">&#39;01&#39;</span>); insert into course values (<span style="color:#e6db74">&#39;03&#39;</span>, <span style="color:#e6db74">&#39;英语&#39;</span>, <span style="color:#e6db74">&#39;03&#39;</span>); commit; <span style="color:#f92672">--</span> <span style="color:#960050;background-color:#1e0010">创建教师表</span>teacher create table teacher (Tno varchar(<span style="color:#ae81ff">10</span>) <span style="color:#f92672">not</span> null, Tname varchar(<span style="color:#ae81ff">10</span>) , primary key (Tno)); strat transaction; insert into teacher values (<span style="color:#e6db74">&#39;01&#39;</span>, <span style="color:#e6db74">&#39;张三&#39;</span>); insert into teacher values (<span style="color:#e6db74">&#39;02&#39;</span>, <span style="color:#e6db74">&#39;李四&#39;</span>); insert into teacher values (<span style="color:#e6db74">&#39;03&#39;</span>, <span style="color:#e6db74">&#39;王五&#39;</span>); commit; <span style="color:#f92672">--</span> <span style="color:#960050;background-color:#1e0010">创建成绩表</span> sc create table sc (Sno varchar (<span style="color:#ae81ff">10</span>) , Cno varchar (<span style="color:#ae81ff">10</span>) , score decimal(<span style="color:#ae81ff">18</span>,<span style="color:#ae81ff">1</span>), primary key (Sno, Cno)); start transaction; insert into SC values(<span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#ae81ff">80</span>); insert into SC values(<span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#ae81ff">90</span>); insert into SC values(<span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#ae81ff">99</span>); insert into SC values(<span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#ae81ff">70</span>); insert into SC values(<span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#ae81ff">60</span>); insert into SC values(<span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#ae81ff">80</span>); insert into SC values(<span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#ae81ff">80</span>); insert into SC values(<span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#ae81ff">80</span>); insert into SC values(<span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#ae81ff">80</span>); insert into SC values(<span style="color:#e6db74">&#39;04&#39;</span> , <span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#ae81ff">50</span>); insert into SC values(<span style="color:#e6db74">&#39;04&#39;</span> , <span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#ae81ff">30</span>); insert into SC values(<span style="color:#e6db74">&#39;04&#39;</span> , <span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#ae81ff">20</span>); insert into SC values(<span style="color:#e6db74">&#39;05&#39;</span> , <span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#ae81ff">76</span>); insert into SC values(<span style="color:#e6db74">&#39;05&#39;</span> , <span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#ae81ff">87</span>); insert into SC values(<span style="color:#e6db74">&#39;06&#39;</span> , <span style="color:#e6db74">&#39;01&#39;</span> , <span style="color:#ae81ff">31</span>); insert into SC values(<span style="color:#e6db74">&#39;06&#39;</span> , <span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#ae81ff">34</span>); insert into SC values(<span style="color:#e6db74">&#39;07&#39;</span> , <span style="color:#e6db74">&#39;02&#39;</span> , <span style="color:#ae81ff">89</span>); insert into SC values(<span style="color:#e6db74">&#39;07&#39;</span> , <span style="color:#e6db74">&#39;03&#39;</span> , <span style="color:#ae81ff">98</span>); commit;
+</span></span></code></pre></div>
+
+        </div>
+        <div class="post-reward">
+            <div style="padding: 0 0 0 0; margin: 0 0 0 0; width: 100%; font-size:16px; text-align: center;">
+                <div id="QR" style="opacity: 0;">
+                    <div id="wechat" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="wechat_qr" src="https://www.heiok.top/img/thinks.jpg" alt="wechat_pay"></a>
+                        <p>微信</p>
+                    </div>
+                    <div id="alipay" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="alipay_qr" src="https://www.heiok.top/img/thinks.jpg" alt="alipay"></a>
+                        <p>支付宝</p>
+                    </div>
+                </div>
+                <button id="rewardButton"
+                        onclick="
+                    var qr = document.getElementById('QR');
+                    if (qr.style.opacity === '0') {
+                        qr.style.opacity='1';
+                    } else {
+                        qr.style.opacity='0'
+                    }"
+                >
+                    <span>🧧 鼓励</span>
+                </button>
+            </div>
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://www.heiok.top/posts/tutorial/mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E7%9F%A5%E8%AF%86/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>Mysql基础查询知识</span>
+  </a>
+  <a class="next" href="https://www.heiok.top/posts/tutorial/mysql%E4%BC%98%E5%8C%96-%E7%B4%A2%E5%BC%95/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Mysql优化-索引</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql练习题-50 on twitter"
+       href="https://twitter.com/intent/tweet/?text=Mysql%e7%bb%83%e4%b9%a0%e9%a2%98-50&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E7%25BB%2583%25E4%25B9%25A0%25E9%25A2%2598-50%2f&amp;hashtags=">
+    <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql练习题-50 on linkedin"
+       href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E7%25BB%2583%25E4%25B9%25A0%25E9%25A2%2598-50%2f&amp;title=Mysql%e7%bb%83%e4%b9%a0%e9%a2%98-50&amp;summary=Mysql%e7%bb%83%e4%b9%a0%e9%a2%98-50&amp;source=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E7%25BB%2583%25E4%25B9%25A0%25E9%25A2%2598-50%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql练习题-50 on reddit"
+       href="https://reddit.com/submit?url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E7%25BB%2583%25E4%25B9%25A0%25E9%25A2%2598-50%2f&title=Mysql%e7%bb%83%e4%b9%a0%e9%a2%98-50">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql练习题-50 on facebook"
+       href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E7%25BB%2583%25E4%25B9%25A0%25E9%25A2%2598-50%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql练习题-50 on whatsapp"
+       href="https://api.whatsapp.com/send?text=Mysql%e7%bb%83%e4%b9%a0%e9%a2%98-50%20-%20https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E7%25BB%2583%25E4%25B9%25A0%25E9%25A2%2598-50%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql练习题-50 on telegram"
+       href="https://telegram.me/share/url?text=Mysql%e7%bb%83%e4%b9%a0%e9%a2%98-50&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E7%25BB%2583%25E4%25B9%25A0%25E9%25A2%2598-50%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+        </footer>
+    </div>
+
+<style>
+    .comments_details summary::marker {
+        font-size: 20px;
+        content: '👉展开评论';
+        color: var(--content);
+    }
+    .comments_details[open] summary::marker{
+        font-size: 20px;
+        content: '👇关闭评论';
+        color: var(--content);
+    }
+</style>
+
+
+<div>
+    <details class="comments_details">
+        <summary style="cursor: pointer; margin: 50px 0 20px 0;width: 130px;">
+            <span style="font-size: 20px;color: var(--content);">...</span>
+        </summary>
+        <div id="tcomment"></div>
+    </details>
+    <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js">
+    </script>
+    <script>
+        twikoo.init({
+            envId:  null ,
+        el: "#tcomment",
+            lang: 'zh-CN',
+            region:  null ,
+        path: window.TWIKOO_MAGIC_PATH||window.location.pathname,
+        })
+    </script>
+</div>
+</article>
+</main>
+
+<footer class="footer">
+    <span>
+        Copyright
+        &copy;
+        2020-2026
+        <a href="https://www.heiok.top/" style="color:#939393;">wait`s blog</a>
+        All Rights Reserved
+    </span>
+    <a href="https://beian.miit.gov.cn/" target="_blank" style="color:#939393;">蜀ICP备2023024013号</a>&nbsp;
+    <span>
+        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=null"
+           style="display:inline-block;text-decoration:none;height:20px;color:#939393;">
+            <img src="" style="float:left;margin: 0px 5px 0px 0px;"/>
+            
+        </a>
+    </span>
+    <span id="busuanzi_container">
+        <span class="fa fa-user"></span> <span id="busuanzi_value_site_uv"></span>
+        <span class="fa fa-eye"></span> <span id="busuanzi_value_site_pv"></span>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '复制';
+
+        function copyingDone() {
+            copybutton.innerText = '已复制！';
+            setTimeout(() => {
+                copybutton.innerText = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+</body>
+
+</html>

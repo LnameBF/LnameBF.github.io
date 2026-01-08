@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<meta name="referrer" content="no-referrer">
+<title>Git 常用基本命令使用详细大全 | wait`s blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="  在进行项目开发时，都会用到版本控制工具，如svn、Git等，随着Git的发展，渐渐的被越来越多的人使用，甚至慢慢在取代svn的地位。下面将从Git仓库的创建 、Git常用的基本命令 、Git的分支管理 、Git查看提交历史 、Git 标签 、Git 远程仓库来介绍Git的使用。当然下面所涉及的命令都是在Git bash中操作的，所有必须先安装Git，至于怎样安装Git，这里就不介绍了，网上有一大把安装教程。">
+<meta name="author" content="wait">
+<link rel="canonical" href="https://www.heiok.top/posts/tutorial/git-%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E8%AF%A6%E7%BB%86%E5%A4%A7%E5%85%A8/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="apple-touch-icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="mask-icon" href="https://www.heiok.top/img/thinks.jpg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://www.heiok.top/posts/tutorial/git-%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E8%AF%A6%E7%BB%86%E5%A4%A7%E5%85%A8/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="Git 常用基本命令使用详细大全" />
+<meta property="og:description" content="  在进行项目开发时，都会用到版本控制工具，如svn、Git等，随着Git的发展，渐渐的被越来越多的人使用，甚至慢慢在取代svn的地位。下面将从Git仓库的创建 、Git常用的基本命令 、Git的分支管理 、Git查看提交历史 、Git 标签 、Git 远程仓库来介绍Git的使用。当然下面所涉及的命令都是在Git bash中操作的，所有必须先安装Git，至于怎样安装Git，这里就不介绍了，网上有一大把安装教程。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.heiok.top/posts/tutorial/git-%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E8%AF%A6%E7%BB%86%E5%A4%A7%E5%85%A8/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-01-08T16:37:49+08:00" />
+<meta property="article:modified_time" content="2026-01-08T16:37:49+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Git 常用基本命令使用详细大全"/>
+<meta name="twitter:description" content="  在进行项目开发时，都会用到版本控制工具，如svn、Git等，随着Git的发展，渐渐的被越来越多的人使用，甚至慢慢在取代svn的地位。下面将从Git仓库的创建 、Git常用的基本命令 、Git的分支管理 、Git查看提交历史 、Git 标签 、Git 远程仓库来介绍Git的使用。当然下面所涉及的命令都是在Git bash中操作的，所有必须先安装Git，至于怎样安装Git，这里就不介绍了，网上有一大把安装教程。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://www.heiok.top/posts/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Git 常用基本命令使用详细大全",
+      "item": "https://www.heiok.top/posts/tutorial/git-%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E8%AF%A6%E7%BB%86%E5%A4%A7%E5%85%A8/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Git 常用基本命令使用详细大全",
+  "name": "Git 常用基本命令使用详细大全",
+  "description": " 在进行项目开发时，都会用到版本控制工具，如svn、Git等，随着Git的发展，渐渐的被越来越多的人使用，甚至慢慢在取代svn的地位。下面将从Git仓库的创建 、Git常用的基本命令 、Git的分支管理 、Git查看提交历史 、Git 标签 、Git 远程仓库来介绍Git的使用。当然下面所涉及的命令都是在Git bash中操作的，所有必须先安装Git，至于怎样安装Git，这里就不介绍了，网上有一大把安装教程。\n",
+  "keywords": [
+    
+  ],
+  "articleBody": " 在进行项目开发时，都会用到版本控制工具，如svn、Git等，随着Git的发展，渐渐的被越来越多的人使用，甚至慢慢在取代svn的地位。下面将从Git仓库的创建 、Git常用的基本命令 、Git的分支管理 、Git查看提交历史 、Git 标签 、Git 远程仓库来介绍Git的使用。当然下面所涉及的命令都是在Git bash中操作的，所有必须先安装Git，至于怎样安装Git，这里就不介绍了，网上有一大把安装教程。\n{#Git__2}Git 创建仓库 创建一个git仓库有如下几种方式：\ngit init：初始化一个git仓库 git clone：clone一个git仓库 下面对这几种方式进行详细介绍：\ngit init\nGit使用git init命令来初始化一个Git仓库，执行完git init命令后，会生成一个.git目录，该目录包含了资源数据，且只会在仓库的根目录生成。 如果用当前目录作为Git仓库，则只需要执行如下命令：\ngit init 执行结果如下：\n执行该命令之后，就可以在当前目录下生成.init文件夹，并且会默认生成一个master分支。\n如果要在指定的目录下生成仓库，则指令如下：\ngit init newDir newDir为仓库的路径，执行完成之后，会在newDir目录下生成一个.git目录。具体的执行结果如下：\n执行该命令之后，就可以在当前目录下生成newtest文件夹，并在改文件夹下生成.init文件夹。\ngit clone\n使用git clone命令可以从Git仓库拷贝项目，类似于SVN中的 svn checkout，命令格式为： git clone \u003curl\u003e [directory] url为git仓库地址，directory为本地目录，比如，要克隆某个Git 代码仓库，可以用下面的命令：\ngit clone git://github.com/schacon/grit.git 执行完成之后会在当前目录下生成仓库，如果要指定目录下生成，则可以在后面加一个具体的位置路径，如：\ngit clone git://github.com/schacon/grit.git newgit 如下为clone一个仓库的执行结果：\ngit clone 时，可以用不同的协议，包括 ssh, git, https 等，其中最常用的是 ssh，因为速度较快，还可以配置公钥免输入密码，各种写法格式如下：\ngit clone git@github.com/schacon/grit.git --SSH协议 git clone git://github.com/schacon/grit.git --GIT协议 git clone https://github.com/schacon/grit.git --HTTPS协议 {#Git__55}Git 基本指令的使用 下面介绍一下git中常用的几种命令：\ngit config：配置信息 git add：添加文件到缓存命令 git status：查看文件的状态命令 git diff：查看更新的详细信息命令 git commit：提交命令 git reset HEAD：取消缓存命令 git rm：删除命令 git mv：移动或重命名命令 下面对这几个命令进行详细介绍：\ngit config\n我们可以通过git config来配置用户名和邮箱地址，便于我们将代码提交到远程仓库，具体格式如下： git config --global user.name '你的用户名' git config --global user.email '你的邮箱' git add\ngit add 命令可将文件添加到缓存，如新项目中，添加所有文件很普遍，可以使用如下命令： git add . 当然我们也可以指定某一类文件，如将java文件添加到缓存中，可以使用如下命令：\nit add *.java 如：我们可以创建两个文件，将它添加的缓存中，具体操作如下：\n3. git status\n我们可以使用 git status 命令来查看相关文件的状态，直接执行如下命令：\ngit status 如果有修改的文件，则执行结果如下：\n根据上面git status命令的提示内容，我们可以得到三种处理情况：\n暂存文件的命令：git add \u003c文件名\u003e 放弃未暂存文件的修改命令：git checkout – \u003c文件名\u003e 将被修改的文件暂存并提交的命令：git commit -a 如果你对Git的各种状态比较熟悉了，也可以使用 git status -s 来查看简写的状态，这种简写的状态和SVN上的差不多 M - 被修改，A - 被添加，D - 被删除，R - 重命名，?? - 未被跟踪 等等。如果有修改的文件，则执行结果如下：\n4. git diff\n执行 git diff 来查看更新的详细信息，与git status不同的是，git status只显示更新的状态，而 git diff 可以显示已写入缓存与已修改但尚未写入缓存的改动的区别具体的详细信息。\n尚未缓存的改动：git diff 查看已缓存的改动： git diff –cached 查看已缓存的与未缓存的所有改动：git diff HEAD 显示摘要而非整个 diff：git diff –stat 如：我们在修改一下test.txt文件内容，使用git diff查看修改详细信息：\n之后我们将修改的内容add到缓存中，再使用git diff查看修改详细信息：\ngit commit\ngit commit 将缓存区内容添加到仓库中，可以在后面加-m选项，以在命令行中提供提交注释，格式如下： git commit -m \"第一次版本提交\" 如果你觉得 每次 commit之前要add一下，想跳过add这一步，可以直接使用 -a选项,如：\ngit commit -am \"第一次版本提交\" 如：我们可以创建一个文件，并将它添加打缓存，之后在提交，具体操作如下：\n6. git reset HEAD\ngit reset HEAD 命令用于取消已缓存的内容，如我们要取消已提交的test.txt文件，可以如下使用：\ngit reset HEAD test.txt 执行完之后，再使用commit提交时，test.txt文件不会被提交。\n如：我们先修改test1.txt，test2.txt文件，之后再都添加到缓存，然后再使用git reset HEAD命令恢复test1.txt，最后再使用提交，具体操作如下：\n可以看出，修改的test1文件经过git reset HEAD后，没有被提交上去。简而言之，执行 git reset HEAD 以取消之前 git add 添加。\n7. git rm\n如果只是简单地从工作目录中手工删除文件，运行 git status 时就会在 Changes not staged for commit 的提示。要从 Git 中移除某个文件，就必须要从已跟踪文件清单中移除，然后提交。可以如下使用：\ngit rm \u003cfile\u003e 如果删除之前修改过并且已经放到暂存区域的话，则必须要用强制删除选项 -f\ngit rm -f \u003cfile\u003e 如果把文件从暂存区域移除，但仍然希望保留在当前工作目录中，换句话说，仅是从跟踪清单中删除，使用 –cached 选项即可\ngit rm --cached \u003cfile\u003e 可以递归删除，即如果后面跟的是一个目录做为参数，则会递归删除整个目录中的所有子目录和文件：\ngit rm --r * 如：我们移除上面所创建的hello.java文件：\ngit mv\ngit mv 命令用于移动或重命名一个文件、目录、软连接，如要将一个test.txt文件重命名为newtest.txt，则可以使用如下命令： git mv test.txt newtest.txt 如：我们将上面的test1.txt文件重命名为test.txt:\n{#Git_171}Git的分支管理 几乎每种版本控制系统都支持分支管理，使用分支我们可以从主干中分离出来，然后继续开发，不影响主干。下面介绍一下Git中分支常用的命令：\ngit branch：查看分支命令 git branch (branchname)：创建分支命令 git checkout (branchname)：切换分支命令 git merge：合并分支命令 git branch -d (branchname)：删除分支命令 下面分别对这些命令进行详细介绍：\ngit branch\ngit branch可以查看分支，也可以创建分支，如果没有参数时，git branch会列出你在本地的分支；如果有参数时，git branch就会创建改参数的分支。 如果要查看分支，命令格式如下：\ngit branch 在bash执行的效果如下图所示：\n当我们想创建分支时，可以在后面加参数，命令格式如下：\ngit branch branchname 如我们想创建一个test的分支，可以如下操作：\n现在我们可以看到，多了一个新的分支test。而master分支在我们执行git init的时候，缺省情况下 Git 就会为你创建 master 分支。\ngit checkout (branchname)\ngit checkout可以切换分支，命令格式如下： git checkout branchname 如果我们想切换到上面刚刚创建的test分支中，可以如下操作：\n可以看到，没有执行之前，当前的分支是master，当执行之后，当前的分支是test，这个时候可以可以在切换后的分支中继续操作，而不会影响到其他分支。\n我们也可以使用 git checkout -b (branchname) 命令来创建新分支并立即切换到该分支下，从而在该分支中操作。如，我们想创建一个newtest分支，并创建后就切换到该分支下，可以如下操作：\n可以看出，执行之前还在master分支中，执行之后，直接进入newtest分支了。\ngit merge\ngit merge命令可以将任意分支合并到到当前分支中去，命令格式如下： git merge branchname 如：我们新建一个newtest分支，并在其中增加test3.txt文件，之后在master中将newtest分支的修改合并到master，结果如下：\n可见master中也存在test3.txt文件了。\n合并冲突\n合并的时候，最大的难点就是冲突了，合并并不仅仅是简单的文件添加、移除的操作，Git 也会合并修改，如果我们在两个分支中同时修改了同一个文件，这时再合并，就可能会产生冲突，冲突并不可怕，可怕的是要怎样去解决，下面以一个小的例子来展示一下合并是冲突的解决。\n还是用上面的那个仓库，现在有两个分支：master、newtest，两个分支中都要test.txt文件，这个时候我们都这个两个仓库的文件都进行修改，之后再提交，最后将newtest合并到master中，具体的操作如下：\n1、先修改分支：master、newtest中的test.txt文件，并提交：\n2、之后再将newtest分支修改的内容合并到master分支中：\n可以看到newtest分支修改的内容和master分支修改的内容发生了冲突，这是根据具体的情况去解决，如下，我们保留两个分支都有的，之后再add，在commit就可以了：\n到此一个简单的合并就完成了。实际项目开发中，合并比这要复杂的多，要结合具体的情况去操作。\ngit branch -d (branchname)\ngit branch -d可以删除分支，删除分支命令格式如下： git branch -d (branchname) 如：我们要删除test分支：\n{#Git_240}Git查看提交历史 在使用 Git 提交了若干更新之后，又或者克隆了某个项目，想回顾下提交历史，我们可以使用 git log 命令查看，如，我们想列出历史提交记录如下：\n下面介绍查看历史记录的几种选项：\n–oneline ：查看历史记录的简洁版本 –graph ：查看历史中什么时候出现了分支、合并 –reverse ：逆向显示所有日志 –author ：查找指定用户的提交日志 –since、–before、 –until、–after： 指定筛选日期 –no-merges ：选项以隐藏合并提交 我们可以用 –oneline 选项来查看历史记录的简洁版本：\n我们还可以用 –graph 选项，查看历史中什么时候出现了分支、合并：\n这样我们可以更清楚明了地看到何时工作分叉、又何时归并，也可以用 –reverse 参数来逆向显示所有日志：\n如果只想查找指定用户的提交日志可以使用命令：git log –author , 例如，比方说我们要找 Git 源码中qtqt提交的部分：\n如果你要指定日期，可以执行几个选项：–since 和 –before，但是你也可以用 –until 和 –after，–no-merges 选项以隐藏合并提交。\n例如，如果我要看 Git 项目中八月一日前且在七月二十九日之后的所有提交，我可以执行这个：\n多数情况下，了解每条提交与那个分支／标签关联是很有用的。–decorate 标记让git log展示所有指向每个提交引用（如分支，标签等）,如:\n{#Git__266}Git 标签 使用标签可以很方便的永远的记住那个特别的提交快照，比如：我们发一个新的版本时，可以给它加一个\"vx.x\"版本，这样你可以使用git tag给它打上标签。\n创建新标签\n可以使用 git tag -a vx.x 来创建一个标签。a 选项意为\"创建一个带注解的标签\"。 不用 -a 选项也可以执行的，但它不会记录这标签是啥时候打的，谁打的，也不会让你添加个标签的注解。\n如：我们为我们上的例子创建一个标签：\n追加标签\n如果我们忘了给某个提交打标签，又将它发布了，我们可以给它追加标签。如，假设我们发布了提交 d6f7147，但是那时候忘了给它打标签。 我们现在也可以：\n查看标签\n如果我们要查看所有标签可以使用以下命令：\ngit tag 执行结果如下：\n指定标签信息命令：\ngit tag -a \u003ctagname\u003e -m \"某某标签\" PGP签名标签命令：\ngit tag -s \u003ctagname\u003e -m \"某某标签\" {#Git__294}Git 远程仓库 前面我们使用到的 Git 命令都是在本地执行，如果你想通过 Git 分享你的代码或者与其他开发人员合作。 你就需要将数据放到一台其他开发人员能够连接的服务器上。本本将使用 Github 作为远程仓库，来介绍Git 远程仓库的使用。\n下面介绍远程仓库常用的几种指令：\ngit remote add：添加远程仓库 git remote：查看当前的远程仓库 git fetch 、git pull：提取远程仓仓库 git push：推送到远程仓库 git remote rm：删除远程仓库 1.git remote add\ngit remote add可以添加一个远程仓库，其命令格式如下：\ngit remote add [alias] [url] 参数[alias]为别名， [url]为远程仓库的地址，如：我们可以将https://github.com/qtqt/test.git\n仓库添加到本地，并命名为test，操作如下：\n2. git remote\ngit remote可以查看当前有哪些远程仓库，执行结果如下：\n可以看出，有上面添加的别名为test仓库。\ngit fetch 、git pull\ngit fetch 可以提取远程仓库的数据，如果有多个远程仓库，我们可以在后面加仓库的别名，操作如下：\n该命令执行完后需要执行git merge 远程分支到你所在的分支。假设你配置好了一个远程仓库，并且你想要提取更新的数据，你可以首先执行 git fetch [alias] 告诉 Git 去获取它有你没有的数据，然后你可以执行 git merge [alias]/[branch] 以将服务器上的任何更新（假设有人这时候推送到服务器了）合并到你的当前分支。操作如下：\n执行完成之后可以在本地仓库找到远程仓库的文件。使用这种方式只能保证本地是一个空的仓库，如果非空，则会报：fatal: refusing to merge unrelated histories错误。 git pull命令用于从另一个存储库或本地分支获取并集成(整合)，在默认模式下，git pull是git fetch后跟git merge FETCH_HEAD的缩写，使用格式：\ngit pull [options] [\u003crepository\u003e [\u003crefspec\u003e...]] 如：我们可以将远程仓库pull到本地，如果本地仓库和远程仓库实际上是独立的两个仓库，–allow-unrelated-history选项来解决。\ngit fetch 和git pull的区别：\ngit fetch：相当于是从远程获取最新版本到本地，不会自动合并。\ngit pull：相当于是从远程获取最新版本并merge到本地。\ngit push\ngit push 推送你的新分支与数据到某个远端仓库命令，格式如下：\ngit push [alias] [branch] 如：我们可以将前面提交的文件push到远程仓库中：\n5. git remote rm\ngit remote rm删除远程仓库，格式如下：\ngit remote rm [别名] 如：我们可以先添加一个test2仓库，之后再删除它，操作如下：\n好了，到此基本上将Git常用的操作介绍完了。\n",
+  "wordCount" : "5632",
+  "inLanguage": "zh",
+  "datePublished": "2026-01-08T16:37:49+08:00",
+  "dateModified": "2026-01-08T16:37:49+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "wait"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.heiok.top/posts/tutorial/git-%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%E4%BD%BF%E7%94%A8%E8%AF%A6%E7%BB%86%E5%A4%A7%E5%85%A8/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wait`s blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.heiok.top/img/thinks.jpg"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://www.heiok.top/" accesskey="h" title="wait`s blog (Alt + H)">
+            <img src="https://www.heiok.top/img/Q.gif" alt="logo" aria-label="logo"
+                 height="35">wait`s blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://www.heiok.top/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/posts" title="📚 文章">
+                <span>📚 文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/archives/" title="⏱️ 时间轴">
+                <span>⏱️ 时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/about" title="🙋🏻‍♂️ 关于">
+                <span>🙋🏻‍♂️ 关于</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/links" title="🤝 友链">
+                <span>🤝 友链</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            <div class="breadcrumbs"><a href="https://www.heiok.top/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://www.heiok.top/posts/">📚文章</a></div>
+            <h1 class="post-title">
+                Git 常用基本命令使用详细大全
+            </h1>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2026-01-08
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>5632字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>12分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>wait
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    <span id="post_meta_style_8">
+                        <span class="fa fa-commenting-o"></span>
+                        <span>
+                            <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js"></script>
+                            <script>
+                                let url = document.documentURI
+                                
+                                let dnsUrl = "https://www.heiok.top/"
+                                let urlSplit = url.split(dnsUrl)
+                                let finalUrl = urlSplit[1]
+                                if (finalUrl[0] !== '/') {
+                                    finalUrl = '/'+finalUrl
+                                }
+                                twikoo.getCommentsCount({
+                                    envId:  null , 
+                                region:  null , 
+                                urls: [ 
+                                    
+                                    finalUrl,
+                                ],
+                                    includeReply: false 
+                                }).then(function (res) {
+                                    let count = res[0].count
+                                    const obj = document.getElementById("comment_count");
+                                    obj.innerText = count
+                                    
+                                    
+                                    
+                                }).catch(function (err) {
+                                    
+                                    console.error(err);
+                                });
+                            </script>
+                            <span id="comment_count"></span>
+                        </span>
+                    </span>
+                </span>
+
+</div>
+        </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#content_views" aria-label="{#Git__2}Git 创建仓库">{#Git__2}Git 创建仓库</a></li>
+                <li>
+                    <a href="#git__55git-%e5%9f%ba%e6%9c%ac%e6%8c%87%e4%bb%a4%e7%9a%84%e4%bd%bf%e7%94%a8" aria-label="{#Git__55}Git 基本指令的使用">{#Git__55}Git 基本指令的使用</a></li>
+                <li>
+                    <a href="#git_171git%e7%9a%84%e5%88%86%e6%94%af%e7%ae%a1%e7%90%86" aria-label="{#Git_171}Git的分支管理">{#Git_171}Git的分支管理</a></li>
+                <li>
+                    <a href="#git_240git%e6%9f%a5%e7%9c%8b%e6%8f%90%e4%ba%a4%e5%8e%86%e5%8f%b2" aria-label="{#Git_240}Git查看提交历史">{#Git_240}Git查看提交历史</a></li>
+                <li>
+                    <a href="#git__266git-%e6%a0%87%e7%ad%be" aria-label="{#Git__266}Git 标签">{#Git__266}Git 标签</a></li>
+                <li>
+                    <a href="#git__294git-%e8%bf%9c%e7%a8%8b%e4%bb%93%e5%ba%93" aria-label="{#Git__294}Git 远程仓库">{#Git__294}Git 远程仓库</a>
+                </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        if (elements) {
+            activeElement = Array.from(elements).find((element) => {
+                if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                    (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                    return element;
+                }
+            }) || activeElement
+
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                if (element === activeElement){
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+                }
+            })
+        }
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><p>  在进行项目开发时，都会用到版本控制工具，如svn、Git等，随着Git的发展，渐渐的被越来越多的人使用，甚至慢慢在取代svn的地位。下面将从<strong>Git仓库的创建</strong> 、<strong>Git常用的基本命令</strong> 、<strong>Git的分支管理</strong> 、<strong>Git查看提交历史</strong> 、<strong>Git 标签</strong> 、<strong>Git 远程仓库</strong>来介绍Git的使用。当然下面所涉及的命令都是在Git bash中操作的，所有必须先安装Git，至于怎样安装Git，这里就不介绍了，网上有一大把安装教程。</p>
+<h3 id="content_views">{#Git__2}Git 创建仓库<a hidden class="anchor" aria-hidden="true" href="#content_views">#</a></h3>
+<p>创建一个git仓库有如下几种方式：</p>
+<ul>
+<li><strong>git init</strong>：初始化一个git仓库</li>
+<li><strong>git clone</strong>：clone一个git仓库</li>
+</ul>
+<p><strong>下面对这几种方式进行详细介绍：</strong></p>
+<ol>
+<li><strong>git init</strong><br>
+  Git使用git init命令来初始化一个Git仓库，执行完git init命令后，会生成一个.git目录，该目录包含了资源数据，且只会在仓库的根目录生成。</li>
+</ol>
+<p>如果用当前目录作为Git仓库，则只需要执行如下命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git init
+</span></span></code></pre></div><p>执行结果如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731145706377.jpg" alt="在这里插入图片描述"  />
+<br>
+执行该命令之后，就可以在当前目录下生成.init文件夹，并且会默认生成一个master分支。</p>
+<p>如果要在指定的目录下生成仓库，则指令如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git init newDir
+</span></span></code></pre></div><p>newDir为仓库的路径，执行完成之后，会在newDir目录下生成一个.git目录。具体的执行结果如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731150209453.jpg" alt="在这里插入图片描述"  />
+<br>
+执行该命令之后，就可以在当前目录下生成newtest文件夹，并在改文件夹下生成.init文件夹。</p>
+<ol start="2">
+<li><strong>git clone</strong><br>
+使用git clone命令可以从Git仓库拷贝项目，类似于SVN中的 svn checkout，命令格式为：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git clone <span style="color:#f92672">&lt;</span>url<span style="color:#f92672">&gt;</span> <span style="color:#f92672">[</span>directory<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>url为git仓库地址，directory为本地目录，比如，要克隆某个Git 代码仓库，可以用下面的命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git clone git:<span style="color:#75715e">//github.com/schacon/grit.git</span>
+</span></span></code></pre></div><p>执行完成之后会在当前目录下生成仓库，如果要指定目录下生成，则可以在后面加一个具体的位置路径，如：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git clone git:<span style="color:#75715e">//github.com/schacon/grit.git newgit</span>
+</span></span></code></pre></div><p>如下为clone一个仓库的执行结果：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731154609439.jpg" alt="在这里插入图片描述"  />
+<br>
+  git clone 时，可以用不同的协议，包括 ssh, git, https 等，其中最常用的是 ssh，因为速度较快，还可以配置公钥免输入密码，各种写法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git clone git<span style="color:#a6e22e">@github.com</span><span style="color:#f92672">/</span>schacon<span style="color:#f92672">/</span>grit.<span style="color:#a6e22e">git</span>         <span style="color:#f92672">--</span>SSH协议
+</span></span><span style="display:flex;"><span>git clone git:<span style="color:#75715e">//github.com/schacon/grit.git          --GIT协议</span>
+</span></span><span style="display:flex;"><span>git clone https:<span style="color:#75715e">//github.com/schacon/grit.git      --HTTPS协议</span>
+</span></span></code></pre></div><h3 id="git__55git-基本指令的使用">{#Git__55}Git 基本指令的使用<a hidden class="anchor" aria-hidden="true" href="#git__55git-基本指令的使用">#</a></h3>
+<p>下面介绍一下git中常用的几种命令：</p>
+<ul>
+<li><strong>git config</strong>：配置信息</li>
+<li><strong>git add</strong>：添加文件到缓存命令</li>
+<li><strong>git status</strong>：查看文件的状态命令</li>
+<li><strong>git diff</strong>：查看更新的详细信息命令</li>
+<li><strong>git commit</strong>：提交命令</li>
+<li><strong>git reset HEAD</strong>：取消缓存命令</li>
+<li><strong>git rm</strong>：删除命令</li>
+<li><strong>git mv</strong>：移动或重命名命令</li>
+</ul>
+<p><strong>下面对这几个命令进行详细介绍：</strong></p>
+<ol>
+<li><strong>git config</strong><br>
+我们可以通过git config来配置用户名和邮箱地址，便于我们将代码提交到远程仓库，具体格式如下：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git config <span style="color:#f92672">--</span>global user.<span style="color:#a6e22e">name</span> <span style="color:#960050;background-color:#1e0010">&#39;</span>你的用户名<span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span><span style="display:flex;"><span>git config <span style="color:#f92672">--</span>global user.<span style="color:#a6e22e">email</span> <span style="color:#960050;background-color:#1e0010">&#39;</span>你的邮箱<span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><ol start="2">
+<li><strong>git add</strong><br>
+git add 命令可将文件添加到缓存，如新项目中，添加所有文件很普遍，可以使用如下命令：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git add .
+</span></span></code></pre></div><p>当然我们也可以指定某一类文件，如将java文件添加到缓存中，可以使用如下命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>it add <span style="color:#f92672">*</span>.<span style="color:#a6e22e">java</span>
+</span></span></code></pre></div><p>如：我们可以创建两个文件，将它添加的缓存中，具体操作如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731161323137.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+3. <strong>git status</strong><br>
+我们可以使用 git status 命令来查看相关文件的状态，直接执行如下命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git status
+</span></span></code></pre></div><p>如果有修改的文件，则执行结果如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731161735462.jpg" alt="在这里插入图片描述"  />
+<br>
+根据上面git status命令的提示内容，我们可以得到三种处理情况：</p>
+<ul>
+<li>暂存文件的命令：<strong>git add &lt;文件名&gt;</strong></li>
+<li>放弃未暂存文件的修改命令：<strong>git checkout &ndash; &lt;文件名&gt;</strong></li>
+<li>将被修改的文件暂存并提交的命令：<strong>git commit -a</strong></li>
+</ul>
+<p>  如果你对Git的各种状态比较熟悉了，也可以使用 git status -s 来查看简写的状态，这种简写的状态和SVN上的差不多 M - 被修改，A - 被添加，D - 被删除，R - 重命名，?? - 未被跟踪 等等。如果有修改的文件，则执行结果如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731161819643.jpg" alt="在这里插入图片描述"  />
+<br>
+4. <strong>git diff</strong><br>
+  执行 git diff 来查看更新的详细信息，与git status不同的是，git status只显示更新的状态，而 git diff 可以显示已写入缓存与已修改但尚未写入缓存的改动的区别具体的详细信息。</p>
+<ul>
+<li>尚未缓存的改动：<strong>git diff</strong></li>
+<li>查看已缓存的改动： <strong>git diff &ndash;cached</strong></li>
+<li>查看已缓存的与未缓存的所有改动：<strong>git diff HEAD</strong></li>
+<li>显示摘要而非整个 diff：<strong>git diff &ndash;stat</strong></li>
+</ul>
+<p>如：我们在修改一下test.txt文件内容，使用git diff查看修改详细信息：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731162338923.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+之后我们将修改的内容add到缓存中，再使用git diff查看修改详细信息：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731162650488.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+</p>
+<ol start="5">
+<li><strong>git commit</strong><br>
+git commit 将缓存区内容添加到仓库中，可以在后面加-m选项，以在命令行中提供提交注释，格式如下：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git commit <span style="color:#f92672">-</span>m <span style="color:#e6db74">&#34;第一次版本提交&#34;</span>
+</span></span></code></pre></div><p>如果你觉得 每次 commit之前要add一下，想跳过add这一步，可以直接使用 -a选项,如：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git commit <span style="color:#f92672">-</span>am <span style="color:#e6db74">&#34;第一次版本提交&#34;</span>
+</span></span></code></pre></div><p>如：我们可以创建一个文件，并将它添加打缓存，之后在提交，具体操作如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731164040231.jpg" alt="在这里插入图片描述"  />
+<br>
+6. <strong>git reset HEAD</strong><br>
+git reset HEAD 命令用于取消已缓存的内容，如我们要取消已提交的test.txt文件，可以如下使用：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git reset HEAD test.<span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><p>执行完之后，再使用commit提交时，test.txt文件不会被提交。<br>
+如：我们先修改test1.txt，test2.txt文件，之后再都添加到缓存，然后再使用git reset HEAD命令恢复test1.txt，最后再使用提交，具体操作如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731165010729.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+可以看出，修改的test1文件经过git reset HEAD后，没有被提交上去。简而言之，执行 git reset HEAD 以取消之前 git add 添加。<br>
+7. <strong>git rm</strong><br>
+如果只是简单地从工作目录中手工删除文件，运行 git status 时就会在 Changes not staged for commit 的提示。要从 Git 中移除某个文件，就必须要从已跟踪文件清单中移除，然后提交。可以如下使用：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git rm <span style="color:#f92672">&lt;</span>file<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>如果删除之前修改过并且已经放到暂存区域的话，则必须要用强制删除选项 -f</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git rm <span style="color:#f92672">-</span>f <span style="color:#f92672">&lt;</span>file<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>  如果把文件从暂存区域移除，但仍然希望保留在当前工作目录中，换句话说，仅是从跟踪清单中删除，使用 &ndash;cached 选项即可</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git rm <span style="color:#f92672">--</span>cached <span style="color:#f92672">&lt;</span>file<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>可以递归删除，即如果后面跟的是一个目录做为参数，则会递归删除整个目录中的所有子目录和文件：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git rm <span style="color:#f92672">--</span>r <span style="color:#f92672">*</span>
+</span></span></code></pre></div><p>如：我们移除上面所创建的hello.java文件：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731165541253.jpg" alt="在这里插入图片描述"  />
+</p>
+<ol start="9">
+<li><strong>git mv</strong><br>
+git mv 命令用于移动或重命名一个文件、目录、软连接，如要将一个test.txt文件重命名为newtest.txt，则可以使用如下命令：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git mv test.<span style="color:#a6e22e">txt</span> newtest.<span style="color:#a6e22e">txt</span>
+</span></span></code></pre></div><p>如：我们将上面的test1.txt文件重命名为test.txt:<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731165757739.jpg" alt="在这里插入图片描述"  />
+</p>
+<h3 id="git_171git的分支管理">{#Git_171}Git的分支管理<a hidden class="anchor" aria-hidden="true" href="#git_171git的分支管理">#</a></h3>
+<p>  几乎每种版本控制系统都支持分支管理，使用分支我们可以从主干中分离出来，然后继续开发，不影响主干。下面介绍一下Git中分支常用的命令：</p>
+<ul>
+<li><strong>git branch</strong>：查看分支命令</li>
+<li><strong>git branch (branchname)</strong>：创建分支命令</li>
+<li><strong>git checkout (branchname)</strong>：切换分支命令</li>
+<li><strong>git merge</strong>：合并分支命令</li>
+<li><strong>git branch -d (branchname)</strong>：删除分支命令</li>
+</ul>
+<p><strong>下面分别对这些命令进行详细介绍：</strong></p>
+<ol>
+<li><strong>git branch</strong><br>
+git branch可以查看分支，也可以创建分支，如果没有参数时，git branch会列出你在本地的分支；如果有参数时，git branch就会创建改参数的分支。</li>
+</ol>
+<p>如果要查看分支，命令格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git branch
+</span></span></code></pre></div><p>在bash执行的效果如下图所示：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731113408345.jpg" alt="在这里插入图片描述"  />
+<br>
+当我们想创建分支时，可以在后面加参数，命令格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git branch  branchname
+</span></span></code></pre></div><p>如我们想创建一个test的分支，可以如下操作：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731113728315.jpg" alt="在这里插入图片描述"  />
+<br>
+  现在我们可以看到，多了一个新的分支test。而master分支在我们执行git init的时候，缺省情况下 Git 就会为你创建 master 分支。</p>
+<ol start="2">
+<li><strong>git checkout (branchname)</strong><br>
+git checkout可以切换分支，命令格式如下：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git checkout branchname
+</span></span></code></pre></div><p>如果我们想切换到上面刚刚创建的test分支中，可以如下操作：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731114804559.jpg" alt="在这里插入图片描述"  />
+<br>
+  可以看到，没有执行之前，当前的分支是master，当执行之后，当前的分支是test，这个时候可以可以在切换后的分支中继续操作，而不会影响到其他分支。<br>
+  我们也可以使用 <strong>git checkout -b (branchname)</strong> 命令来创建新分支并立即切换到该分支下，从而在该分支中操作。如，我们想创建一个newtest分支，并创建后就切换到该分支下，可以如下操作：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731121134501.jpg" alt="在这里插入图片描述"  />
+<br>
+可以看出，执行之前还在master分支中，执行之后，直接进入newtest分支了。</p>
+<ol start="3">
+<li><strong>git merge</strong><br>
+git merge命令可以将任意分支合并到到当前分支中去，命令格式如下：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git merge branchname
+</span></span></code></pre></div><p>如：我们新建一个newtest分支，并在其中增加test3.txt文件，之后在master中将newtest分支的修改合并到master，结果如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731183613365.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+可见master中也存在test3.txt文件了。<br>
+<strong>合并冲突</strong><br>
+  合并的时候，最大的难点就是冲突了，合并并不仅仅是简单的文件添加、移除的操作，Git 也会合并修改，如果我们在两个分支中同时修改了同一个文件，这时再合并，就可能会产生冲突，冲突并不可怕，可怕的是要怎样去解决，下面以一个小的例子来展示一下合并是冲突的解决。<br>
+  还是用上面的那个仓库，现在有两个分支：master、newtest，两个分支中都要test.txt文件，这个时候我们都这个两个仓库的文件都进行修改，之后再提交，最后将newtest合并到master中，具体的操作如下：<br>
+1、先修改分支：master、newtest中的test.txt文件，并提交：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801114319740.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+2、之后再将newtest分支修改的内容合并到master分支中：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801114823386.jpg" alt="在这里插入图片描述"  />
+<br>
+ 可以看到newtest分支修改的内容和master分支修改的内容发生了冲突，这是根据具体的情况去解决，如下，我们保留两个分支都有的，之后再add，在commit就可以了：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801115441361.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+ 到此一个简单的合并就完成了。实际项目开发中，合并比这要复杂的多，要结合具体的情况去操作。</p>
+<ul>
+<li><strong>git branch -d (branchname)</strong><br>
+git branch -d可以删除分支，删除分支命令格式如下：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git branch <span style="color:#f92672">-</span>d (branchname)
+</span></span></code></pre></div><p>如：我们要删除test分支：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190731180227718.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+</p>
+<h3 id="git_240git查看提交历史">{#Git_240}Git查看提交历史<a hidden class="anchor" aria-hidden="true" href="#git_240git查看提交历史">#</a></h3>
+<p> 在使用 Git 提交了若干更新之后，又或者克隆了某个项目，想回顾下提交历史，我们可以使用 <strong>git log</strong> 命令查看，如，我们想列出历史提交记录如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801121409336.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+下面介绍查看历史记录的几种选项：</p>
+<ul>
+<li><strong>&ndash;oneline</strong> ：查看历史记录的简洁版本</li>
+<li><strong>&ndash;graph</strong> ：查看历史中什么时候出现了分支、合并</li>
+<li><strong>&ndash;reverse</strong> ：逆向显示所有日志</li>
+<li><strong>&ndash;author</strong> ：查找指定用户的提交日志</li>
+<li><strong>&ndash;since、&ndash;before、 &ndash;until、&ndash;after</strong>： 指定筛选日期</li>
+<li><strong>&ndash;no-merges</strong> ：选项以隐藏合并提交</li>
+</ul>
+<p>我们可以用 <strong>&ndash;oneline</strong> 选项来查看历史记录的简洁版本：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801121543803.jpg" alt="在这里插入图片描述"  />
+<br>
+我们还可以用 <strong>&ndash;graph</strong> 选项，查看历史中什么时候出现了分支、合并：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801121708209.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+ 这样我们可以更清楚明了地看到何时工作分叉、又何时归并，也可以用 <strong>&ndash;reverse</strong> 参数来逆向显示所有日志：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801144148407.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+<br>
+ 如果只想查找指定用户的提交日志可以使用命令：<strong>git log &ndash;author</strong> , 例如，比方说我们要找 Git 源码中qtqt提交的部分：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801144448996.jpg" alt="在这里插入图片描述"  />
+<br>
+ 如果你要指定日期，可以执行几个选项：&ndash;since 和 &ndash;before，但是你也可以用 &ndash;until 和 &ndash;after，&ndash;no-merges 选项以隐藏合并提交。</p>
+<p>例如，如果我要看 Git 项目中八月一日前且在七月二十九日之后的所有提交，我可以执行这个：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801150027793.jpg" alt="在这里插入图片描述"  />
+<br>
+ 多数情况下，了解每条提交与那个分支／标签关联是很有用的。<strong>&ndash;decorate</strong> 标记让git log展示所有指向每个提交引用（如分支，标签等）,如:<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801152740396.jpg" alt="在这里插入图片描述"  />
+</p>
+<h3 id="git__266git-标签">{#Git__266}Git 标签<a hidden class="anchor" aria-hidden="true" href="#git__266git-标签">#</a></h3>
+<p>使用标签可以很方便的永远的记住那个特别的提交快照，比如：我们发一个新的版本时，可以给它加一个&quot;vx.x&quot;版本，这样你可以使用git tag给它打上标签。<br>
+<strong>创建新标签</strong><br>
+ 可以使用 <strong>git tag -a vx.x</strong> 来创建一个标签。a 选项意为&quot;创建一个带注解的标签&quot;。 不用 -a 选项也可以执行的，但它不会记录这标签是啥时候打的，谁打的，也不会让你添加个标签的注解。<br>
+如：我们为我们上的例子创建一个标签：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801152935645.jpg" alt="在这里插入图片描述"  />
+<br>
+<strong>追加标签</strong><br>
+如果我们忘了给某个提交打标签，又将它发布了，我们可以给它追加标签。如，假设我们发布了提交 d6f7147，但是那时候忘了给它打标签。 我们现在也可以：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801153352398.jpg" alt="在这里插入图片描述"  />
+<br>
+<strong>查看标签</strong><br>
+如果我们要查看所有标签可以使用以下命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git tag
+</span></span></code></pre></div><p>执行结果如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801153532294.jpg" alt="在这里插入图片描述"  />
+<br>
+指定标签信息命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git tag <span style="color:#f92672">-</span>a <span style="color:#f92672">&lt;</span>tagname<span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span>m <span style="color:#e6db74">&#34;某某标签&#34;</span>
+</span></span></code></pre></div><p>PGP签名标签命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git tag <span style="color:#f92672">-</span>s <span style="color:#f92672">&lt;</span>tagname<span style="color:#f92672">&gt;</span> <span style="color:#f92672">-</span>m <span style="color:#e6db74">&#34;某某标签&#34;</span>
+</span></span></code></pre></div><h3 id="git__294git-远程仓库">{#Git__294}Git 远程仓库<a hidden class="anchor" aria-hidden="true" href="#git__294git-远程仓库">#</a></h3>
+<p> 前面我们使用到的 Git 命令都是在本地执行，如果你想通过 Git 分享你的代码或者与其他开发人员合作。 你就需要将数据放到一台其他开发人员能够连接的服务器上。本本将使用 Github 作为远程仓库，来介绍Git 远程仓库的使用。<br>
+下面介绍远程仓库常用的几种指令：</p>
+<ul>
+<li><strong>git remote add</strong>：添加远程仓库</li>
+<li><strong>git remote</strong>：查看当前的远程仓库</li>
+<li><strong>git fetch</strong> 、<strong>git pull</strong>：提取远程仓仓库</li>
+<li><strong>git push</strong>：推送到远程仓库</li>
+<li><strong>git remote rm</strong>：删除远程仓库</li>
+</ul>
+<p>1.<strong>git remote add</strong><br>
+git remote add可以添加一个远程仓库，其命令格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git remote add <span style="color:#f92672">[</span>alias<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>url<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>参数[alias]为别名， [url]为远程仓库的地址，如：我们可以将https://github.com/qtqt/test.git</p>
+<p>仓库添加到本地，并命名为test，操作如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801164530171.jpg" alt="在这里插入图片描述"  />
+<br>
+2. <strong>git remote</strong><br>
+git remote可以查看当前有哪些远程仓库，执行结果如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801164618710.jpg" alt="在这里插入图片描述"  />
+<br>
+可以看出，有上面添加的别名为test仓库。</p>
+<ol start="3">
+<li><strong>git fetch</strong> 、<strong>git pull</strong><br>
+<strong>git fetch</strong> 可以提取远程仓库的数据，如果有多个远程仓库，我们可以在后面加仓库的别名，操作如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801164810212.jpg" alt="在这里插入图片描述"  />
+<br>
+ 该命令执行完后需要执行git merge 远程分支到你所在的分支。假设你配置好了一个远程仓库，并且你想要提取更新的数据，你可以首先执行 git fetch [alias] 告诉 Git 去获取它有你没有的数据，然后你可以执行 git merge [alias]/[branch] 以将服务器上的任何更新（假设有人这时候推送到服务器了）合并到你的当前分支。操作如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801164855388.png" alt="在这里插入图片描述"  />
+<br>
+ 执行完成之后可以在本地仓库找到远程仓库的文件。使用这种方式只能保证本地是一个空的仓库，如果非空，则会报：fatal: refusing to merge unrelated histories错误。</li>
+</ol>
+<p><strong>git pull</strong>命令用于从另一个存储库或本地分支获取并集成(整合)，在默认模式下，git pull是git fetch后跟git merge FETCH_HEAD的缩写，使用格式：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git pull <span style="color:#f92672">[</span>options<span style="color:#f92672">]</span> <span style="color:#f92672">[&lt;</span>repository<span style="color:#f92672">&gt;</span> <span style="color:#f92672">[&lt;</span>refspec<span style="color:#f92672">&gt;</span>...<span style="color:#f92672">]]</span>
+</span></span></code></pre></div><p>如：我们可以将远程仓库pull到本地，如果本地仓库和远程仓库实际上是独立的两个仓库，&ndash;allow-unrelated-history选项来解决。<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801172317820.png" alt="在这里插入图片描述"  />
+<br>
+<strong>git fetch</strong> 和<strong>git pull</strong>的区别：</p>
+<ol>
+<li>
+<p>git fetch：相当于是从远程获取最新版本到本地，不会自动合并。</p>
+</li>
+<li>
+<p>git pull：相当于是从远程获取最新版本并merge到本地。</p>
+</li>
+<li>
+<p><strong>git push</strong><br>
+git push 推送你的新分支与数据到某个远端仓库命令，格式如下：</p>
+</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git push <span style="color:#f92672">[</span>alias<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>branch<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>如：我们可以将前面提交的文件push到远程仓库中：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/201908011739082.png" alt="在这里插入图片描述"  />
+<br>
+5. <strong>git remote rm</strong><br>
+git remote rm删除远程仓库，格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>git remote rm <span style="color:#f92672">[</span>别名<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>如：我们可以先添加一个test2仓库，之后再删除它，操作如下：<br>
+<img loading="lazy" src="https://img-blog.csdnimg.cn/20190801171507752.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3F0aWFv,size_16,color_FFFFFF,t_70" alt="在这里插入图片描述"  />
+</p>
+<p>好了，到此基本上将Git常用的操作介绍完了。</p>
+
+
+        </div>
+        <div class="post-reward">
+            <div style="padding: 0 0 0 0; margin: 0 0 0 0; width: 100%; font-size:16px; text-align: center;">
+                <div id="QR" style="opacity: 0;">
+                    <div id="wechat" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="wechat_qr" src="https://www.heiok.top/img/thinks.jpg" alt="wechat_pay"></a>
+                        <p>微信</p>
+                    </div>
+                    <div id="alipay" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="alipay_qr" src="https://www.heiok.top/img/thinks.jpg" alt="alipay"></a>
+                        <p>支付宝</p>
+                    </div>
+                </div>
+                <button id="rewardButton"
+                        onclick="
+                    var qr = document.getElementById('QR');
+                    if (qr.style.opacity === '0') {
+                        qr.style.opacity='1';
+                    } else {
+                        qr.style.opacity='0'
+                    }"
+                >
+                    <span>🧧 鼓励</span>
+                </button>
+            </div>
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://www.heiok.top/posts/tutorial/efcore%E5%AE%9E%E7%8E%B0%E5%85%85%E8%A1%80%E6%A8%A1%E5%9E%8B/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>EfCore实现充血模型</span>
+  </a>
+  <a class="next" href="https://www.heiok.top/posts/tutorial/git-%E5%91%BD%E4%BB%A4/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Git 命令</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Git 常用基本命令使用详细大全 on twitter"
+       href="https://twitter.com/intent/tweet/?text=Git%20%e5%b8%b8%e7%94%a8%e5%9f%ba%e6%9c%ac%e5%91%bd%e4%bb%a4%e4%bd%bf%e7%94%a8%e8%af%a6%e7%bb%86%e5%a4%a7%e5%85%a8&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fgit-%25E5%25B8%25B8%25E7%2594%25A8%25E5%259F%25BA%25E6%259C%25AC%25E5%2591%25BD%25E4%25BB%25A4%25E4%25BD%25BF%25E7%2594%25A8%25E8%25AF%25A6%25E7%25BB%2586%25E5%25A4%25A7%25E5%2585%25A8%2f&amp;hashtags=">
+    <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Git 常用基本命令使用详细大全 on linkedin"
+       href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fgit-%25E5%25B8%25B8%25E7%2594%25A8%25E5%259F%25BA%25E6%259C%25AC%25E5%2591%25BD%25E4%25BB%25A4%25E4%25BD%25BF%25E7%2594%25A8%25E8%25AF%25A6%25E7%25BB%2586%25E5%25A4%25A7%25E5%2585%25A8%2f&amp;title=Git%20%e5%b8%b8%e7%94%a8%e5%9f%ba%e6%9c%ac%e5%91%bd%e4%bb%a4%e4%bd%bf%e7%94%a8%e8%af%a6%e7%bb%86%e5%a4%a7%e5%85%a8&amp;summary=Git%20%e5%b8%b8%e7%94%a8%e5%9f%ba%e6%9c%ac%e5%91%bd%e4%bb%a4%e4%bd%bf%e7%94%a8%e8%af%a6%e7%bb%86%e5%a4%a7%e5%85%a8&amp;source=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fgit-%25E5%25B8%25B8%25E7%2594%25A8%25E5%259F%25BA%25E6%259C%25AC%25E5%2591%25BD%25E4%25BB%25A4%25E4%25BD%25BF%25E7%2594%25A8%25E8%25AF%25A6%25E7%25BB%2586%25E5%25A4%25A7%25E5%2585%25A8%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Git 常用基本命令使用详细大全 on reddit"
+       href="https://reddit.com/submit?url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fgit-%25E5%25B8%25B8%25E7%2594%25A8%25E5%259F%25BA%25E6%259C%25AC%25E5%2591%25BD%25E4%25BB%25A4%25E4%25BD%25BF%25E7%2594%25A8%25E8%25AF%25A6%25E7%25BB%2586%25E5%25A4%25A7%25E5%2585%25A8%2f&title=Git%20%e5%b8%b8%e7%94%a8%e5%9f%ba%e6%9c%ac%e5%91%bd%e4%bb%a4%e4%bd%bf%e7%94%a8%e8%af%a6%e7%bb%86%e5%a4%a7%e5%85%a8">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Git 常用基本命令使用详细大全 on facebook"
+       href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fgit-%25E5%25B8%25B8%25E7%2594%25A8%25E5%259F%25BA%25E6%259C%25AC%25E5%2591%25BD%25E4%25BB%25A4%25E4%25BD%25BF%25E7%2594%25A8%25E8%25AF%25A6%25E7%25BB%2586%25E5%25A4%25A7%25E5%2585%25A8%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Git 常用基本命令使用详细大全 on whatsapp"
+       href="https://api.whatsapp.com/send?text=Git%20%e5%b8%b8%e7%94%a8%e5%9f%ba%e6%9c%ac%e5%91%bd%e4%bb%a4%e4%bd%bf%e7%94%a8%e8%af%a6%e7%bb%86%e5%a4%a7%e5%85%a8%20-%20https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fgit-%25E5%25B8%25B8%25E7%2594%25A8%25E5%259F%25BA%25E6%259C%25AC%25E5%2591%25BD%25E4%25BB%25A4%25E4%25BD%25BF%25E7%2594%25A8%25E8%25AF%25A6%25E7%25BB%2586%25E5%25A4%25A7%25E5%2585%25A8%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Git 常用基本命令使用详细大全 on telegram"
+       href="https://telegram.me/share/url?text=Git%20%e5%b8%b8%e7%94%a8%e5%9f%ba%e6%9c%ac%e5%91%bd%e4%bb%a4%e4%bd%bf%e7%94%a8%e8%af%a6%e7%bb%86%e5%a4%a7%e5%85%a8&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fgit-%25E5%25B8%25B8%25E7%2594%25A8%25E5%259F%25BA%25E6%259C%25AC%25E5%2591%25BD%25E4%25BB%25A4%25E4%25BD%25BF%25E7%2594%25A8%25E8%25AF%25A6%25E7%25BB%2586%25E5%25A4%25A7%25E5%2585%25A8%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+        </footer>
+    </div>
+
+<style>
+    .comments_details summary::marker {
+        font-size: 20px;
+        content: '👉展开评论';
+        color: var(--content);
+    }
+    .comments_details[open] summary::marker{
+        font-size: 20px;
+        content: '👇关闭评论';
+        color: var(--content);
+    }
+</style>
+
+
+<div>
+    <details class="comments_details">
+        <summary style="cursor: pointer; margin: 50px 0 20px 0;width: 130px;">
+            <span style="font-size: 20px;color: var(--content);">...</span>
+        </summary>
+        <div id="tcomment"></div>
+    </details>
+    <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js">
+    </script>
+    <script>
+        twikoo.init({
+            envId:  null ,
+        el: "#tcomment",
+            lang: 'zh-CN',
+            region:  null ,
+        path: window.TWIKOO_MAGIC_PATH||window.location.pathname,
+        })
+    </script>
+</div>
+</article>
+</main>
+
+<footer class="footer">
+    <span>
+        Copyright
+        &copy;
+        2020-2026
+        <a href="https://www.heiok.top/" style="color:#939393;">wait`s blog</a>
+        All Rights Reserved
+    </span>
+    <a href="https://beian.miit.gov.cn/" target="_blank" style="color:#939393;">蜀ICP备2023024013号</a>&nbsp;
+    <span>
+        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=null"
+           style="display:inline-block;text-decoration:none;height:20px;color:#939393;">
+            <img src="" style="float:left;margin: 0px 5px 0px 0px;"/>
+            
+        </a>
+    </span>
+    <span id="busuanzi_container">
+        <span class="fa fa-user"></span> <span id="busuanzi_value_site_uv"></span>
+        <span class="fa fa-eye"></span> <span id="busuanzi_value_site_pv"></span>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '复制';
+
+        function copyingDone() {
+            copybutton.innerText = '已复制！';
+            setTimeout(() => {
+                copybutton.innerText = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+</body>
+
+</html>

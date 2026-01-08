@@ -1,0 +1,2524 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<meta name="referrer" content="no-referrer">
+<title>dotnet 数据库读写分离实现 | wait`s blog</title>
+<meta name="keywords" content="">
+<meta name="description" content=".NET中实现读写分离
+什么是读写分离
+读写分离是一种数据库架构设计模式，将数据库读操作和写操作分离到不同的数据库实例上执行。主数据库（Master）处理写操作和一些重要的读操作，而从数据库（Slave/Replica）处理大部分读操作。这种模式可以提高系统的并发处理能力，优化数据库负载。
+读写分离的优势
+
+提高系统性能：分担数据库负载，提高并发处理能力
+提高系统可用性：主库故障时，从库可以继续提供读服务
+便于数据备份：可以在从库进行备份，不影响主库性能
+扩展性强：可以根据读请求的增长方便地添加更多从库
+
+在.NET中实现读写分离的方法
+方法一：使用ADO.NET手动实现
+public class DatabaseManager
+{
+    private readonly string _masterConnectionString;
+    private readonly string _slaveConnectionString;
+
+    public DatabaseManager(string masterConnectionString, string slaveConnectionString)
+    {
+        _masterConnectionString = masterConnectionString;
+        _slaveConnectionString = slaveConnectionString;
+    }
+
+    public SqlConnection GetWriteConnection()
+    {
+        var connection = new SqlConnection(_masterConnectionString);
+        connection.Open();
+        return connection;
+    }
+    public SqlConnection GetReadConnection()
+    {
+        var connection = new SqlConnection(_slaveConnectionString);
+        connection.Open();
+        return connection;
+    }
+    
+    public async Task&lt;T&gt; ExecuteWriteOperationAsync&lt;T&gt;(Func&lt;SqlConnection, Task&lt;T&gt;&gt; operation)
+    {
+        using (var connection = GetWriteConnection())
+        {
+            return await operation(connection);
+        }
+    }
+    
+    public async Task&lt;T&gt; ExecuteReadOperationAsync&lt;T&gt;(Func&lt;SqlConnection, Task&lt;T&gt;&gt; operation)
+    {
+        using (var connection = GetReadConnection())
+        {
+            return await operation(connection);
+        }
+    }
+}
+方法二：使用Entity Framework Core实现
+1. 创建多个DbContext
+public class ReadDbContext : AppDbContext
+{
+    public ReadDbContext(DbContextOptions&lt;ReadDbContext&gt; options) : base(options)
+    {
+    }
+}
+
+public class WriteDbContext : AppDbContext
+{
+    public WriteDbContext(DbContextOptions&lt;WriteDbContext&gt; options) : base(options)
+    {
+    }
+}
+
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions options) : base(options)
+    {
+    }
+    
+    public DbSet&lt;User&gt; Users { get; set; }
+    // 其他实体...
+}
+2. 在Startup.cs注册服务
+public void ConfigureServices(IServiceCollection services)
+{
+    // 注册写库上下文
+    services.AddDbContext&lt;WriteDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;MasterConnection&#34;)));
+    
+    // 注册读库上下文
+    services.AddDbContext&lt;ReadDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;SlaveConnection&#34;)));
+        
+    // ...其他服务注册
+}
+3. 创建仓储模式实现读写分离
+public interface IUserRepository
+{
+    Task&lt;User&gt; GetByIdAsync(int id);
+    Task&lt;IEnumerable&lt;User&gt;&gt; GetAllAsync();
+    Task AddAsync(User user);
+    Task UpdateAsync(User user);
+    Task DeleteAsync(int id);
+}
+
+public class UserRepository : IUserRepository
+{
+    private readonly ReadDbContext _readContext;
+    private readonly WriteDbContext _writeContext;
+
+    public UserRepository(ReadDbContext readContext, WriteDbContext writeContext)
+    {
+        _readContext = readContext;
+        _writeContext = writeContext;
+    }
+
+    public async Task&lt;User&gt; GetByIdAsync(int id)
+    {
+        return await _readContext.Users.FindAsync(id);
+    }
+
+    public async Task&lt;IEnumerable&lt;User&gt;&gt; GetAllAsync()
+    {
+        return await _readContext.Users.ToListAsync();
+    }
+
+    public async Task AddAsync(User user)
+    {
+        await _writeContext.Users.AddAsync(user);
+        await _writeContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(User user)
+    {
+        _writeContext.Users.Update(user);
+        await _writeContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var user = await _writeContext.Users.FindAsync(id);
+        if (user != null)
+        {
+            _writeContext.Users.Remove(user);
+            await _writeContext.SaveChangesAsync();
+        }
+    }
+}
+方法三：使用第三方库实现读写分离
+使用EntityFramework Plus
+// 安装包
+// Install-Package Z.EntityFramework.Plus.EFCore
+
+// 配置
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddDbContext&lt;AppDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;DefaultConnection&#34;)));
+    
+    // 配置EF&#43;的读写分离
+    services.AddEFSecondLevelCache();
+    
+    services.AddScoped&lt;DbContextReadWriteManager&gt;();
+}
+
+// 实现读写管理器
+public class DbContextReadWriteManager
+{
+    private readonly AppDbContext _context;
+    private readonly IConfiguration _configuration;
+
+    public DbContextReadWriteManager(AppDbContext context, IConfiguration configuration)
+    {
+        _context = context;
+        _configuration = configuration;
+    }
+
+    public IQueryable&lt;T&gt; AsReadOnly&lt;T&gt;() where T : class
+    {
+        // 使用SecondLevelCache缓存查询结果
+        return _context.Set&lt;T&gt;().AsNoTracking().FromCache();
+    }
+
+    public DbSet&lt;T&gt; AsWritable&lt;T&gt;() where T : class
+    {
+        return _context.Set&lt;T&gt;();
+    }
+}
+方法四：使用.NET 6&#43;的中间件实现读写分离
+1. 创建自定义中间件
+public class ReadWriteSeparationMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly IConfiguration _configuration;
+
+    public ReadWriteSeparationMiddleware(RequestDelegate next, IConfiguration configuration)
+    {
+        _next = next;
+        _configuration = configuration;
+    }
+
+    public async Task InvokeAsync(HttpContext context, AppDbContext dbContext)
+    {
+        // 根据HTTP方法判断是读操作还是写操作
+        bool isReadOperation = context.Request.Method == &#34;GET&#34;;
+
+        if (isReadOperation)
+        {
+            // 设置读库连接字符串
+            dbContext.Database.GetDbConnection().ConnectionString = 
+                _configuration.GetConnectionString(&#34;SlaveConnection&#34;);
+        }
+        else
+        {
+            // 设置写库连接字符串
+            dbContext.Database.GetDbConnection().ConnectionString = 
+                _configuration.GetConnectionString(&#34;MasterConnection&#34;);
+        }
+
+        await _next(context);
+    }
+}
+
+// 扩展方法
+public static class ReadWriteSeparationMiddlewareExtensions
+{
+    public static IApplicationBuilder UseReadWriteSeparation(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware&lt;ReadWriteSeparationMiddleware&gt;();
+    }
+}
+2. 在Startup.cs中配置中间件
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    // 其他中间件...
+    
+    app.UseReadWriteSeparation();
+    
+    app.UseEndpoints(endpoints =&gt;
+    {
+        endpoints.MapControllers();
+    });
+}
+方法五：使用Dapper实现读写分离
+public class DapperReadWriteRepository
+{
+    private readonly string _masterConnectionString;
+    private readonly string _slaveConnectionString;
+
+    public DapperReadWriteRepository(IConfiguration configuration)
+    {
+        _masterConnectionString = configuration.GetConnectionString(&#34;MasterConnection&#34;);
+        _slaveConnectionString = configuration.GetConnectionString(&#34;SlaveConnection&#34;);
+    }
+
+    public async Task&lt;IEnumerable&lt;T&gt;&gt; QueryAsync&lt;T&gt;(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_slaveConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.QueryAsync&lt;T&gt;(sql, param);
+        }
+    }
+
+    public async Task&lt;T&gt; QuerySingleAsync&lt;T&gt;(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_slaveConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.QuerySingleAsync&lt;T&gt;(sql, param);
+        }
+    }
+
+    public async Task&lt;int&gt; ExecuteAsync(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_masterConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.ExecuteAsync(sql, param);
+        }
+    }
+}
+方法六：使用SqlSugar实现读写分离
+SqlSugar是一个轻量级的.NET ORM框架，它内置了对读写分离的支持。">
+<meta name="author" content="wait">
+<link rel="canonical" href="https://www.heiok.top/posts/tutorial/dotnet-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E5%AE%9E%E7%8E%B0/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="apple-touch-icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="mask-icon" href="https://www.heiok.top/img/thinks.jpg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://www.heiok.top/posts/tutorial/dotnet-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E5%AE%9E%E7%8E%B0/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="dotnet 数据库读写分离实现" />
+<meta property="og:description" content=".NET中实现读写分离
+什么是读写分离
+读写分离是一种数据库架构设计模式，将数据库读操作和写操作分离到不同的数据库实例上执行。主数据库（Master）处理写操作和一些重要的读操作，而从数据库（Slave/Replica）处理大部分读操作。这种模式可以提高系统的并发处理能力，优化数据库负载。
+读写分离的优势
+
+提高系统性能：分担数据库负载，提高并发处理能力
+提高系统可用性：主库故障时，从库可以继续提供读服务
+便于数据备份：可以在从库进行备份，不影响主库性能
+扩展性强：可以根据读请求的增长方便地添加更多从库
+
+在.NET中实现读写分离的方法
+方法一：使用ADO.NET手动实现
+public class DatabaseManager
+{
+    private readonly string _masterConnectionString;
+    private readonly string _slaveConnectionString;
+
+    public DatabaseManager(string masterConnectionString, string slaveConnectionString)
+    {
+        _masterConnectionString = masterConnectionString;
+        _slaveConnectionString = slaveConnectionString;
+    }
+
+    public SqlConnection GetWriteConnection()
+    {
+        var connection = new SqlConnection(_masterConnectionString);
+        connection.Open();
+        return connection;
+    }
+    public SqlConnection GetReadConnection()
+    {
+        var connection = new SqlConnection(_slaveConnectionString);
+        connection.Open();
+        return connection;
+    }
+    
+    public async Task&lt;T&gt; ExecuteWriteOperationAsync&lt;T&gt;(Func&lt;SqlConnection, Task&lt;T&gt;&gt; operation)
+    {
+        using (var connection = GetWriteConnection())
+        {
+            return await operation(connection);
+        }
+    }
+    
+    public async Task&lt;T&gt; ExecuteReadOperationAsync&lt;T&gt;(Func&lt;SqlConnection, Task&lt;T&gt;&gt; operation)
+    {
+        using (var connection = GetReadConnection())
+        {
+            return await operation(connection);
+        }
+    }
+}
+方法二：使用Entity Framework Core实现
+1. 创建多个DbContext
+public class ReadDbContext : AppDbContext
+{
+    public ReadDbContext(DbContextOptions&lt;ReadDbContext&gt; options) : base(options)
+    {
+    }
+}
+
+public class WriteDbContext : AppDbContext
+{
+    public WriteDbContext(DbContextOptions&lt;WriteDbContext&gt; options) : base(options)
+    {
+    }
+}
+
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions options) : base(options)
+    {
+    }
+    
+    public DbSet&lt;User&gt; Users { get; set; }
+    // 其他实体...
+}
+2. 在Startup.cs注册服务
+public void ConfigureServices(IServiceCollection services)
+{
+    // 注册写库上下文
+    services.AddDbContext&lt;WriteDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;MasterConnection&#34;)));
+    
+    // 注册读库上下文
+    services.AddDbContext&lt;ReadDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;SlaveConnection&#34;)));
+        
+    // ...其他服务注册
+}
+3. 创建仓储模式实现读写分离
+public interface IUserRepository
+{
+    Task&lt;User&gt; GetByIdAsync(int id);
+    Task&lt;IEnumerable&lt;User&gt;&gt; GetAllAsync();
+    Task AddAsync(User user);
+    Task UpdateAsync(User user);
+    Task DeleteAsync(int id);
+}
+
+public class UserRepository : IUserRepository
+{
+    private readonly ReadDbContext _readContext;
+    private readonly WriteDbContext _writeContext;
+
+    public UserRepository(ReadDbContext readContext, WriteDbContext writeContext)
+    {
+        _readContext = readContext;
+        _writeContext = writeContext;
+    }
+
+    public async Task&lt;User&gt; GetByIdAsync(int id)
+    {
+        return await _readContext.Users.FindAsync(id);
+    }
+
+    public async Task&lt;IEnumerable&lt;User&gt;&gt; GetAllAsync()
+    {
+        return await _readContext.Users.ToListAsync();
+    }
+
+    public async Task AddAsync(User user)
+    {
+        await _writeContext.Users.AddAsync(user);
+        await _writeContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(User user)
+    {
+        _writeContext.Users.Update(user);
+        await _writeContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var user = await _writeContext.Users.FindAsync(id);
+        if (user != null)
+        {
+            _writeContext.Users.Remove(user);
+            await _writeContext.SaveChangesAsync();
+        }
+    }
+}
+方法三：使用第三方库实现读写分离
+使用EntityFramework Plus
+// 安装包
+// Install-Package Z.EntityFramework.Plus.EFCore
+
+// 配置
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddDbContext&lt;AppDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;DefaultConnection&#34;)));
+    
+    // 配置EF&#43;的读写分离
+    services.AddEFSecondLevelCache();
+    
+    services.AddScoped&lt;DbContextReadWriteManager&gt;();
+}
+
+// 实现读写管理器
+public class DbContextReadWriteManager
+{
+    private readonly AppDbContext _context;
+    private readonly IConfiguration _configuration;
+
+    public DbContextReadWriteManager(AppDbContext context, IConfiguration configuration)
+    {
+        _context = context;
+        _configuration = configuration;
+    }
+
+    public IQueryable&lt;T&gt; AsReadOnly&lt;T&gt;() where T : class
+    {
+        // 使用SecondLevelCache缓存查询结果
+        return _context.Set&lt;T&gt;().AsNoTracking().FromCache();
+    }
+
+    public DbSet&lt;T&gt; AsWritable&lt;T&gt;() where T : class
+    {
+        return _context.Set&lt;T&gt;();
+    }
+}
+方法四：使用.NET 6&#43;的中间件实现读写分离
+1. 创建自定义中间件
+public class ReadWriteSeparationMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly IConfiguration _configuration;
+
+    public ReadWriteSeparationMiddleware(RequestDelegate next, IConfiguration configuration)
+    {
+        _next = next;
+        _configuration = configuration;
+    }
+
+    public async Task InvokeAsync(HttpContext context, AppDbContext dbContext)
+    {
+        // 根据HTTP方法判断是读操作还是写操作
+        bool isReadOperation = context.Request.Method == &#34;GET&#34;;
+
+        if (isReadOperation)
+        {
+            // 设置读库连接字符串
+            dbContext.Database.GetDbConnection().ConnectionString = 
+                _configuration.GetConnectionString(&#34;SlaveConnection&#34;);
+        }
+        else
+        {
+            // 设置写库连接字符串
+            dbContext.Database.GetDbConnection().ConnectionString = 
+                _configuration.GetConnectionString(&#34;MasterConnection&#34;);
+        }
+
+        await _next(context);
+    }
+}
+
+// 扩展方法
+public static class ReadWriteSeparationMiddlewareExtensions
+{
+    public static IApplicationBuilder UseReadWriteSeparation(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware&lt;ReadWriteSeparationMiddleware&gt;();
+    }
+}
+2. 在Startup.cs中配置中间件
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    // 其他中间件...
+    
+    app.UseReadWriteSeparation();
+    
+    app.UseEndpoints(endpoints =&gt;
+    {
+        endpoints.MapControllers();
+    });
+}
+方法五：使用Dapper实现读写分离
+public class DapperReadWriteRepository
+{
+    private readonly string _masterConnectionString;
+    private readonly string _slaveConnectionString;
+
+    public DapperReadWriteRepository(IConfiguration configuration)
+    {
+        _masterConnectionString = configuration.GetConnectionString(&#34;MasterConnection&#34;);
+        _slaveConnectionString = configuration.GetConnectionString(&#34;SlaveConnection&#34;);
+    }
+
+    public async Task&lt;IEnumerable&lt;T&gt;&gt; QueryAsync&lt;T&gt;(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_slaveConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.QueryAsync&lt;T&gt;(sql, param);
+        }
+    }
+
+    public async Task&lt;T&gt; QuerySingleAsync&lt;T&gt;(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_slaveConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.QuerySingleAsync&lt;T&gt;(sql, param);
+        }
+    }
+
+    public async Task&lt;int&gt; ExecuteAsync(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_masterConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.ExecuteAsync(sql, param);
+        }
+    }
+}
+方法六：使用SqlSugar实现读写分离
+SqlSugar是一个轻量级的.NET ORM框架，它内置了对读写分离的支持。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.heiok.top/posts/tutorial/dotnet-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E5%AE%9E%E7%8E%B0/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-01-08T16:37:49+08:00" />
+<meta property="article:modified_time" content="2026-01-08T16:37:49+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="dotnet 数据库读写分离实现"/>
+<meta name="twitter:description" content=".NET中实现读写分离
+什么是读写分离
+读写分离是一种数据库架构设计模式，将数据库读操作和写操作分离到不同的数据库实例上执行。主数据库（Master）处理写操作和一些重要的读操作，而从数据库（Slave/Replica）处理大部分读操作。这种模式可以提高系统的并发处理能力，优化数据库负载。
+读写分离的优势
+
+提高系统性能：分担数据库负载，提高并发处理能力
+提高系统可用性：主库故障时，从库可以继续提供读服务
+便于数据备份：可以在从库进行备份，不影响主库性能
+扩展性强：可以根据读请求的增长方便地添加更多从库
+
+在.NET中实现读写分离的方法
+方法一：使用ADO.NET手动实现
+public class DatabaseManager
+{
+    private readonly string _masterConnectionString;
+    private readonly string _slaveConnectionString;
+
+    public DatabaseManager(string masterConnectionString, string slaveConnectionString)
+    {
+        _masterConnectionString = masterConnectionString;
+        _slaveConnectionString = slaveConnectionString;
+    }
+
+    public SqlConnection GetWriteConnection()
+    {
+        var connection = new SqlConnection(_masterConnectionString);
+        connection.Open();
+        return connection;
+    }
+    public SqlConnection GetReadConnection()
+    {
+        var connection = new SqlConnection(_slaveConnectionString);
+        connection.Open();
+        return connection;
+    }
+    
+    public async Task&lt;T&gt; ExecuteWriteOperationAsync&lt;T&gt;(Func&lt;SqlConnection, Task&lt;T&gt;&gt; operation)
+    {
+        using (var connection = GetWriteConnection())
+        {
+            return await operation(connection);
+        }
+    }
+    
+    public async Task&lt;T&gt; ExecuteReadOperationAsync&lt;T&gt;(Func&lt;SqlConnection, Task&lt;T&gt;&gt; operation)
+    {
+        using (var connection = GetReadConnection())
+        {
+            return await operation(connection);
+        }
+    }
+}
+方法二：使用Entity Framework Core实现
+1. 创建多个DbContext
+public class ReadDbContext : AppDbContext
+{
+    public ReadDbContext(DbContextOptions&lt;ReadDbContext&gt; options) : base(options)
+    {
+    }
+}
+
+public class WriteDbContext : AppDbContext
+{
+    public WriteDbContext(DbContextOptions&lt;WriteDbContext&gt; options) : base(options)
+    {
+    }
+}
+
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions options) : base(options)
+    {
+    }
+    
+    public DbSet&lt;User&gt; Users { get; set; }
+    // 其他实体...
+}
+2. 在Startup.cs注册服务
+public void ConfigureServices(IServiceCollection services)
+{
+    // 注册写库上下文
+    services.AddDbContext&lt;WriteDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;MasterConnection&#34;)));
+    
+    // 注册读库上下文
+    services.AddDbContext&lt;ReadDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;SlaveConnection&#34;)));
+        
+    // ...其他服务注册
+}
+3. 创建仓储模式实现读写分离
+public interface IUserRepository
+{
+    Task&lt;User&gt; GetByIdAsync(int id);
+    Task&lt;IEnumerable&lt;User&gt;&gt; GetAllAsync();
+    Task AddAsync(User user);
+    Task UpdateAsync(User user);
+    Task DeleteAsync(int id);
+}
+
+public class UserRepository : IUserRepository
+{
+    private readonly ReadDbContext _readContext;
+    private readonly WriteDbContext _writeContext;
+
+    public UserRepository(ReadDbContext readContext, WriteDbContext writeContext)
+    {
+        _readContext = readContext;
+        _writeContext = writeContext;
+    }
+
+    public async Task&lt;User&gt; GetByIdAsync(int id)
+    {
+        return await _readContext.Users.FindAsync(id);
+    }
+
+    public async Task&lt;IEnumerable&lt;User&gt;&gt; GetAllAsync()
+    {
+        return await _readContext.Users.ToListAsync();
+    }
+
+    public async Task AddAsync(User user)
+    {
+        await _writeContext.Users.AddAsync(user);
+        await _writeContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(User user)
+    {
+        _writeContext.Users.Update(user);
+        await _writeContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var user = await _writeContext.Users.FindAsync(id);
+        if (user != null)
+        {
+            _writeContext.Users.Remove(user);
+            await _writeContext.SaveChangesAsync();
+        }
+    }
+}
+方法三：使用第三方库实现读写分离
+使用EntityFramework Plus
+// 安装包
+// Install-Package Z.EntityFramework.Plus.EFCore
+
+// 配置
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddDbContext&lt;AppDbContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&#34;DefaultConnection&#34;)));
+    
+    // 配置EF&#43;的读写分离
+    services.AddEFSecondLevelCache();
+    
+    services.AddScoped&lt;DbContextReadWriteManager&gt;();
+}
+
+// 实现读写管理器
+public class DbContextReadWriteManager
+{
+    private readonly AppDbContext _context;
+    private readonly IConfiguration _configuration;
+
+    public DbContextReadWriteManager(AppDbContext context, IConfiguration configuration)
+    {
+        _context = context;
+        _configuration = configuration;
+    }
+
+    public IQueryable&lt;T&gt; AsReadOnly&lt;T&gt;() where T : class
+    {
+        // 使用SecondLevelCache缓存查询结果
+        return _context.Set&lt;T&gt;().AsNoTracking().FromCache();
+    }
+
+    public DbSet&lt;T&gt; AsWritable&lt;T&gt;() where T : class
+    {
+        return _context.Set&lt;T&gt;();
+    }
+}
+方法四：使用.NET 6&#43;的中间件实现读写分离
+1. 创建自定义中间件
+public class ReadWriteSeparationMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly IConfiguration _configuration;
+
+    public ReadWriteSeparationMiddleware(RequestDelegate next, IConfiguration configuration)
+    {
+        _next = next;
+        _configuration = configuration;
+    }
+
+    public async Task InvokeAsync(HttpContext context, AppDbContext dbContext)
+    {
+        // 根据HTTP方法判断是读操作还是写操作
+        bool isReadOperation = context.Request.Method == &#34;GET&#34;;
+
+        if (isReadOperation)
+        {
+            // 设置读库连接字符串
+            dbContext.Database.GetDbConnection().ConnectionString = 
+                _configuration.GetConnectionString(&#34;SlaveConnection&#34;);
+        }
+        else
+        {
+            // 设置写库连接字符串
+            dbContext.Database.GetDbConnection().ConnectionString = 
+                _configuration.GetConnectionString(&#34;MasterConnection&#34;);
+        }
+
+        await _next(context);
+    }
+}
+
+// 扩展方法
+public static class ReadWriteSeparationMiddlewareExtensions
+{
+    public static IApplicationBuilder UseReadWriteSeparation(this IApplicationBuilder builder)
+    {
+        return builder.UseMiddleware&lt;ReadWriteSeparationMiddleware&gt;();
+    }
+}
+2. 在Startup.cs中配置中间件
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    // 其他中间件...
+    
+    app.UseReadWriteSeparation();
+    
+    app.UseEndpoints(endpoints =&gt;
+    {
+        endpoints.MapControllers();
+    });
+}
+方法五：使用Dapper实现读写分离
+public class DapperReadWriteRepository
+{
+    private readonly string _masterConnectionString;
+    private readonly string _slaveConnectionString;
+
+    public DapperReadWriteRepository(IConfiguration configuration)
+    {
+        _masterConnectionString = configuration.GetConnectionString(&#34;MasterConnection&#34;);
+        _slaveConnectionString = configuration.GetConnectionString(&#34;SlaveConnection&#34;);
+    }
+
+    public async Task&lt;IEnumerable&lt;T&gt;&gt; QueryAsync&lt;T&gt;(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_slaveConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.QueryAsync&lt;T&gt;(sql, param);
+        }
+    }
+
+    public async Task&lt;T&gt; QuerySingleAsync&lt;T&gt;(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_slaveConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.QuerySingleAsync&lt;T&gt;(sql, param);
+        }
+    }
+
+    public async Task&lt;int&gt; ExecuteAsync(string sql, object param = null)
+    {
+        using (var connection = new SqlConnection(_masterConnectionString))
+        {
+            await connection.OpenAsync();
+            return await connection.ExecuteAsync(sql, param);
+        }
+    }
+}
+方法六：使用SqlSugar实现读写分离
+SqlSugar是一个轻量级的.NET ORM框架，它内置了对读写分离的支持。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://www.heiok.top/posts/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "dotnet 数据库读写分离实现",
+      "item": "https://www.heiok.top/posts/tutorial/dotnet-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E5%AE%9E%E7%8E%B0/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "dotnet 数据库读写分离实现",
+  "name": "dotnet 数据库读写分离实现",
+  "description": ".NET中实现读写分离 什么是读写分离 读写分离是一种数据库架构设计模式，将数据库读操作和写操作分离到不同的数据库实例上执行。主数据库（Master）处理写操作和一些重要的读操作，而从数据库（Slave/Replica）处理大部分读操作。这种模式可以提高系统的并发处理能力，优化数据库负载。\n读写分离的优势 提高系统性能：分担数据库负载，提高并发处理能力 提高系统可用性：主库故障时，从库可以继续提供读服务 便于数据备份：可以在从库进行备份，不影响主库性能 扩展性强：可以根据读请求的增长方便地添加更多从库 在.NET中实现读写分离的方法 方法一：使用ADO.NET手动实现 public class DatabaseManager { private readonly string _masterConnectionString; private readonly string _slaveConnectionString; public DatabaseManager(string masterConnectionString, string slaveConnectionString) { _masterConnectionString = masterConnectionString; _slaveConnectionString = slaveConnectionString; } public SqlConnection GetWriteConnection() { var connection = new SqlConnection(_masterConnectionString); connection.Open(); return connection; } public SqlConnection GetReadConnection() { var connection = new SqlConnection(_slaveConnectionString); connection.Open(); return connection; } public async Task\u0026lt;T\u0026gt; ExecuteWriteOperationAsync\u0026lt;T\u0026gt;(Func\u0026lt;SqlConnection, Task\u0026lt;T\u0026gt;\u0026gt; operation) { using (var connection = GetWriteConnection()) { return await operation(connection); } } public async Task\u0026lt;T\u0026gt; ExecuteReadOperationAsync\u0026lt;T\u0026gt;(Func\u0026lt;SqlConnection, Task\u0026lt;T\u0026gt;\u0026gt; operation) { using (var connection = GetReadConnection()) { return await operation(connection); } } } 方法二：使用Entity Framework Core实现 1. 创建多个DbContext public class ReadDbContext : AppDbContext { public ReadDbContext(DbContextOptions\u0026lt;ReadDbContext\u0026gt; options) : base(options) { } } public class WriteDbContext : AppDbContext { public WriteDbContext(DbContextOptions\u0026lt;WriteDbContext\u0026gt; options) : base(options) { } } public class AppDbContext : DbContext { public AppDbContext(DbContextOptions options) : base(options) { } public DbSet\u0026lt;User\u0026gt; Users { get; set; } // 其他实体... } 2. 在Startup.cs注册服务 public void ConfigureServices(IServiceCollection services) { // 注册写库上下文 services.AddDbContext\u0026lt;WriteDbContext\u0026gt;(options =\u0026gt; options.UseSqlServer(Configuration.GetConnectionString(\u0026#34;MasterConnection\u0026#34;))); // 注册读库上下文 services.AddDbContext\u0026lt;ReadDbContext\u0026gt;(options =\u0026gt; options.UseSqlServer(Configuration.GetConnectionString(\u0026#34;SlaveConnection\u0026#34;))); // ...其他服务注册 } 3. 创建仓储模式实现读写分离 public interface IUserRepository { Task\u0026lt;User\u0026gt; GetByIdAsync(int id); Task\u0026lt;IEnumerable\u0026lt;User\u0026gt;\u0026gt; GetAllAsync(); Task AddAsync(User user); Task UpdateAsync(User user); Task DeleteAsync(int id); } public class UserRepository : IUserRepository { private readonly ReadDbContext _readContext; private readonly WriteDbContext _writeContext; public UserRepository(ReadDbContext readContext, WriteDbContext writeContext) { _readContext = readContext; _writeContext = writeContext; } public async Task\u0026lt;User\u0026gt; GetByIdAsync(int id) { return await _readContext.Users.FindAsync(id); } public async Task\u0026lt;IEnumerable\u0026lt;User\u0026gt;\u0026gt; GetAllAsync() { return await _readContext.Users.ToListAsync(); } public async Task AddAsync(User user) { await _writeContext.Users.AddAsync(user); await _writeContext.SaveChangesAsync(); } public async Task UpdateAsync(User user) { _writeContext.Users.Update(user); await _writeContext.SaveChangesAsync(); } public async Task DeleteAsync(int id) { var user = await _writeContext.Users.FindAsync(id); if (user != null) { _writeContext.Users.Remove(user); await _writeContext.SaveChangesAsync(); } } } 方法三：使用第三方库实现读写分离 使用EntityFramework Plus // 安装包 // Install-Package Z.EntityFramework.Plus.EFCore // 配置 public void ConfigureServices(IServiceCollection services) { services.AddDbContext\u0026lt;AppDbContext\u0026gt;(options =\u0026gt; options.UseSqlServer(Configuration.GetConnectionString(\u0026#34;DefaultConnection\u0026#34;))); // 配置EF+的读写分离 services.AddEFSecondLevelCache(); services.AddScoped\u0026lt;DbContextReadWriteManager\u0026gt;(); } // 实现读写管理器 public class DbContextReadWriteManager { private readonly AppDbContext _context; private readonly IConfiguration _configuration; public DbContextReadWriteManager(AppDbContext context, IConfiguration configuration) { _context = context; _configuration = configuration; } public IQueryable\u0026lt;T\u0026gt; AsReadOnly\u0026lt;T\u0026gt;() where T : class { // 使用SecondLevelCache缓存查询结果 return _context.Set\u0026lt;T\u0026gt;().AsNoTracking().FromCache(); } public DbSet\u0026lt;T\u0026gt; AsWritable\u0026lt;T\u0026gt;() where T : class { return _context.Set\u0026lt;T\u0026gt;(); } } 方法四：使用.NET 6+的中间件实现读写分离 1. 创建自定义中间件 public class ReadWriteSeparationMiddleware { private readonly RequestDelegate _next; private readonly IConfiguration _configuration; public ReadWriteSeparationMiddleware(RequestDelegate next, IConfiguration configuration) { _next = next; _configuration = configuration; } public async Task InvokeAsync(HttpContext context, AppDbContext dbContext) { // 根据HTTP方法判断是读操作还是写操作 bool isReadOperation = context.Request.Method == \u0026#34;GET\u0026#34;; if (isReadOperation) { // 设置读库连接字符串 dbContext.Database.GetDbConnection().ConnectionString = _configuration.GetConnectionString(\u0026#34;SlaveConnection\u0026#34;); } else { // 设置写库连接字符串 dbContext.Database.GetDbConnection().ConnectionString = _configuration.GetConnectionString(\u0026#34;MasterConnection\u0026#34;); } await _next(context); } } // 扩展方法 public static class ReadWriteSeparationMiddlewareExtensions { public static IApplicationBuilder UseReadWriteSeparation(this IApplicationBuilder builder) { return builder.UseMiddleware\u0026lt;ReadWriteSeparationMiddleware\u0026gt;(); } } 2. 在Startup.cs中配置中间件 public void Configure(IApplicationBuilder app, IWebHostEnvironment env) { // 其他中间件... app.UseReadWriteSeparation(); app.UseEndpoints(endpoints =\u0026gt; { endpoints.MapControllers(); }); } 方法五：使用Dapper实现读写分离 public class DapperReadWriteRepository { private readonly string _masterConnectionString; private readonly string _slaveConnectionString; public DapperReadWriteRepository(IConfiguration configuration) { _masterConnectionString = configuration.GetConnectionString(\u0026#34;MasterConnection\u0026#34;); _slaveConnectionString = configuration.GetConnectionString(\u0026#34;SlaveConnection\u0026#34;); } public async Task\u0026lt;IEnumerable\u0026lt;T\u0026gt;\u0026gt; QueryAsync\u0026lt;T\u0026gt;(string sql, object param = null) { using (var connection = new SqlConnection(_slaveConnectionString)) { await connection.OpenAsync(); return await connection.QueryAsync\u0026lt;T\u0026gt;(sql, param); } } public async Task\u0026lt;T\u0026gt; QuerySingleAsync\u0026lt;T\u0026gt;(string sql, object param = null) { using (var connection = new SqlConnection(_slaveConnectionString)) { await connection.OpenAsync(); return await connection.QuerySingleAsync\u0026lt;T\u0026gt;(sql, param); } } public async Task\u0026lt;int\u0026gt; ExecuteAsync(string sql, object param = null) { using (var connection = new SqlConnection(_masterConnectionString)) { await connection.OpenAsync(); return await connection.ExecuteAsync(sql, param); } } } 方法六：使用SqlSugar实现读写分离 SqlSugar是一个轻量级的.NET ORM框架，它内置了对读写分离的支持。\n",
+  "keywords": [
+    
+  ],
+  "articleBody": ".NET中实现读写分离 什么是读写分离 读写分离是一种数据库架构设计模式，将数据库读操作和写操作分离到不同的数据库实例上执行。主数据库（Master）处理写操作和一些重要的读操作，而从数据库（Slave/Replica）处理大部分读操作。这种模式可以提高系统的并发处理能力，优化数据库负载。\n读写分离的优势 提高系统性能：分担数据库负载，提高并发处理能力 提高系统可用性：主库故障时，从库可以继续提供读服务 便于数据备份：可以在从库进行备份，不影响主库性能 扩展性强：可以根据读请求的增长方便地添加更多从库 在.NET中实现读写分离的方法 方法一：使用ADO.NET手动实现 public class DatabaseManager { private readonly string _masterConnectionString; private readonly string _slaveConnectionString; public DatabaseManager(string masterConnectionString, string slaveConnectionString) { _masterConnectionString = masterConnectionString; _slaveConnectionString = slaveConnectionString; } public SqlConnection GetWriteConnection() { var connection = new SqlConnection(_masterConnectionString); connection.Open(); return connection; } public SqlConnection GetReadConnection() { var connection = new SqlConnection(_slaveConnectionString); connection.Open(); return connection; } public async Task ExecuteWriteOperationAsync(Func",
+  "wordCount" : "3772",
+  "inLanguage": "zh",
+  "datePublished": "2026-01-08T16:37:49+08:00",
+  "dateModified": "2026-01-08T16:37:49+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "wait"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.heiok.top/posts/tutorial/dotnet-%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB%E5%AE%9E%E7%8E%B0/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wait`s blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.heiok.top/img/thinks.jpg"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://www.heiok.top/" accesskey="h" title="wait`s blog (Alt + H)">
+            <img src="https://www.heiok.top/img/Q.gif" alt="logo" aria-label="logo"
+                 height="35">wait`s blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://www.heiok.top/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/posts" title="📚 文章">
+                <span>📚 文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/archives/" title="⏱️ 时间轴">
+                <span>⏱️ 时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/about" title="🙋🏻‍♂️ 关于">
+                <span>🙋🏻‍♂️ 关于</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/links" title="🤝 友链">
+                <span>🤝 友链</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            <div class="breadcrumbs"><a href="https://www.heiok.top/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://www.heiok.top/posts/">📚文章</a></div>
+            <h1 class="post-title">
+                dotnet 数据库读写分离实现
+            </h1>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2026-01-08
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>3772字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>8分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>wait
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    <span id="post_meta_style_8">
+                        <span class="fa fa-commenting-o"></span>
+                        <span>
+                            <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js"></script>
+                            <script>
+                                let url = document.documentURI
+                                
+                                let dnsUrl = "https://www.heiok.top/"
+                                let urlSplit = url.split(dnsUrl)
+                                let finalUrl = urlSplit[1]
+                                if (finalUrl[0] !== '/') {
+                                    finalUrl = '/'+finalUrl
+                                }
+                                twikoo.getCommentsCount({
+                                    envId:  null , 
+                                region:  null , 
+                                urls: [ 
+                                    
+                                    finalUrl,
+                                ],
+                                    includeReply: false 
+                                }).then(function (res) {
+                                    let count = res[0].count
+                                    const obj = document.getElementById("comment_count");
+                                    obj.innerText = count
+                                    
+                                    
+                                    
+                                }).catch(function (err) {
+                                    
+                                    console.error(err);
+                                });
+                            </script>
+                            <span id="comment_count"></span>
+                        </span>
+                    </span>
+                </span>
+
+</div>
+        </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#net%e4%b8%ad%e5%ae%9e%e7%8e%b0%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label=".NET中实现读写分离">.NET中实现读写分离</a><ul>
+                        
+                <li>
+                    <a href="#%e4%bb%80%e4%b9%88%e6%98%af%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label="什么是读写分离">什么是读写分离</a></li>
+                <li>
+                    <a href="#%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e7%9a%84%e4%bc%98%e5%8a%bf" aria-label="读写分离的优势">读写分离的优势</a></li>
+                <li>
+                    <a href="#%e5%9c%a8net%e4%b8%ad%e5%ae%9e%e7%8e%b0%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e7%9a%84%e6%96%b9%e6%b3%95" aria-label="在.NET中实现读写分离的方法">在.NET中实现读写分离的方法</a><ul>
+                        
+                <li>
+                    <a href="#%e6%96%b9%e6%b3%95%e4%b8%80%e4%bd%bf%e7%94%a8adonet%e6%89%8b%e5%8a%a8%e5%ae%9e%e7%8e%b0" aria-label="方法一：使用ADO.NET手动实现">方法一：使用ADO.NET手动实现</a></li>
+                <li>
+                    <a href="#%e6%96%b9%e6%b3%95%e4%ba%8c%e4%bd%bf%e7%94%a8entity-framework-core%e5%ae%9e%e7%8e%b0" aria-label="方法二：使用Entity Framework Core实现">方法二：使用Entity Framework Core实现</a><ul>
+                        
+                <li>
+                    <a href="#1-%e5%88%9b%e5%bb%ba%e5%a4%9a%e4%b8%aadbcontext" aria-label="1. 创建多个DbContext">1. 创建多个DbContext</a></li>
+                <li>
+                    <a href="#2-%e5%9c%a8startupcs%e6%b3%a8%e5%86%8c%e6%9c%8d%e5%8a%a1" aria-label="2. 在Startup.cs注册服务">2. 在Startup.cs注册服务</a></li>
+                <li>
+                    <a href="#3-%e5%88%9b%e5%bb%ba%e4%bb%93%e5%82%a8%e6%a8%a1%e5%bc%8f%e5%ae%9e%e7%8e%b0%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label="3. 创建仓储模式实现读写分离">3. 创建仓储模式实现读写分离</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e6%96%b9%e6%b3%95%e4%b8%89%e4%bd%bf%e7%94%a8%e7%ac%ac%e4%b8%89%e6%96%b9%e5%ba%93%e5%ae%9e%e7%8e%b0%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label="方法三：使用第三方库实现读写分离">方法三：使用第三方库实现读写分离</a><ul>
+                        
+                <li>
+                    <a href="#%e4%bd%bf%e7%94%a8entityframework-plus" aria-label="使用EntityFramework Plus">使用EntityFramework Plus</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e6%96%b9%e6%b3%95%e5%9b%9b%e4%bd%bf%e7%94%a8net-6%e7%9a%84%e4%b8%ad%e9%97%b4%e4%bb%b6%e5%ae%9e%e7%8e%b0%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label="方法四：使用.NET 6&#43;的中间件实现读写分离">方法四：使用.NET 6+的中间件实现读写分离</a><ul>
+                        
+                <li>
+                    <a href="#1-%e5%88%9b%e5%bb%ba%e8%87%aa%e5%ae%9a%e4%b9%89%e4%b8%ad%e9%97%b4%e4%bb%b6" aria-label="1. 创建自定义中间件">1. 创建自定义中间件</a></li>
+                <li>
+                    <a href="#2-%e5%9c%a8startupcs%e4%b8%ad%e9%85%8d%e7%bd%ae%e4%b8%ad%e9%97%b4%e4%bb%b6" aria-label="2. 在Startup.cs中配置中间件">2. 在Startup.cs中配置中间件</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e6%96%b9%e6%b3%95%e4%ba%94%e4%bd%bf%e7%94%a8dapper%e5%ae%9e%e7%8e%b0%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label="方法五：使用Dapper实现读写分离">方法五：使用Dapper实现读写分离</a></li>
+                <li>
+                    <a href="#%e6%96%b9%e6%b3%95%e5%85%ad%e4%bd%bf%e7%94%a8sqlsugar%e5%ae%9e%e7%8e%b0%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label="方法六：使用SqlSugar实现读写分离">方法六：使用SqlSugar实现读写分离</a><ul>
+                        
+                <li>
+                    <a href="#1-%e5%ae%89%e8%a3%85sqlsugar%e5%8c%85" aria-label="1. 安装SqlSugar包">1. 安装SqlSugar包</a></li>
+                <li>
+                    <a href="#2-%e9%85%8d%e7%bd%ae%e4%b8%bb%e4%bb%8e%e6%95%b0%e6%8d%ae%e5%ba%93" aria-label="2. 配置主从数据库">2. 配置主从数据库</a></li>
+                <li>
+                    <a href="#3-%e4%bd%bf%e7%94%a8%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label="3. 使用读写分离">3. 使用读写分离</a></li>
+                <li>
+                    <a href="#4-%e9%ab%98%e7%ba%a7%e9%85%8d%e7%bd%ae%e8%87%aa%e5%ae%9a%e4%b9%89%e8%af%bb%e5%86%99%e9%80%bb%e8%be%91" aria-label="4. 高级配置：自定义读写逻辑">4. 高级配置：自定义读写逻辑</a></li>
+                <li>
+                    <a href="#5-%e9%85%8d%e7%bd%ae%e8%b4%9f%e8%bd%bd%e5%9d%87%e8%a1%a1%e7%ad%96%e7%95%a5" aria-label="5. 配置负载均衡策略">5. 配置负载均衡策略</a></li>
+                <li>
+                    <a href="#6-%e4%b8%8e%e4%be%9d%e8%b5%96%e6%b3%a8%e5%85%a5%e9%9b%86%e6%88%90" aria-label="6. 与依赖注入集成">6. 与依赖注入集成</a></li>
+                <li>
+                    <a href="#7-%e5%a4%9a%e7%a7%9f%e6%88%b7%e5%9c%ba%e6%99%af%e4%b8%8b%e7%9a%84%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb" aria-label="7. 多租户场景下的读写分离">7. 多租户场景下的读写分离</a></li></ul>
+                </li></ul>
+                </li>
+                <li>
+                    <a href="#%e8%b4%9f%e8%bd%bd%e5%9d%87%e8%a1%a1%e7%ad%96%e7%95%a5" aria-label="负载均衡策略">负载均衡策略</a><ul>
+                        
+                <li>
+                    <a href="#1-%e8%bd%ae%e8%af%a2%e7%ad%96%e7%95%a5round-robin" aria-label="1. 轮询策略（Round Robin）">1. 轮询策略（Round Robin）</a></li>
+                <li>
+                    <a href="#2-%e9%9a%8f%e6%9c%ba%e7%ad%96%e7%95%a5random" aria-label="2. 随机策略（Random）">2. 随机策略（Random）</a></li>
+                <li>
+                    <a href="#3-%e6%9d%83%e9%87%8d%e7%ad%96%e7%95%a5weighted" aria-label="3. 权重策略（Weighted）">3. 权重策略（Weighted）</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e6%95%b0%e6%8d%ae%e4%b8%80%e8%87%b4%e6%80%a7%e5%a4%84%e7%90%86" aria-label="数据一致性处理">数据一致性处理</a><ul>
+                        
+                <li>
+                    <a href="#%e5%a4%84%e7%90%86%e6%95%b0%e6%8d%ae%e4%b8%80%e8%87%b4%e6%80%a7%e7%9a%84%e7%ad%96%e7%95%a5" aria-label="处理数据一致性的策略：">处理数据一致性的策略：</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e9%85%8d%e7%bd%ae%e7%a4%ba%e4%be%8bappsettingsjson" aria-label="读写分离配置示例（appsettings.json）">读写分离配置示例（appsettings.json）</a></li>
+                <li>
+                    <a href="#%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e6%9c%80%e4%bd%b3%e5%ae%9e%e8%b7%b5" aria-label="读写分离最佳实践">读写分离最佳实践</a></li>
+                <li>
+                    <a href="#%e6%80%bb%e7%bb%93" aria-label="总结">总结</a></li>
+                <li>
+                    <a href="#sqlsugar-%e5%85%b7%e4%bd%93%e5%ae%9e%e7%8e%b0" aria-label="sqlsugar 具体实现">sqlsugar 具体实现</a></li>
+                <li>
+                    <a href="#%e7%bc%96%e5%86%99%e6%8b%93%e5%b1%95%e6%96%b9%e6%b3%95%e5%ae%9e%e7%8e%b0%e5%85%b7%e4%bd%93%e7%9a%84%e8%af%bb%e5%86%99%e6%93%8d%e4%bd%9c%e4%bd%bf%e7%94%a8%e5%ba%93" aria-label="编写拓展方法实现具体的读写操作使用库">编写拓展方法实现具体的读写操作使用库</a></li>
+                <li>
+                    <a href="#%e5%9c%a8%e5%9f%ba%e7%a1%80%e4%bb%93%e5%82%a8%e5%b1%82%e9%85%8d%e7%bd%ae%e8%af%bb%e5%86%99%e6%93%8d%e4%bd%9c" aria-label="在基础仓储层配置读写操作">在基础仓储层配置读写操作</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        if (elements) {
+            activeElement = Array.from(elements).find((element) => {
+                if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                    (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                    return element;
+                }
+            }) || activeElement
+
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                if (element === activeElement){
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+                }
+            })
+        }
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h1 id="net中实现读写分离">.NET中实现读写分离<a hidden class="anchor" aria-hidden="true" href="#net中实现读写分离">#</a></h1>
+<h2 id="什么是读写分离">什么是读写分离<a hidden class="anchor" aria-hidden="true" href="#什么是读写分离">#</a></h2>
+<p>读写分离是一种数据库架构设计模式，将数据库读操作和写操作分离到不同的数据库实例上执行。主数据库（Master）处理写操作和一些重要的读操作，而从数据库（Slave/Replica）处理大部分读操作。这种模式可以提高系统的并发处理能力，优化数据库负载。</p>
+<h2 id="读写分离的优势">读写分离的优势<a hidden class="anchor" aria-hidden="true" href="#读写分离的优势">#</a></h2>
+<ul>
+<li><strong>提高系统性能</strong>：分担数据库负载，提高并发处理能力</li>
+<li><strong>提高系统可用性</strong>：主库故障时，从库可以继续提供读服务</li>
+<li><strong>便于数据备份</strong>：可以在从库进行备份，不影响主库性能</li>
+<li><strong>扩展性强</strong>：可以根据读请求的增长方便地添加更多从库</li>
+</ul>
+<h2 id="在net中实现读写分离的方法">在.NET中实现读写分离的方法<a hidden class="anchor" aria-hidden="true" href="#在net中实现读写分离的方法">#</a></h2>
+<h3 id="方法一使用adonet手动实现">方法一：使用ADO.NET手动实现<a hidden class="anchor" aria-hidden="true" href="#方法一使用adonet手动实现">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DatabaseManager</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> <span style="color:#66d9ef">string</span> _masterConnectionString;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> <span style="color:#66d9ef">string</span> _slaveConnectionString;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> DatabaseManager(<span style="color:#66d9ef">string</span> masterConnectionString, <span style="color:#66d9ef">string</span> slaveConnectionString)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _masterConnectionString = masterConnectionString;
+</span></span><span style="display:flex;"><span>        _slaveConnectionString = slaveConnectionString;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> SqlConnection GetWriteConnection()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> connection = <span style="color:#66d9ef">new</span> SqlConnection(_masterConnectionString);
+</span></span><span style="display:flex;"><span>        connection.Open();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> connection;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> SqlConnection GetReadConnection()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> connection = <span style="color:#66d9ef">new</span> SqlConnection(_slaveConnectionString);
+</span></span><span style="display:flex;"><span>        connection.Open();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> connection;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;T&gt; ExecuteWriteOperationAsync&lt;T&gt;(Func&lt;SqlConnection, Task&lt;T&gt;&gt; operation)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> connection = GetWriteConnection())
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> operation(connection);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;T&gt; ExecuteReadOperationAsync&lt;T&gt;(Func&lt;SqlConnection, Task&lt;T&gt;&gt; operation)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> connection = GetReadConnection())
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> operation(connection);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="方法二使用entity-framework-core实现">方法二：使用Entity Framework Core实现<a hidden class="anchor" aria-hidden="true" href="#方法二使用entity-framework-core实现">#</a></h3>
+<h4 id="1-创建多个dbcontext">1. 创建多个DbContext<a hidden class="anchor" aria-hidden="true" href="#1-创建多个dbcontext">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReadDbContext</span> : AppDbContext
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> ReadDbContext(DbContextOptions&lt;ReadDbContext&gt; options) : <span style="color:#66d9ef">base</span>(options)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">WriteDbContext</span> : AppDbContext
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> WriteDbContext(DbContextOptions&lt;WriteDbContext&gt; options) : <span style="color:#66d9ef">base</span>(options)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">AppDbContext</span> : DbContext
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> AppDbContext(DbContextOptions options) : <span style="color:#66d9ef">base</span>(options)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> DbSet&lt;User&gt; Users { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 其他实体...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="2-在startupcs注册服务">2. 在Startup.cs注册服务<a hidden class="anchor" aria-hidden="true" href="#2-在startupcs注册服务">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> ConfigureServices(IServiceCollection services)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 注册写库上下文</span>
+</span></span><span style="display:flex;"><span>    services.AddDbContext&lt;WriteDbContext&gt;(options =&gt;
+</span></span><span style="display:flex;"><span>        options.UseSqlServer(Configuration.GetConnectionString(<span style="color:#e6db74">&#34;MasterConnection&#34;</span>)));
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 注册读库上下文</span>
+</span></span><span style="display:flex;"><span>    services.AddDbContext&lt;ReadDbContext&gt;(options =&gt;
+</span></span><span style="display:flex;"><span>        options.UseSqlServer(Configuration.GetConnectionString(<span style="color:#e6db74">&#34;SlaveConnection&#34;</span>)));
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// ...其他服务注册</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="3-创建仓储模式实现读写分离">3. 创建仓储模式实现读写分离<a hidden class="anchor" aria-hidden="true" href="#3-创建仓储模式实现读写分离">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">interface</span> <span style="color:#a6e22e">IUserRepository</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Task&lt;User&gt; GetByIdAsync(<span style="color:#66d9ef">int</span> id);
+</span></span><span style="display:flex;"><span>    Task&lt;IEnumerable&lt;User&gt;&gt; GetAllAsync();
+</span></span><span style="display:flex;"><span>    Task AddAsync(User user);
+</span></span><span style="display:flex;"><span>    Task UpdateAsync(User user);
+</span></span><span style="display:flex;"><span>    Task DeleteAsync(<span style="color:#66d9ef">int</span> id);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserRepository</span> : IUserRepository
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> ReadDbContext _readContext;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> WriteDbContext _writeContext;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> UserRepository(ReadDbContext readContext, WriteDbContext writeContext)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _readContext = readContext;
+</span></span><span style="display:flex;"><span>        _writeContext = writeContext;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;User&gt; GetByIdAsync(<span style="color:#66d9ef">int</span> id)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> _readContext.Users.FindAsync(id);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;IEnumerable&lt;User&gt;&gt; GetAllAsync()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> _readContext.Users.ToListAsync();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task AddAsync(User user)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> _writeContext.Users.AddAsync(user);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> _writeContext.SaveChangesAsync();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task UpdateAsync(User user)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _writeContext.Users.Update(user);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> _writeContext.SaveChangesAsync();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task DeleteAsync(<span style="color:#66d9ef">int</span> id)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> user = <span style="color:#66d9ef">await</span> _writeContext.Users.FindAsync(id);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (user != <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            _writeContext.Users.Remove(user);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">await</span> _writeContext.SaveChangesAsync();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="方法三使用第三方库实现读写分离">方法三：使用第三方库实现读写分离<a hidden class="anchor" aria-hidden="true" href="#方法三使用第三方库实现读写分离">#</a></h3>
+<h4 id="使用entityframework-plus">使用EntityFramework Plus<a hidden class="anchor" aria-hidden="true" href="#使用entityframework-plus">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// 安装包</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// Install-Package Z.EntityFramework.Plus.EFCore</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 配置</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> ConfigureServices(IServiceCollection services)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    services.AddDbContext&lt;AppDbContext&gt;(options =&gt;
+</span></span><span style="display:flex;"><span>        options.UseSqlServer(Configuration.GetConnectionString(<span style="color:#e6db74">&#34;DefaultConnection&#34;</span>)));
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 配置EF+的读写分离</span>
+</span></span><span style="display:flex;"><span>    services.AddEFSecondLevelCache();
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    services.AddScoped&lt;DbContextReadWriteManager&gt;();
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 实现读写管理器</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DbContextReadWriteManager</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> AppDbContext _context;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> IConfiguration _configuration;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> DbContextReadWriteManager(AppDbContext context, IConfiguration configuration)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _context = context;
+</span></span><span style="display:flex;"><span>        _configuration = configuration;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> IQueryable&lt;T&gt; AsReadOnly&lt;T&gt;() <span style="color:#66d9ef">where</span> T : <span style="color:#66d9ef">class</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 使用SecondLevelCache缓存查询结果</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> _context.Set&lt;T&gt;().AsNoTracking().FromCache();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> DbSet&lt;T&gt; AsWritable&lt;T&gt;() <span style="color:#66d9ef">where</span> T : <span style="color:#66d9ef">class</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> _context.Set&lt;T&gt;();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="方法四使用net-6的中间件实现读写分离">方法四：使用.NET 6+的中间件实现读写分离<a hidden class="anchor" aria-hidden="true" href="#方法四使用net-6的中间件实现读写分离">#</a></h3>
+<h4 id="1-创建自定义中间件">1. 创建自定义中间件<a hidden class="anchor" aria-hidden="true" href="#1-创建自定义中间件">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReadWriteSeparationMiddleware</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> RequestDelegate _next;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> IConfiguration _configuration;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> ReadWriteSeparationMiddleware(RequestDelegate next, IConfiguration configuration)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _next = next;
+</span></span><span style="display:flex;"><span>        _configuration = configuration;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task InvokeAsync(HttpContext context, AppDbContext dbContext)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 根据HTTP方法判断是读操作还是写操作</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">bool</span> isReadOperation = context.Request.Method == <span style="color:#e6db74">&#34;GET&#34;</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (isReadOperation)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 设置读库连接字符串</span>
+</span></span><span style="display:flex;"><span>            dbContext.Database.GetDbConnection().ConnectionString = 
+</span></span><span style="display:flex;"><span>                _configuration.GetConnectionString(<span style="color:#e6db74">&#34;SlaveConnection&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 设置写库连接字符串</span>
+</span></span><span style="display:flex;"><span>            dbContext.Database.GetDbConnection().ConnectionString = 
+</span></span><span style="display:flex;"><span>                _configuration.GetConnectionString(<span style="color:#e6db74">&#34;MasterConnection&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> _next(context);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 扩展方法</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ReadWriteSeparationMiddlewareExtensions</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> IApplicationBuilder UseReadWriteSeparation(<span style="color:#66d9ef">this</span> IApplicationBuilder builder)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> builder.UseMiddleware&lt;ReadWriteSeparationMiddleware&gt;();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="2-在startupcs中配置中间件">2. 在Startup.cs中配置中间件<a hidden class="anchor" aria-hidden="true" href="#2-在startupcs中配置中间件">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> Configure(IApplicationBuilder app, IWebHostEnvironment env)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 其他中间件...</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    app.UseReadWriteSeparation();
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    app.UseEndpoints(endpoints =&gt;
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        endpoints.MapControllers();
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="方法五使用dapper实现读写分离">方法五：使用Dapper实现读写分离<a hidden class="anchor" aria-hidden="true" href="#方法五使用dapper实现读写分离">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DapperReadWriteRepository</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> <span style="color:#66d9ef">string</span> _masterConnectionString;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> <span style="color:#66d9ef">string</span> _slaveConnectionString;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> DapperReadWriteRepository(IConfiguration configuration)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _masterConnectionString = configuration.GetConnectionString(<span style="color:#e6db74">&#34;MasterConnection&#34;</span>);
+</span></span><span style="display:flex;"><span>        _slaveConnectionString = configuration.GetConnectionString(<span style="color:#e6db74">&#34;SlaveConnection&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;IEnumerable&lt;T&gt;&gt; QueryAsync&lt;T&gt;(<span style="color:#66d9ef">string</span> sql, <span style="color:#66d9ef">object</span> param = <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> connection = <span style="color:#66d9ef">new</span> SqlConnection(_slaveConnectionString))
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">await</span> connection.OpenAsync();
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> connection.QueryAsync&lt;T&gt;(sql, param);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;T&gt; QuerySingleAsync&lt;T&gt;(<span style="color:#66d9ef">string</span> sql, <span style="color:#66d9ef">object</span> param = <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> connection = <span style="color:#66d9ef">new</span> SqlConnection(_slaveConnectionString))
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">await</span> connection.OpenAsync();
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> connection.QuerySingleAsync&lt;T&gt;(sql, param);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;<span style="color:#66d9ef">int</span>&gt; ExecuteAsync(<span style="color:#66d9ef">string</span> sql, <span style="color:#66d9ef">object</span> param = <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">using</span> (<span style="color:#66d9ef">var</span> connection = <span style="color:#66d9ef">new</span> SqlConnection(_masterConnectionString))
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">await</span> connection.OpenAsync();
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> connection.ExecuteAsync(sql, param);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="方法六使用sqlsugar实现读写分离">方法六：使用SqlSugar实现读写分离<a hidden class="anchor" aria-hidden="true" href="#方法六使用sqlsugar实现读写分离">#</a></h3>
+<p>SqlSugar是一个轻量级的.NET ORM框架，它内置了对读写分离的支持。</p>
+<h4 id="1-安装sqlsugar包">1. 安装SqlSugar包<a hidden class="anchor" aria-hidden="true" href="#1-安装sqlsugar包">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Install-Package SqlSugar
+</span></span></code></pre></div><h4 id="2-配置主从数据库">2. 配置主从数据库<a hidden class="anchor" aria-hidden="true" href="#2-配置主从数据库">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SqlSugarContext</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">static</span> SqlSugarScope _db;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> SqlSugarScope Db
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">get</span>
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (_db == <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                _db = <span style="color:#66d9ef">new</span> SqlSugarScope(<span style="color:#66d9ef">new</span> ConnectionConfig()
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    ConnectionString = <span style="color:#e6db74">&#34;Server=master-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>                    DbType = DbType.SqlServer,
+</span></span><span style="display:flex;"><span>                    InitKeyType = InitKeyType.Attribute,
+</span></span><span style="display:flex;"><span>                    IsAutoCloseConnection = <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>                    SlaveConnectionConfigs = <span style="color:#66d9ef">new</span> List&lt;SlaveConnectionConfig&gt;()
+</span></span><span style="display:flex;"><span>                    {
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">// 配置从库连接</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">new</span> SlaveConnectionConfig{ 
+</span></span><span style="display:flex;"><span>                            ConnectionString = <span style="color:#e6db74">&#34;Server=slave1-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>                            HitRate = <span style="color:#ae81ff">10</span> <span style="color:#75715e">// 权重</span>
+</span></span><span style="display:flex;"><span>                        },
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">new</span> SlaveConnectionConfig{ 
+</span></span><span style="display:flex;"><span>                            ConnectionString = <span style="color:#e6db74">&#34;Server=slave2-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>                            HitRate = <span style="color:#ae81ff">10</span> <span style="color:#75715e">// 权重</span>
+</span></span><span style="display:flex;"><span>                        }
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                });
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> _db;
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="3-使用读写分离">3. 使用读写分离<a hidden class="anchor" aria-hidden="true" href="#3-使用读写分离">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">UserRepository</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 读操作自动使用从库</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;List&lt;User&gt;&gt; GetAllUsersAsync()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Queryable&lt;User&gt;().ToListAsync();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;User&gt; GetUserByIdAsync(<span style="color:#66d9ef">int</span> id)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Queryable&lt;User&gt;().InSingleAsync(id);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 写操作使用主库</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task AddUserAsync(User user)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Insertable(user).ExecuteCommandAsync();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task UpdateUserAsync(User user)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Updateable(user).ExecuteCommandAsync();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task DeleteUserAsync(<span style="color:#66d9ef">int</span> id)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Deleteable&lt;User&gt;().In(id).ExecuteCommandAsync();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="4-高级配置自定义读写逻辑">4. 高级配置：自定义读写逻辑<a hidden class="anchor" aria-hidden="true" href="#4-高级配置自定义读写逻辑">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;User&gt; GetUserWithCustomLogicAsync(<span style="color:#66d9ef">int</span> id)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 强制使用主库进行查询（适用于对一致性要求高的场景）</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> user = <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Ado.UseMasterOrElse(()=&gt;
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> SqlSugarContext.Db.Queryable&lt;User&gt;().InSingleAsync(id);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> user;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 使用事务时也会自动切换到主库</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task TransferAsync(<span style="color:#66d9ef">int</span> fromUserId, <span style="color:#66d9ef">int</span> toUserId, <span style="color:#66d9ef">decimal</span> amount)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 开启事务自动使用主库</span>
+</span></span><span style="display:flex;"><span>        SqlSugarContext.Db.Ado.BeginTran();
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> fromUser = <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Queryable&lt;User&gt;().InSingleAsync(fromUserId);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> toUser = <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Queryable&lt;User&gt;().InSingleAsync(toUserId);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        fromUser.Balance -= amount;
+</span></span><span style="display:flex;"><span>        toUser.Balance += amount;
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Updateable(fromUser).ExecuteCommandAsync();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> SqlSugarContext.Db.Updateable(toUser).ExecuteCommandAsync();
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        SqlSugarContext.Db.Ado.CommitTran();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">catch</span> (Exception ex)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        SqlSugarContext.Db.Ado.RollbackTran();
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">throw</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="5-配置负载均衡策略">5. 配置负载均衡策略<a hidden class="anchor" aria-hidden="true" href="#5-配置负载均衡策略">#</a></h4>
+<p>SqlSugar支持两种负载均衡策略：</p>
+<ol>
+<li><strong>轮询策略</strong>：按顺序分配查询到从库</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// 配置轮询策略</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">new</span> SqlSugarScope(<span style="color:#66d9ef">new</span> ConnectionConfig()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 主库配置...</span>
+</span></span><span style="display:flex;"><span>    SlaveConnectionConfigs = slaveConnections,
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 默认为轮询策略，可以不设置</span>
+</span></span><span style="display:flex;"><span>    SlaveLoadBalancer = <span style="color:#66d9ef">new</span> RoundRobinSqlSugarLoadBalancer() 
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><ol start="2">
+<li><strong>权重策略</strong>：根据HitRate权重分配查询</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// 配置权重策略，根据SlaveConnectionConfig中的HitRate进行分配</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">new</span> SqlSugarScope(<span style="color:#66d9ef">new</span> ConnectionConfig()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 主库配置...</span>
+</span></span><span style="display:flex;"><span>    SlaveConnectionConfigs = slaveConnections,
+</span></span><span style="display:flex;"><span>    SlaveLoadBalancer = <span style="color:#66d9ef">new</span> WeightSqlSugarLoadBalancer() 
+</span></span><span style="display:flex;"><span>});
+</span></span></code></pre></div><h4 id="6-与依赖注入集成">6. 与依赖注入集成<a hidden class="anchor" aria-hidden="true" href="#6-与依赖注入集成">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#75715e">// 在Startup.cs中注册SqlSugar服务</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">void</span> ConfigureServices(IServiceCollection services)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 注册SqlSugar服务</span>
+</span></span><span style="display:flex;"><span>    services.AddSingleton&lt;ISqlSugarClient&gt;(sp =&gt;
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">var</span> config = <span style="color:#66d9ef">new</span> ConnectionConfig()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            ConnectionString = Configuration.GetConnectionString(<span style="color:#e6db74">&#34;MasterConnection&#34;</span>),
+</span></span><span style="display:flex;"><span>            DbType = DbType.SqlServer,
+</span></span><span style="display:flex;"><span>            InitKeyType = InitKeyType.Attribute,
+</span></span><span style="display:flex;"><span>            IsAutoCloseConnection = <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>            SlaveConnectionConfigs = <span style="color:#66d9ef">new</span> List&lt;SlaveConnectionConfig&gt;()
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">new</span> SlaveConnectionConfig{
+</span></span><span style="display:flex;"><span>                    ConnectionString = Configuration.GetConnectionString(<span style="color:#e6db74">&#34;SlaveConnection1&#34;</span>),
+</span></span><span style="display:flex;"><span>                    HitRate = <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">new</span> SlaveConnectionConfig{
+</span></span><span style="display:flex;"><span>                    ConnectionString = Configuration.GetConnectionString(<span style="color:#e6db74">&#34;SlaveConnection2&#34;</span>),
+</span></span><span style="display:flex;"><span>                    HitRate = <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> SqlSugarScope(config);
+</span></span><span style="display:flex;"><span>    });
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 注册仓储</span>
+</span></span><span style="display:flex;"><span>    services.AddScoped&lt;IUserRepository, UserRepository&gt;();
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 其他服务注册...</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="7-多租户场景下的读写分离">7. 多租户场景下的读写分离<a hidden class="anchor" aria-hidden="true" href="#7-多租户场景下的读写分离">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MultiTenantDbContext</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> SqlSugarScope GetDb()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">new</span> SqlSugarScope(<span style="color:#66d9ef">new</span> List&lt;ConnectionConfig&gt;()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 租户1的配置（包含读写分离）</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">new</span> ConnectionConfig()
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                ConfigId = <span style="color:#e6db74">&#34;tenant1&#34;</span>,
+</span></span><span style="display:flex;"><span>                ConnectionString = <span style="color:#e6db74">&#34;Server=tenant1-master;Database=Tenant1Db;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>                DbType = DbType.SqlServer,
+</span></span><span style="display:flex;"><span>                IsAutoCloseConnection = <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>                SlaveConnectionConfigs = <span style="color:#66d9ef">new</span> List&lt;SlaveConnectionConfig&gt;()
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">new</span> SlaveConnectionConfig{ 
+</span></span><span style="display:flex;"><span>                        ConnectionString = <span style="color:#e6db74">&#34;Server=tenant1-slave;Database=Tenant1Db;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>                        HitRate = <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 租户2的配置（包含读写分离）</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">new</span> ConnectionConfig()
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                ConfigId = <span style="color:#e6db74">&#34;tenant2&#34;</span>,
+</span></span><span style="display:flex;"><span>                ConnectionString = <span style="color:#e6db74">&#34;Server=tenant2-master;Database=Tenant2Db;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>                DbType = DbType.SqlServer,
+</span></span><span style="display:flex;"><span>                IsAutoCloseConnection = <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>                SlaveConnectionConfigs = <span style="color:#66d9ef">new</span> List&lt;SlaveConnectionConfig&gt;()
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    <span style="color:#66d9ef">new</span> SlaveConnectionConfig{ 
+</span></span><span style="display:flex;"><span>                        ConnectionString = <span style="color:#e6db74">&#34;Server=tenant2-slave;Database=Tenant2Db;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>                        HitRate = <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>                    }
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 使用多租户</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;List&lt;User&gt;&gt; GetTenantUsersAsync(<span style="color:#66d9ef">string</span> tenantId)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> db = MultiTenantDbContext.GetDb();
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> db.GetConnection(tenantId).Queryable&lt;User&gt;().ToListAsync();
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>SqlSugar的读写分离实现简单高效，自动根据操作类型（查询/增删改）来选择合适的数据库连接，无需开发人员手动管理连接。它内置的负载均衡策略也可以灵活应对不同规模的系统需求。</p>
+<h2 id="负载均衡策略">负载均衡策略<a hidden class="anchor" aria-hidden="true" href="#负载均衡策略">#</a></h2>
+<p>在实现读写分离时，如果有多个从库，可以实现不同的负载均衡策略：</p>
+<h3 id="1-轮询策略round-robin">1. 轮询策略（Round Robin）<a hidden class="anchor" aria-hidden="true" href="#1-轮询策略round-robin">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RoundRobinLoadBalancer</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> List&lt;<span style="color:#66d9ef">string</span>&gt; _slaveConnectionStrings;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> _currentIndex = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> <span style="color:#66d9ef">object</span> _lock = <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">object</span>();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> RoundRobinLoadBalancer(IConfiguration configuration)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _slaveConnectionStrings = configuration.GetSection(<span style="color:#e6db74">&#34;SlaveConnections&#34;</span>)
+</span></span><span style="display:flex;"><span>            .Get&lt;List&lt;<span style="color:#66d9ef">string</span>&gt;&gt;();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> GetConnection()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">lock</span> (_lock)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (_currentIndex &gt;= _slaveConnectionStrings.Count)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                _currentIndex = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> _slaveConnectionStrings[_currentIndex++];
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="2-随机策略random">2. 随机策略（Random）<a hidden class="anchor" aria-hidden="true" href="#2-随机策略random">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">RandomLoadBalancer</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> List&lt;<span style="color:#66d9ef">string</span>&gt; _slaveConnectionStrings;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> Random _random = <span style="color:#66d9ef">new</span> Random();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> RandomLoadBalancer(IConfiguration configuration)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _slaveConnectionStrings = configuration.GetSection(<span style="color:#e6db74">&#34;SlaveConnections&#34;</span>)
+</span></span><span style="display:flex;"><span>            .Get&lt;List&lt;<span style="color:#66d9ef">string</span>&gt;&gt;();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> GetConnection()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> index = _random.Next(<span style="color:#ae81ff">0</span>, _slaveConnectionStrings.Count);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> _slaveConnectionStrings[index];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="3-权重策略weighted">3. 权重策略（Weighted）<a hidden class="anchor" aria-hidden="true" href="#3-权重策略weighted">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">WeightedLoadBalancer</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> List&lt;SlaveDatabase&gt; _slaveDatabases;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> Random _random = <span style="color:#66d9ef">new</span> Random();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> WeightedLoadBalancer(IConfiguration configuration)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _slaveDatabases = configuration.GetSection(<span style="color:#e6db74">&#34;SlaveDatabases&#34;</span>)
+</span></span><span style="display:flex;"><span>            .Get&lt;List&lt;SlaveDatabase&gt;&gt;();
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> GetConnection()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> totalWeight = _slaveDatabases.Sum(db =&gt; db.Weight);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> randomValue = _random.Next(<span style="color:#ae81ff">1</span>, totalWeight + <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> weightSum = <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> database <span style="color:#66d9ef">in</span> _slaveDatabases)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            weightSum += database.Weight;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (randomValue &lt;= weightSum)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> database.ConnectionString;
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 默认返回第一个</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> _slaveDatabases.First().ConnectionString;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SlaveDatabase</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">string</span> ConnectionString { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> Weight { <span style="color:#66d9ef">get</span>; <span style="color:#66d9ef">set</span>; }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="数据一致性处理">数据一致性处理<a hidden class="anchor" aria-hidden="true" href="#数据一致性处理">#</a></h2>
+<p>读写分离面临的主要挑战是数据一致性。主库和从库之间的数据同步存在延迟，可能导致从库读取到旧数据。</p>
+<h3 id="处理数据一致性的策略">处理数据一致性的策略：<a hidden class="anchor" aria-hidden="true" href="#处理数据一致性的策略">#</a></h3>
+<ol>
+<li><strong>延迟容忍</strong>：对于可以容忍数据延迟的业务，直接从从库读取</li>
+<li><strong>强一致性要求</strong>：对于要求强一致性的业务，从主库读取</li>
+<li><strong>会话一致性</strong>：在同一会话内，写操作后的读操作都路由到主库</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-csharp" data-lang="csharp"><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ConsistencyAwareRepository</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> ReadDbContext _readContext;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> WriteDbContext _writeContext;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">readonly</span> IHttpContextAccessor _httpContextAccessor;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> ConsistencyAwareRepository(
+</span></span><span style="display:flex;"><span>        ReadDbContext readContext, 
+</span></span><span style="display:flex;"><span>        WriteDbContext writeContext,
+</span></span><span style="display:flex;"><span>        IHttpContextAccessor httpContextAccessor)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        _readContext = readContext;
+</span></span><span style="display:flex;"><span>        _writeContext = writeContext;
+</span></span><span style="display:flex;"><span>        _httpContextAccessor = httpContextAccessor;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;User&gt; GetByIdAsync(<span style="color:#66d9ef">int</span> id)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 检查会话状态，判断是否需要从主库读取</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (HasRecentWriteOperation())
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> _writeContext.Users.FindAsync(id);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> _readContext.Users.FindAsync(id);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">bool</span> HasRecentWriteOperation()
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 检查会话中是否有标记表明最近有写操作</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> _httpContextAccessor.HttpContext.Session.GetString(<span style="color:#e6db74">&#34;HasRecentWrite&#34;</span>) == <span style="color:#e6db74">&#34;true&#34;</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task AddAsync(User user)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> _writeContext.Users.AddAsync(user);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">await</span> _writeContext.SaveChangesAsync();
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 标记当前会话有写操作</span>
+</span></span><span style="display:flex;"><span>        _httpContextAccessor.HttpContext.Session.SetString(<span style="color:#e6db74">&#34;HasRecentWrite&#34;</span>, <span style="color:#e6db74">&#34;true&#34;</span>);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="读写分离配置示例appsettingsjson">读写分离配置示例（appsettings.json）<a hidden class="anchor" aria-hidden="true" href="#读写分离配置示例appsettingsjson">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;ConnectionStrings&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;MasterConnection&#34;</span>: <span style="color:#e6db74">&#34;Server=master-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;SlaveConnection&#34;</span>: <span style="color:#e6db74">&#34;Server=slave-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>
+</span></span><span style="display:flex;"><span>  },
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;SlaveConnections&#34;</span>: [
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Server=slave1-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Server=slave2-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#34;Server=slave3-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>
+</span></span><span style="display:flex;"><span>  ],
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;SlaveDatabases&#34;</span>: [
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;ConnectionString&#34;</span>: <span style="color:#e6db74">&#34;Server=slave1-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;Weight&#34;</span>: <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;ConnectionString&#34;</span>: <span style="color:#e6db74">&#34;Server=slave2-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;Weight&#34;</span>: <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>    },
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;ConnectionString&#34;</span>: <span style="color:#e6db74">&#34;Server=slave3-server;Database=MyDatabase;User Id=sa;Password=YourPassword;&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#f92672">&#34;Weight&#34;</span>: <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  ]
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="读写分离最佳实践">读写分离最佳实践<a hidden class="anchor" aria-hidden="true" href="#读写分离最佳实践">#</a></h2>
+<ol>
+<li><strong>合理划分读写操作</strong>：明确区分哪些操作是读操作，哪些是写操作</li>
+<li><strong>处理数据一致性问题</strong>：根据业务需求选择合适的数据一致性策略</li>
+<li><strong>监控主从延迟</strong>：定期检查主从同步状态，避免数据延迟过大</li>
+<li><strong>合理设置连接池</strong>：根据读写比例配置主从数据库的连接池大小</li>
+<li><strong>异常处理机制</strong>：当从库不可用时，应有降级策略（如切换到主库）</li>
+<li><strong>分布式事务处理</strong>：在涉及多个数据源的事务中，确保事务的一致性</li>
+</ol>
+<h2 id="总结">总结<a hidden class="anchor" aria-hidden="true" href="#总结">#</a></h2>
+<p>.NET中实现读写分离有多种方式，可以根据项目需求和复杂度选择合适的实现方法。无论采用哪种方式，都需要注意数据一致性、异常处理和负载均衡等问题。读写分离是提高系统性能和可用性的重要手段，但也增加了系统的复杂度，需要权衡利弊后再决定是否采用。</p>
+<h2 id="sqlsugar-具体实现">sqlsugar 具体实现<a hidden class="anchor" aria-hidden="true" href="#sqlsugar-具体实现">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Myblog.Entity.Enties;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> Myblog.Entity.Enties.Interface;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> NLog;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">using</span> SqlSugar;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> Myblog.WebApi.Extension;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// &lt;summary&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// sqlsugar配置</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">/// &lt;/summary&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SqlsugarExtension</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">void</span> AddSqlsugar(<span style="color:#66d9ef">this</span> WebApplicationBuilder builder)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 注册SqlSugar</span>
+</span></span><span style="display:flex;"><span>        builder.Services.AddSingleton&lt;ISqlSugarClient&gt;(s =&gt;
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            Console.WriteLine(<span style="color:#e6db74">&#34;初始化数据库配置&#34;</span>);
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 配置主从库连接</span>
+</span></span><span style="display:flex;"><span>            List&lt;SlaveConnectionConfig&gt; slaveConnectionConfigs = <span style="color:#66d9ef">new</span> List&lt;SlaveConnectionConfig&gt;();
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 添加从库配置</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">string?</span> slaveConnection = builder.Configuration.GetSection(<span style="color:#e6db74">&#34;ConnectionStrings:MySqlSlave&#34;</span>).Value;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (!<span style="color:#66d9ef">string</span>.IsNullOrEmpty(slaveConnection))
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                slaveConnectionConfigs.Add(<span style="color:#66d9ef">new</span> SlaveConnectionConfig
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    ConnectionString = slaveConnection,
+</span></span><span style="display:flex;"><span>                    HitRate = <span style="color:#ae81ff">10</span> <span style="color:#75715e">// 访问权重</span>
+</span></span><span style="display:flex;"><span>                });
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            SqlSugarScope sqlSugar = <span style="color:#66d9ef">new</span> SqlSugarScope(<span style="color:#66d9ef">new</span> ConnectionConfig()
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    DbType = SqlSugar.DbType.MySql,
+</span></span><span style="display:flex;"><span>                    InitKeyType = InitKeyType.Attribute,
+</span></span><span style="display:flex;"><span>                    ConnectionString = builder.Configuration.GetSection(<span style="color:#e6db74">&#34;ConnectionStrings:MySql&#34;</span>).Value, <span style="color:#75715e">// 主库连接字符串</span>
+</span></span><span style="display:flex;"><span>                    IsAutoCloseConnection = <span style="color:#66d9ef">true</span>,
+</span></span><span style="display:flex;"><span>                    SlaveConnectionConfigs = slaveConnectionConfigs, <span style="color:#75715e">// 从库配置</span>
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                db =&gt;
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    <span style="color:#75715e">//单例参数配置，所有上下文生效</span>
+</span></span><span style="display:flex;"><span>                    db.Aop.OnLogExecuting = (sql, pars) =&gt;
+</span></span><span style="display:flex;"><span>                    {
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">// 获取完整的 SQL 语句（替换参数）</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">var</span> fullSql = sql;
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> parameter <span style="color:#66d9ef">in</span> pars)
+</span></span><span style="display:flex;"><span>                        {
+</span></span><span style="display:flex;"><span>                            <span style="color:#75715e">// 根据参数类型处理替换</span>
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">var</span> <span style="color:#66d9ef">value</span> = parameter.Value?.ToString();
+</span></span><span style="display:flex;"><span>                            <span style="color:#66d9ef">if</span> (parameter.DbType == System.Data.DbType.String
+</span></span><span style="display:flex;"><span>                                || parameter.DbType == System.Data.DbType.DateTime
+</span></span><span style="display:flex;"><span>                                || parameter.DbType == System.Data.DbType.Date)
+</span></span><span style="display:flex;"><span>                            {
+</span></span><span style="display:flex;"><span>                                <span style="color:#66d9ef">value</span> = <span style="color:#e6db74">$&#34;&#39;{value}&#39;&#34;</span>;
+</span></span><span style="display:flex;"><span>                            }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                            fullSql = fullSql.Replace(parameter.ParameterName, <span style="color:#66d9ef">value</span> ?? <span style="color:#e6db74">&#34;NULL&#34;</span>);
+</span></span><span style="display:flex;"><span>                        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#75715e">// 获取当前执行的数据库类型（主库/从库）</span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">string</span> dbType = <span style="color:#e6db74">&#34;Master&#34;</span>;
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">if</span> (sql.Contains(<span style="color:#e6db74">&#34;/*Slave*/&#34;</span>))
+</span></span><span style="display:flex;"><span>                        {
+</span></span><span style="display:flex;"><span>                            dbType = <span style="color:#e6db74">&#34;Slave&#34;</span>;
+</span></span><span style="display:flex;"><span>                        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>                        <span style="color:#66d9ef">var</span> logger = LogManager.GetCurrentClassLogger();
+</span></span><span style="display:flex;"><span>                        DateTime date = DateTime.Now.Date.ToLocalTime();
+</span></span><span style="display:flex;"><span>                        Console.WriteLine(<span style="color:#e6db74">$&#34;===================SQL开始:{date}====================&#34;</span>);
+</span></span><span style="display:flex;"><span>                        Console.WriteLine(<span style="color:#e6db74">$&#34;当前使用数据库: {dbType}&#34;</span>);
+</span></span><span style="display:flex;"><span>                        logger.Info(<span style="color:#e6db74">$&#34;OP:SQL:[{dbType}]\r\n{fullSql}&#34;</span>);
+</span></span><span style="display:flex;"><span>                        Console.WriteLine(<span style="color:#e6db74">&#34;===================SQL结束====================&#34;</span>);
+</span></span><span style="display:flex;"><span>                    };
+</span></span><span style="display:flex;"><span>                });
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 初始化数据库</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">string?</span> initDatabasevalue = builder.Configuration.GetSection(<span style="color:#e6db74">&#34;ConnectionStrings:InitDatabase&#34;</span>).Value;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">bool</span> initDatabase;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">bool</span>.TryParse(initDatabasevalue, <span style="color:#66d9ef">out</span> initDatabase);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (initDatabase)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                sqlSugar.DbMaintenance.CreateDatabase();
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// 初始化表</span>
+</span></span><span style="display:flex;"><span>                Type[] types = <span style="color:#66d9ef">typeof</span>(Albums).Assembly.GetTypes()
+</span></span><span style="display:flex;"><span>                    .Where(it =&gt; it.IsClass &amp;&amp; !it.IsAbstract &amp;&amp; <span style="color:#66d9ef">typeof</span>(IEntity).IsAssignableFrom(it))
+</span></span><span style="display:flex;"><span>                    .ToArray();
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">foreach</span> (<span style="color:#66d9ef">var</span> type <span style="color:#66d9ef">in</span> types)
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    Console.WriteLine(<span style="color:#e6db74">&#34;初始化&#34;</span> + type.Name);
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>                sqlSugar.CodeFirst.InitTables(types);
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> sqlSugar;
+</span></span><span style="display:flex;"><span>        });
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="编写拓展方法实现具体的读写操作使用库">编写拓展方法实现具体的读写操作使用库<a hidden class="anchor" aria-hidden="true" href="#编写拓展方法实现具体的读写操作使用库">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span><span style="color:#66d9ef">using</span> SqlSugar;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">namespace</span> Myblog.Repository
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;summary&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// 数据库读写分离扩展方法</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">/// &lt;/summary&gt;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DatabaseExtensions</span>
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// &lt;summary&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// 获取主库查询对象（用于写操作）</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// &lt;/summary&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> ISugarQueryable&lt;T&gt; AsMaster&lt;T&gt;(<span style="color:#66d9ef">this</span> ISugarQueryable&lt;T&gt; queryable) <span style="color:#66d9ef">where</span> T : class, <span style="color:#66d9ef">new</span>()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> queryable.AS(<span style="color:#e6db74">&#34;Master&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// &lt;summary&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// 获取从库查询对象（用于读操作）</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// &lt;/summary&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> ISugarQueryable&lt;T&gt; AsSlave&lt;T&gt;(<span style="color:#66d9ef">this</span> ISugarQueryable&lt;T&gt; queryable) <span style="color:#66d9ef">where</span> T : class, <span style="color:#66d9ef">new</span>()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> queryable.AS(<span style="color:#e6db74">&#34;Slave&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// &lt;summary&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// 使用从库执行查询（带缓存）</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">/// &lt;/summary&gt;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">static</span> ISugarQueryable&lt;T&gt; AsSlaveWithCache&lt;T&gt;(<span style="color:#66d9ef">this</span> ISugarQueryable&lt;T&gt; queryable, <span style="color:#66d9ef">int</span> cacheDurationInSeconds = <span style="color:#ae81ff">60</span>) <span style="color:#66d9ef">where</span> T : class, <span style="color:#66d9ef">new</span>()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> queryable.WithCache(cacheDurationInSeconds).AS(<span style="color:#e6db74">&#34;Slave&#34;</span>);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>} 
+</span></span></code></pre></div><h2 id="在基础仓储层配置读写操作">在基础仓储层配置读写操作<a hidden class="anchor" aria-hidden="true" href="#在基础仓储层配置读写操作">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>  #region 写操作 - 使用主库
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        public async Task&lt;bool&gt; AddAsync(T entity)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            return await base.InsertAsync(entity);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        public async Task&lt;bool&gt; DeleteAsync(long id)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            return await base.DeleteByIdAsync(id);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        public async Task&lt;bool&gt; UpdateAsync(T entity)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            return await base.UpdateAsync(entity);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        #endregion
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c#" data-lang="c#"><span style="display:flex;"><span>   <span style="color:#75715e">#region</span> <span style="color:#960050;background-color:#1e0010">读操作</span> - <span style="color:#960050;background-color:#1e0010">使用从库</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;T&gt; FindAsync(<span style="color:#66d9ef">long</span> id)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 使用从库查询</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> Context.Queryable&lt;T&gt;().AsSlaveWithCache().InSingleAsync(id);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;List&lt;T&gt;&gt; QueryAsync()
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 使用从库查询</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> Context.Queryable&lt;T&gt;().AsSlaveWithCache().ToListAsync();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;List&lt;T&gt;&gt; FindPageListAsync(Expression&lt;Func&lt;T, <span style="color:#66d9ef">bool</span>&gt;&gt;? func)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 使用从库查询</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (func == <span style="color:#66d9ef">null</span>)
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> Context.Queryable&lt;T&gt;().AsSlaveWithCache().ToListAsync();
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> Context.Queryable&lt;T&gt;().AsSlaveWithCache().Where(func).ToListAsync();
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;List&lt;T&gt;&gt; PageListAsync(<span style="color:#66d9ef">int</span> page, <span style="color:#66d9ef">int</span> size, RefAsync&lt;<span style="color:#66d9ef">int</span>&gt; total)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 使用从库查询</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> Context.Queryable&lt;T&gt;().AsSlave().ToPageListAsync(page, size, total);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">async</span> Task&lt;List&lt;T&gt;&gt; PageListAsync(Expression&lt;Func&lt;T, <span style="color:#66d9ef">bool</span>&gt;&gt; func, <span style="color:#66d9ef">int</span> page, <span style="color:#66d9ef">int</span> size,
+</span></span><span style="display:flex;"><span>            RefAsync&lt;<span style="color:#66d9ef">int</span>&gt; total)
+</span></span><span style="display:flex;"><span>        {
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 使用从库查询</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">await</span> Context.Queryable&lt;T&gt;()
+</span></span><span style="display:flex;"><span>                .AsSlave()
+</span></span><span style="display:flex;"><span>                .Where(func)
+</span></span><span style="display:flex;"><span>                .ToPageListAsync(page, size, total);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">#endregion</span>
+</span></span></code></pre></div>
+
+        </div>
+        <div class="post-reward">
+            <div style="padding: 0 0 0 0; margin: 0 0 0 0; width: 100%; font-size:16px; text-align: center;">
+                <div id="QR" style="opacity: 0;">
+                    <div id="wechat" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="wechat_qr" src="https://www.heiok.top/img/thinks.jpg" alt="wechat_pay"></a>
+                        <p>微信</p>
+                    </div>
+                    <div id="alipay" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="alipay_qr" src="https://www.heiok.top/img/thinks.jpg" alt="alipay"></a>
+                        <p>支付宝</p>
+                    </div>
+                </div>
+                <button id="rewardButton"
+                        onclick="
+                    var qr = document.getElementById('QR');
+                    if (qr.style.opacity === '0') {
+                        qr.style.opacity='1';
+                    } else {
+                        qr.style.opacity='0'
+                    }"
+                >
+                    <span>🧧 鼓励</span>
+                </button>
+            </div>
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://www.heiok.top/posts/tutorial/docker%E4%BB%8B%E7%BB%8D%E5%8F%8A%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E5%A4%A7%E5%85%A8%E8%B6%85%E8%AF%A6%E7%BB%86/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>docker介绍及常用命令大全（超详细）</span>
+  </a>
+  <a class="next" href="https://www.heiok.top/posts/tutorial/efcore%E5%AE%9E%E7%8E%B0%E5%85%85%E8%A1%80%E6%A8%A1%E5%9E%8B/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>EfCore实现充血模型</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share dotnet 数据库读写分离实现 on twitter"
+       href="https://twitter.com/intent/tweet/?text=dotnet%20%e6%95%b0%e6%8d%ae%e5%ba%93%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e5%ae%9e%e7%8e%b0&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdotnet-%25E6%2595%25B0%25E6%258D%25AE%25E5%25BA%2593%25E8%25AF%25BB%25E5%2586%2599%25E5%2588%2586%25E7%25A6%25BB%25E5%25AE%259E%25E7%258E%25B0%2f&amp;hashtags=">
+    <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share dotnet 数据库读写分离实现 on linkedin"
+       href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdotnet-%25E6%2595%25B0%25E6%258D%25AE%25E5%25BA%2593%25E8%25AF%25BB%25E5%2586%2599%25E5%2588%2586%25E7%25A6%25BB%25E5%25AE%259E%25E7%258E%25B0%2f&amp;title=dotnet%20%e6%95%b0%e6%8d%ae%e5%ba%93%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e5%ae%9e%e7%8e%b0&amp;summary=dotnet%20%e6%95%b0%e6%8d%ae%e5%ba%93%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e5%ae%9e%e7%8e%b0&amp;source=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdotnet-%25E6%2595%25B0%25E6%258D%25AE%25E5%25BA%2593%25E8%25AF%25BB%25E5%2586%2599%25E5%2588%2586%25E7%25A6%25BB%25E5%25AE%259E%25E7%258E%25B0%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share dotnet 数据库读写分离实现 on reddit"
+       href="https://reddit.com/submit?url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdotnet-%25E6%2595%25B0%25E6%258D%25AE%25E5%25BA%2593%25E8%25AF%25BB%25E5%2586%2599%25E5%2588%2586%25E7%25A6%25BB%25E5%25AE%259E%25E7%258E%25B0%2f&title=dotnet%20%e6%95%b0%e6%8d%ae%e5%ba%93%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e5%ae%9e%e7%8e%b0">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share dotnet 数据库读写分离实现 on facebook"
+       href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdotnet-%25E6%2595%25B0%25E6%258D%25AE%25E5%25BA%2593%25E8%25AF%25BB%25E5%2586%2599%25E5%2588%2586%25E7%25A6%25BB%25E5%25AE%259E%25E7%258E%25B0%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share dotnet 数据库读写分离实现 on whatsapp"
+       href="https://api.whatsapp.com/send?text=dotnet%20%e6%95%b0%e6%8d%ae%e5%ba%93%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e5%ae%9e%e7%8e%b0%20-%20https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdotnet-%25E6%2595%25B0%25E6%258D%25AE%25E5%25BA%2593%25E8%25AF%25BB%25E5%2586%2599%25E5%2588%2586%25E7%25A6%25BB%25E5%25AE%259E%25E7%258E%25B0%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share dotnet 数据库读写分离实现 on telegram"
+       href="https://telegram.me/share/url?text=dotnet%20%e6%95%b0%e6%8d%ae%e5%ba%93%e8%af%bb%e5%86%99%e5%88%86%e7%a6%bb%e5%ae%9e%e7%8e%b0&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdotnet-%25E6%2595%25B0%25E6%258D%25AE%25E5%25BA%2593%25E8%25AF%25BB%25E5%2586%2599%25E5%2588%2586%25E7%25A6%25BB%25E5%25AE%259E%25E7%258E%25B0%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+        </footer>
+    </div>
+
+<style>
+    .comments_details summary::marker {
+        font-size: 20px;
+        content: '👉展开评论';
+        color: var(--content);
+    }
+    .comments_details[open] summary::marker{
+        font-size: 20px;
+        content: '👇关闭评论';
+        color: var(--content);
+    }
+</style>
+
+
+<div>
+    <details class="comments_details">
+        <summary style="cursor: pointer; margin: 50px 0 20px 0;width: 130px;">
+            <span style="font-size: 20px;color: var(--content);">...</span>
+        </summary>
+        <div id="tcomment"></div>
+    </details>
+    <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js">
+    </script>
+    <script>
+        twikoo.init({
+            envId:  null ,
+        el: "#tcomment",
+            lang: 'zh-CN',
+            region:  null ,
+        path: window.TWIKOO_MAGIC_PATH||window.location.pathname,
+        })
+    </script>
+</div>
+</article>
+</main>
+
+<footer class="footer">
+    <span>
+        Copyright
+        &copy;
+        2020-2026
+        <a href="https://www.heiok.top/" style="color:#939393;">wait`s blog</a>
+        All Rights Reserved
+    </span>
+    <a href="https://beian.miit.gov.cn/" target="_blank" style="color:#939393;">蜀ICP备2023024013号</a>&nbsp;
+    <span>
+        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=null"
+           style="display:inline-block;text-decoration:none;height:20px;color:#939393;">
+            <img src="" style="float:left;margin: 0px 5px 0px 0px;"/>
+            
+        </a>
+    </span>
+    <span id="busuanzi_container">
+        <span class="fa fa-user"></span> <span id="busuanzi_value_site_uv"></span>
+        <span class="fa fa-eye"></span> <span id="busuanzi_value_site_pv"></span>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '复制';
+
+        function copyingDone() {
+            copybutton.innerText = '已复制！';
+            setTimeout(() => {
+                copybutton.innerText = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+</body>
+
+</html>

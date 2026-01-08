@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<meta name="referrer" content="no-referrer">
+<title>Docker Dockerfile指令大全 | wait`s blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="什么是 Dockerfile？
+Dockerfile 是一个用来构建镜像的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。使用docker build命令，用户可以创建基于基础镜像的自定义镜像。
+Dockerfile格式
+# Comment 
+INSTRUCTION arguments  # INSTRUCTION表示指令（不止一条）
+Dockerfile指令详解
+FROM-指定基础镜像
+指定基础镜像，并且Dockerfile中第一条指令必须是FROM指令，且在同一个Dockerfile中创建多个镜像时，可以使用多个FROM指令。">
+<meta name="author" content="wait">
+<link rel="canonical" href="https://www.heiok.top/posts/tutorial/docker-dockerfile%E6%8C%87%E4%BB%A4%E5%A4%A7%E5%85%A8/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="apple-touch-icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="mask-icon" href="https://www.heiok.top/img/thinks.jpg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://www.heiok.top/posts/tutorial/docker-dockerfile%E6%8C%87%E4%BB%A4%E5%A4%A7%E5%85%A8/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="Docker Dockerfile指令大全" />
+<meta property="og:description" content="什么是 Dockerfile？
+Dockerfile 是一个用来构建镜像的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。使用docker build命令，用户可以创建基于基础镜像的自定义镜像。
+Dockerfile格式
+# Comment 
+INSTRUCTION arguments  # INSTRUCTION表示指令（不止一条）
+Dockerfile指令详解
+FROM-指定基础镜像
+指定基础镜像，并且Dockerfile中第一条指令必须是FROM指令，且在同一个Dockerfile中创建多个镜像时，可以使用多个FROM指令。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.heiok.top/posts/tutorial/docker-dockerfile%E6%8C%87%E4%BB%A4%E5%A4%A7%E5%85%A8/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-01-08T16:37:48+08:00" />
+<meta property="article:modified_time" content="2026-01-08T16:37:48+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Docker Dockerfile指令大全"/>
+<meta name="twitter:description" content="什么是 Dockerfile？
+Dockerfile 是一个用来构建镜像的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。使用docker build命令，用户可以创建基于基础镜像的自定义镜像。
+Dockerfile格式
+# Comment 
+INSTRUCTION arguments  # INSTRUCTION表示指令（不止一条）
+Dockerfile指令详解
+FROM-指定基础镜像
+指定基础镜像，并且Dockerfile中第一条指令必须是FROM指令，且在同一个Dockerfile中创建多个镜像时，可以使用多个FROM指令。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://www.heiok.top/posts/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Docker Dockerfile指令大全",
+      "item": "https://www.heiok.top/posts/tutorial/docker-dockerfile%E6%8C%87%E4%BB%A4%E5%A4%A7%E5%85%A8/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Docker Dockerfile指令大全",
+  "name": "Docker Dockerfile指令大全",
+  "description": "什么是 Dockerfile？ Dockerfile 是一个用来构建镜像的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。使用docker build命令，用户可以创建基于基础镜像的自定义镜像。\nDockerfile格式 # Comment INSTRUCTION arguments # INSTRUCTION表示指令（不止一条） Dockerfile指令详解 FROM-指定基础镜像 指定基础镜像，并且Dockerfile中第一条指令必须是FROM指令，且在同一个Dockerfile中创建多个镜像时，可以使用多个FROM指令。\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "什么是 Dockerfile？ Dockerfile 是一个用来构建镜像的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。使用docker build命令，用户可以创建基于基础镜像的自定义镜像。\nDockerfile格式 # Comment INSTRUCTION arguments # INSTRUCTION表示指令（不止一条） Dockerfile指令详解 FROM-指定基础镜像 指定基础镜像，并且Dockerfile中第一条指令必须是FROM指令，且在同一个Dockerfile中创建多个镜像时，可以使用多个FROM指令。\n语法格式如下：\nFROM \u003cimage\u003e FROM \u003cimage\u003e:\u003ctag\u003e 其中是可选项，如果没有选择，那么默认值为latest。\n如果不以任何镜像为基础，那么写法为：FROM scratch。\nRUN-运行指定的命令 运行指定的命令。\n包含两种语法格式，如下所示：\n# shell格式：就像在命令行中输入的Shell脚本命令一样。 RUN \u003ccommand\u003e # exec格式：就像是函数调用的格式。 RUN [\"executable\", \"param1\", \"param2\"] 第一种后边直接跟shell命令。\n在linux操作系统上默认为/bin/sh -c 在windows操作系统上默认为cmd /S /C 第二种是类似于函数调用。可将executable理解成为可执行文件，后面就是两个参数。\n样例：\nRUN /bin/bash -c 'source $HOME/.bashrc; echo $HOME' RUN [\"/bin/bash\", \"-c\", \"echo hello\"] 注意：\n多行命令不要写多个RUN，原因是Dockerfile中每一个指令都会建立一层。多少个RUN就构建了多少层镜像，会造成镜像的臃肿、多层，不仅仅增加了构件部署的时间，还容易出错。RUN书写时的换行符是\\\nCMD-容器启动时要运行的命令 容器启动时要运行的命令。\n包含三种语法格式，如下所示：\n# 第一种就是shell这种执行方式和写法 CMD command param1 param2 # 第二种是可执行文件加上参数的形式（推荐） CMD [\"executable\",\"param1\",\"param2\"] # 该写法是为 ENTRYPOINT 指令指定的程序提供默认参数 CMD [\"\",\"\",...] 推荐使用第二种格式，执行过程比较明确。第一种格式实际上在运行的过程中也会自动转换成第二种格式运行，并且默认可执行文件是sh。\n样例：\nCMD [ \"sh\", \"-c\", \"echo $HOME\" ] CMD [ \"echo\", \"$HOME\" ] 注意：\n这里边包括参数的一定要用双引号,不能是单引号。千万不能写成单引号。原因是参数传递后，docker解析的是一个JSON array.\nENTRYPOINT-为容器指定默认运行程序 类似CMD指令的功能，用于为容器指定默认运行程序，从而使得容器像是一个单独的可执行程序。\n在写Dockerfile时, ENTRYPOINT或者CMD指令会自动覆盖之前的ENTRYPOINT或者CMD指令。即ENTRYPOINT或者CMD指令只能写一条，如果写了多条，那么，ENTRYPOINT或者CMD都只有最后一条生效。\n在Docker镜像运行时, 用户也可以在命令行指定具体命令, 覆盖在Dockerfile里的命令。\n与CMD不同的是，由ENTRYPOINT启动的程序不会被docker run命令行指定的参数所覆盖，而且，这些命令行参数会被当作参数传递给ENTRYPOINT指令指定的程序 ，不过，docker run命令的--entrypoint选项的参数可覆盖ENTRYPOINT指令指定的程序。\n其语法如下：\n# exec格式（推荐） ENTRYPOINT [\"executable\", \"param1\", \"param2\"] # shell格式 ENTRYPOINT command param1 param2 第一种就是可执行文件加参数。与CMD指令一样，ENTRYPOINT也更加推荐使用exec格式。\n第二种就是shell格式。\n样例：\nFROM ubuntu RUN apt-get update \u0026\u0026 apt-get install -y curl \u0026\u0026 rm -rf /var/lib/apt/lists/* ENTRYPOINT [\"curl\", \"-s\", \"http://ip.cn\"] # 将其构建成镜像ubuntu:v1.2，下面我们创建并启动容器： docker run -it ubuntu:v1.2 # 将会在控制台输出我们相应的公网IP信息！ # 此时，如果我们还需要获取HTTP头信息时，我们可以这样： docker run -it ubuntu:v1.2 -i CMD与ENTRYPOINT的异同点 这俩命令非常像，而且还可以配合使用。\n相同点：\n只能写一条，如果写了多条，那么只有最后一条生效。 容器启动时才运行，运行时机相同。 不同点：\nENTRYPOINT不会被运行的command覆盖，而CMD则会被覆盖。 如果我们在Dockerfile中同时写了ENTRYPOINT和CMD，并且CMD指令不是一个完整的可执行命令，那么CMD指定的内容将会作为ENTRYPOINT的参数。如下所示： FROM ubuntu ENTRYPOINT [\"rm\", \"docker2\"] CMD [\"-rf\"] 它真正执行的命令将会是：rm docker2 -rf。\n如果我们在Dockerfile种同时写了ENTRYPOINT和CMD，并且CMD是一个完整的指令，那么它们两个会互相覆盖，谁在最后谁生效。如下所示： FROM ubuntu ENTRYPOINT [\"top\", \"-b\"] CMD ls -al 那么将执行ls -al,top -b不会执行。\n下表显示了针对不同的ENTRYPOINT/CMD进行组合后执行的命令：\nNo ENTRYPOINT ENTRYPOINT exec_entry p1_entry ENTRYPOINT [“exec_entry”, “p1_entry”] No CMD error, not allowed /bin/sh -c exec_entry p1_entry exec_entry p1_entry CMD [“exec_cmd”, “p1_cmd”] exec_cmd p1_cmd ~/bin/sh -c exec_entry p1_entry~ exec_entry p1_entry exec_cmd p1_cmd CMD [“p1_cmd”, “p2_cmd”] p1_cmd p2_cmd ~/bin/sh -c exec_entry p1_entry~ exec_entry p1_entry p1_cmd p2_cmd CMD exec_cmd p1_cmd /bin/sh -c exec_cmd p1_cmd ~/bin/sh -c exec_entry p1_entry~ ~exec_entry p1_entry /bin/sh -c exec_cmd p1_cmd~ 虽然这2个指令功能类似，但是这两个指令不是互斥的. 在很多情况下, 你可以组合ENTRYPOINT和CMD指令, 提升最终用户的体验。同时我们从上表也发现在使用SHELL去执行ENTRYPOINT时，ENTRYPOINT会无视从CMD传来的任何参数，所以CMD只传参数是无效的。\n组合ENTRYPOINT和CMD指令的最佳实践：\n组合使用ENTRYPOINT和CMD命令式, 确保你一定用的是exec表示法. 如果有其中一个用的是shell表示法, 或者一个是shell表示法, 另一个是exec表示法, 你永远得不到你预期的效果。只有当ENTRYPOINT和CMD都用exec表示法, 才能得到预期的效果。\nCOPY-复制文件或者目录到容器里指定路径 从上下文目录中复制文件或者目录到容器里指定路径。\n语法格式如下：\nCOPY [--chown=\u003cuser\u003e:\u003cgroup\u003e] \u003csrc\u003e... \u003cdest\u003e COPY [--chown=\u003cuser\u003e:\u003cgroup\u003e] [\"\",... \"\"] 参数说明：\n[–chown=:] ：可选参数，用户改变复制到容器内文件的拥有者和属组。 \u003c源路径\u003e ：源文件或者源目录，这里可以是通配符表达式，其通配符规则要满足 Go 的 filepath.Match 规则。例如：COPY hom* /mydir/，COPY hom?.txt /mydir/。源路径必须是build上下文中的路径，不能是其父目录中的文件。如果源路径是目录，则其内部文件或子目录会被递归复制，但源路径目录自身不会被复制 。如果指定了多个源路径，或在源路径中使用了通配符，则目标路径必须是一个目录，且必须以/结尾。 \u003c目标路径\u003e ：容器内的指定路径，建议为目标路径使用绝对路径，否则，COPY指令则以WORKDIR为其起始路径；如果目标路径事先不存在，它将会被自动创建，这包括其父目录路径。 样例：\n# 复制宿主机文件index.html到容器/data/html/index.html COPY index.html /data/html/index.html # 复制宿主机data目录下文件（包括子目录）到容器/data/目录下，并不会复制目录本身 COPY data /data/ ADD-复制文件或者目录到容器里指定路径 ADD 指令和 COPY 的使用类似 （同样需求下，官方推荐使用 COPY） ，功能也类似。除此之外，ADD还支持使用TAR文件和URL路径，并且会将tar压缩文件（gzip, bzip2以及 xz格式）解压缩，如果指定的是url，会从指定的url下载文件放到目录中（ 如果url下载的文件为tar文件，则不会展开）。\n其语法格式如下：\nADD [--chown=\u003cuser\u003e:\u003cgroup\u003e] \u003csrc\u003e... \u003cdest\u003e ADD [--chown=\u003cuser\u003e:\u003cgroup\u003e] [\"\",... \"\"] 样例：\nADD /data/src/nginx-1.14.0.tar.gz /data/src/ # 构建镜像 docker build -t nginx:v1.1 . # 创建容器 docker run --rm --name nginx -it nginx:v1.1 ls /data/src # 我们可以发现已经解压了nginx-1.14.0.tar.gz文件 LABEL-为镜像指定标签 为镜像指定标签，其格式为：\nLABEL \u003ckey1\u003e=\u003cvalue1\u003e \u003ckey2\u003e=\u003cvalue2\u003e ... LABEL后面是键值对，多个键值对以空格进行隔开，如果value中包含空格，请使用\"\"将value进行圈起来。\n# 如果太长需要换行的话，则使用\\符号 LABEL name=test \\ description=\"a container is used to test\" 我们可以使用docker inspect命令，来查看镜像的标签：\ndocker inspect --format '{{json .Config.Labels}}' test | python3 -m json.tool 其中，“test\"为容器名称，“python3 -m json.tool\"为将其格式化为JSON输出。\nMAINTAINER-指定生成镜像的作者名称 用于指定生成镜像的作者名称，其格式为：\nMAINTAINER \u003cname\u003e MAINTAINER指令已经被弃用，可以使用LABEL指令进行替代，样例如下：\nLABEL maintainer='Stephen Chow' 说明：\nLABEL会继承基础镜像中的LABEL，如遇到key相同，则值覆盖。\nEXPOSE-为容器打开指定要监听的端口以实现与外部通信 用于为容器打开指定要监听的端口以实现与外部通信，这个只是声明，真正要暴露这个端口需要再构建容器的时候使用”-P\"选项。其格式为：\nEXPOSE \u003cport\u003e [\u003cport\u003e/\u003cprotocol\u003e...] 示例：\nEXPOSE 80/tcp EXPOSE 80/udp 如果想使得容器与主机的端口有映射关系，需要在启动容器时指定-P.\n# 这里的\"-P\"选项是关键，在启动容器的使用使用-P， # Docker会自动分配一个端口和转发指定的端口， # 使用-p可以具体指定使用哪个本地的端口来映射对外开放的端口。 docker run --rm --name nginx -itd -P nginx:v1.4 ENV-设置环境变量 设置环境变量，无论是接下来的指令（如ENV、ADD、COPY等，其调用格式为$variable_name或${variable_name}），还是在容器中运行的程序，都可以使用这里定义的环境变量。\n它有两种语法格式，如下所示：\nENV \u003ckey\u003e \u003cvalue\u003e ENV \u003ckey1\u003e=\u003cvalue1\u003e \u003ckey2\u003e=\u003cvalue2\u003e ... 两者的区别就是第一种是一次设置一个，第二种是一次设置多个。\n示例：\nENV word hello ENV guodong xxxx ENV name1=ping name2=on_ip RUN echo $word 注意：\n如果你想通过CMD或者ENTRYPOINT指令的exec格式来打印环境，就像下面这样：\nCMD [\"echo\", $MODE]\nCMD [\"echo\", \"$MODE\"]\n这样都是不能正确输出环境变量的值的，你可以改成exec格式来执行shell命令，如下所示：\nCMD [\"sh\", \"-c\", \"echo $MODE\"]\n如此，就能正确输出环境变量的值了！\n{#ARG_366}ARG-设置环境变量 构建参数ARG和ENV指令一样，都是设置环境变量。不过作用域不一样。ARG 设置的环境变量仅对 Dockerfile 内有效，也就是说只有 docker build 的过程中有效，构建好的镜像内不存在此环境变量。即在将来容器运行时是不会存在这些环境变量的。但是不要因此就用ARG来保存密码之类的信息，因为通过docker history还是能够看得到的。\nARG构建命令在docker build 中可以用 --build-arg \u003c参数名\u003e=\u003c值\u003e 来覆盖。\n语法格式如下：\nARG \u003c参数名\u003e[=\u003c默认值\u003e] 示例：\nFROM ubuntu:16.04 ARG app=\"python-pip\" RUN apt-get update \u0026\u0026 apt-get install -y $app \u0026\u0026 rm -rf /var/lib/apt/lists/* # 我们可以定义多个参数 FROM busybox ARG user1 ARG buildno # 也可以给参数一个默认值 FROM busybox ARG user1=someuser ARG buildno=1 # 如果我们给ARG定义了参数默认值，那么当build镜像时，如果没有指定参数值，将会使用这个默认值。 WORKDIR-指定工作目录 用于为Dockerfile中所有的RUN、CMD、ENTRYPOINT、COPY和ADD指令设定工作目录。用 WORKDIR 指定的工作目录，会在构建镜像的每一层中都存在。（WORKDIR 指定的工作目录，必须是提前创建好的）。\ndocker build 构建镜像过程中的，每一个 RUN 命令都是新建的一层。只有通过 WORKDIR 创建的目录才会一直存在。\n在Dockerfile文件中，WORKDIR指令可出现多次，其路径也可以为相对路径，不过，它的路径是相对此前一个WORKDIR指令指定的路径。另外，WORKDIR也可调用由ENV指定定义的变量。\n格式：\nWORKDIR \u003c工作目录路径\u003e 样例：\nWORKDIR /var/log # 解析环境变量 ENV DIRPATH /path WORKDIR $DIRPATH # 也可以设置多次 WORKDIR /a WORKDIR b WORKDIR c RUN pwd # pwd执行的结果是/a/b/c VOLUME-定义匿名数据卷 定义匿名数据卷，可实现挂载功能，可以将内地文件夹或者其他容器中得文件夹挂在到这个容器中。在启动容器时忘记挂载数据卷，会自动挂载到匿名卷。\n作用：\n避免重要的数据，因容器重启而丢失，这是非常致命的。（容器使用的是AUFS，这种文件系统不能持久化数据，当容器关闭后，所有的更改都会丢失。） 避免容器不断变大。 语法格式如下：\nVOLUME [\"\u003c路径1\u003e\", \"\u003c路径2\u003e\"...] VOLUME \u003c路径\u003e 在启动容器 docker run 的时候，我们可以通过 -v 参数修改挂载点。\n样例：\n# 定义一个匿名卷 FROM ubuntu:16.04 VOLUME /data # 定义多个匿名卷 FROM ubuntu:16.04 VOLUME [\"/data\", \"/command\"] 这里的/data和/command目录在容器运行时会自动挂载为匿名卷，任何向/data和/command目录中写入的信息都不会记录进容器存储层，从而保证了容器存储层的无状态化！容器匿名卷目录指定可以通过docker run命令中指定-v参数来进行覆盖。\nUSER-指定执行后续命令的用户和用户组 用于指定执行后续命令的用户和用户组，这里只是切换后续命令执行的用户（用户和用户组必须提前已经存在）。在USER命令之前可以使用RUN命令创建需要的用户。\n默认情况下，容器的运行身份为root用户。\n语法格式如下：\n# 可以指定用户名或者UID，组名或者GID USER \u003cuser\u003e[:\u003cgroup\u003e] USER \u003cUID\u003e[:\u003cGID\u003e] USER指令还可以在docker run命令中使用-u参数进行覆盖。\n样例：\nRUN groupadd -r docker \u0026\u0026 useradd -r -g docker docker USER docker ONBUILD-用于延迟构建命令的执行 用于延迟构建命令的执行。简单的说，就是 Dockerfile 里用 ONBUILD 指定的命令，在本次构建镜像的过程中不会执行（假设镜像为 test-build）。当有新的 Dockerfile 使用了之前构建的镜像 FROM test-build ，这时执行新镜像的 Dockerfile 构建时候，会执行 test-build 的 Dockerfile 里的 ONBUILD 指定的命令。\nONBUILD是一个特殊的指令，它后面跟着的是其他指令，比如COPY、RUN等，而这些命令在当前镜像被构建时，并不会被执行。只有以当前镜像为基础镜像去构建下一级镜像时，才会被执行。\nDockerfile中的其他指令都是为了构建当前镜像准备的，只有ONBUILD指令是为了帮助别人定制而准备的。\n语法格式如下：\nONBUILD \u003c其他指令\u003e 样例：\nfrom ubuntu:16.04 WORKDIR /data ONBUILD RUN mkdir test STOPSIGNAL 设置将发送到容器以退出 的系统调用信号。这个信号可以是一个有效的无符号数字，与内核的syscall表中的位置相匹配，如9，或者是SIGNAME格式的信号名，如SIGKILL。\n语法格式如下：\nSTOPSIGNAL signal 默认的停止信号是SIGTERM，在docker stop的时候会给容器内PID为1的进程发送这个signal，通过--stop-signal可以设置自己需要的signal，主要的目的是为了让容器内的应用程序在接收到signal之后可以先做一些事情，实现容器的平滑退出。如果不做任何处理，容器将在一段时间之后强制退出，会造成业务的强制中断，这个时间默认是10s。\nHEALTHCHECK-容器健康状况检查 用于指定某个程序或者指令来监控 docker 容器服务的运行状态是否正常。\n语法格式如下：\n# 设置检查容器健康状况的命令 HEALTHCHECK [OPTIONS] CMD \u003c命令\u003e # 如果基础镜像有健康检查指令，使用这行可以屏蔽掉其健康检查指令 HEALTHCHECK NONE OPTIONS参数说明：\n–interval=\u003c间隔\u003e ：两次检查的时间间隔，默认为30s –timeout=\u003c时长\u003e ：健康检查命令运行超时时间，如果超过这个时间，本次健康检查将会判定为失败，默认为30s –retries=\u003c次数\u003e ：当连续失败指定次数之后，则将容器状态视为unhealthy，默认为3次。 –start-period=DURATION ：启动时间，默认为0s， 如果指定这个参数， 则必须大于 0s ；--start-period 为需要启动的容器提供了初始化的时间段， 在这个时间段内如果检查失败， 则不会记录失败次数。 如果在启动时间内成功执行了健康检查， 则容器将被视为已经启动， 如果在启动时间内再次出现检查失败， 则会记录失败次数。 在 CMD 关键字之后的 command 可以是一个 shell 命令（例如： HEALTHCHECK CMD /bin/check-running）或者一个 exec 数组（与其它 Dockerfile 命令相同， 参考 [ENTRYPOINT]）。\n该命令的返回值说明了容器的状态， 可能是值为：\n0: healthy - 容器健康，可以使用； 1: unhealthy - 容器工作不正常，需要诊断； 2: reserved - 保留，不要使用这个返回值； 当容器的健康状态发生变化时，会生成一个带有新状态的 health_status 事件。\n样例：\nHEALTHCHECK --interval=5m --timeout=3s \\ CMD curl -f http://localhost/ || exit 1 注意：\n和CMD、NETRYPOINT一样，HEALTHCHECK指令只可以出现一次，如果有多个HEALTHCHECK指令，那么只有最后一个才会生效！\nSHELL-重写xxx指令的shell格式所使用的默认shell SHELL指令允许重写xxx指令的shell格式所使用的默认shell。关于默认的shell，Linux是[\"/bin/sh\", \"-c\"]，Windows是[\"cmd\", \"/S\", \"/C\"]。\nSHELL 指令必须在dockerfile中以JSON格式编写。\nSHELL 指令在 Windows 上特别有用，Windows 有两种常用且截然不同的本机 shell：cmd 和 powershell，以及可用的备用 shell，包括 sh。\nSHELL 指令可以出现多次。 每条 SHELL 指令都会覆盖所有先前的 SHELL 指令，并影响所有后续指令。\n样例：\nFROM microsoft/windowsservercore # Executed as cmd /S /C echo default RUN echo default # Executed as cmd /S /C powershell -command Write-Host default RUN powershell -command Write-Host default # Executed as powershell -command Write-Host hello SHELL [\"powershell\", \"-command\"] RUN Write-Host hello # Executed as cmd /S /C echo hello SHELL [\"cmd\", \"/S\", \"/C\"] RUN echo hello ",
+  "wordCount" : "6685",
+  "inLanguage": "zh",
+  "datePublished": "2026-01-08T16:37:48+08:00",
+  "dateModified": "2026-01-08T16:37:48+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "wait"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.heiok.top/posts/tutorial/docker-dockerfile%E6%8C%87%E4%BB%A4%E5%A4%A7%E5%85%A8/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wait`s blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.heiok.top/img/thinks.jpg"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://www.heiok.top/" accesskey="h" title="wait`s blog (Alt + H)">
+            <img src="https://www.heiok.top/img/Q.gif" alt="logo" aria-label="logo"
+                 height="35">wait`s blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://www.heiok.top/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/posts" title="📚 文章">
+                <span>📚 文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/archives/" title="⏱️ 时间轴">
+                <span>⏱️ 时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/about" title="🙋🏻‍♂️ 关于">
+                <span>🙋🏻‍♂️ 关于</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/links" title="🤝 友链">
+                <span>🤝 友链</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            <div class="breadcrumbs"><a href="https://www.heiok.top/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://www.heiok.top/posts/">📚文章</a></div>
+            <h1 class="post-title">
+                Docker Dockerfile指令大全
+            </h1>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2026-01-08
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>6685字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>14分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>wait
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    <span id="post_meta_style_8">
+                        <span class="fa fa-commenting-o"></span>
+                        <span>
+                            <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js"></script>
+                            <script>
+                                let url = document.documentURI
+                                
+                                let dnsUrl = "https://www.heiok.top/"
+                                let urlSplit = url.split(dnsUrl)
+                                let finalUrl = urlSplit[1]
+                                if (finalUrl[0] !== '/') {
+                                    finalUrl = '/'+finalUrl
+                                }
+                                twikoo.getCommentsCount({
+                                    envId:  null , 
+                                region:  null , 
+                                urls: [ 
+                                    
+                                    finalUrl,
+                                ],
+                                    includeReply: false 
+                                }).then(function (res) {
+                                    let count = res[0].count
+                                    const obj = document.getElementById("comment_count");
+                                    obj.innerText = count
+                                    
+                                    
+                                    
+                                }).catch(function (err) {
+                                    
+                                    console.error(err);
+                                });
+                            </script>
+                            <span id="comment_count"></span>
+                        </span>
+                    </span>
+                </span>
+
+</div>
+        </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e4%bb%80%e4%b9%88%e6%98%af-dockerfile" aria-label="什么是 Dockerfile？">什么是 Dockerfile？</a></li>
+                <li>
+                    <a href="#dockerfile%e6%a0%bc%e5%bc%8f" aria-label="Dockerfile格式">Dockerfile格式</a></li>
+                <li>
+                    <a href="#dockerfile%e6%8c%87%e4%bb%a4%e8%af%a6%e8%a7%a3" aria-label="Dockerfile指令详解">Dockerfile指令详解</a><ul>
+                        
+                <li>
+                    <a href="#from-%e6%8c%87%e5%ae%9a%e5%9f%ba%e7%a1%80%e9%95%9c%e5%83%8f" aria-label="FROM-指定基础镜像">FROM-指定基础镜像</a></li>
+                <li>
+                    <a href="#run-%e8%bf%90%e8%a1%8c%e6%8c%87%e5%ae%9a%e7%9a%84%e5%91%bd%e4%bb%a4" aria-label="RUN-运行指定的命令">RUN-运行指定的命令</a></li>
+                <li>
+                    <a href="#cmd-%e5%ae%b9%e5%99%a8%e5%90%af%e5%8a%a8%e6%97%b6%e8%a6%81%e8%bf%90%e8%a1%8c%e7%9a%84%e5%91%bd%e4%bb%a4" aria-label="CMD-容器启动时要运行的命令">CMD-容器启动时要运行的命令</a></li>
+                <li>
+                    <a href="#entrypoint-%e4%b8%ba%e5%ae%b9%e5%99%a8%e6%8c%87%e5%ae%9a%e9%bb%98%e8%ae%a4%e8%bf%90%e8%a1%8c%e7%a8%8b%e5%ba%8f" aria-label="ENTRYPOINT-为容器指定默认运行程序">ENTRYPOINT-为容器指定默认运行程序</a><ul>
+                        
+                <li>
+                    <a href="#cmd%e4%b8%8eentrypoint%e7%9a%84%e5%bc%82%e5%90%8c%e7%82%b9" aria-label="CMD与ENTRYPOINT的异同点">CMD与ENTRYPOINT的异同点</a></li></ul>
+                </li>
+                <li>
+                    <a href="#copy-%e5%a4%8d%e5%88%b6%e6%96%87%e4%bb%b6%e6%88%96%e8%80%85%e7%9b%ae%e5%bd%95%e5%88%b0%e5%ae%b9%e5%99%a8%e9%87%8c%e6%8c%87%e5%ae%9a%e8%b7%af%e5%be%84" aria-label="COPY-复制文件或者目录到容器里指定路径">COPY-复制文件或者目录到容器里指定路径</a></li>
+                <li>
+                    <a href="#add-%e5%a4%8d%e5%88%b6%e6%96%87%e4%bb%b6%e6%88%96%e8%80%85%e7%9b%ae%e5%bd%95%e5%88%b0%e5%ae%b9%e5%99%a8%e9%87%8c%e6%8c%87%e5%ae%9a%e8%b7%af%e5%be%84" aria-label="ADD-复制文件或者目录到容器里指定路径">ADD-复制文件或者目录到容器里指定路径</a></li>
+                <li>
+                    <a href="#label-%e4%b8%ba%e9%95%9c%e5%83%8f%e6%8c%87%e5%ae%9a%e6%a0%87%e7%ad%be" aria-label="LABEL-为镜像指定标签">LABEL-为镜像指定标签</a></li>
+                <li>
+                    <a href="#maintainer-%e6%8c%87%e5%ae%9a%e7%94%9f%e6%88%90%e9%95%9c%e5%83%8f%e7%9a%84%e4%bd%9c%e8%80%85%e5%90%8d%e7%a7%b0" aria-label="MAINTAINER-指定生成镜像的作者名称">MAINTAINER-指定生成镜像的作者名称</a></li>
+                <li>
+                    <a href="#expose-%e4%b8%ba%e5%ae%b9%e5%99%a8%e6%89%93%e5%bc%80%e6%8c%87%e5%ae%9a%e8%a6%81%e7%9b%91%e5%90%ac%e7%9a%84%e7%ab%af%e5%8f%a3%e4%bb%a5%e5%ae%9e%e7%8e%b0%e4%b8%8e%e5%a4%96%e9%83%a8%e9%80%9a%e4%bf%a1" aria-label="EXPOSE-为容器打开指定要监听的端口以实现与外部通信">EXPOSE-为容器打开指定要监听的端口以实现与外部通信</a></li>
+                <li>
+                    <a href="#env-%e8%ae%be%e7%bd%ae%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f" aria-label="ENV-设置环境变量">ENV-设置环境变量</a></li>
+                <li>
+                    <a href="#arg_366arg-%e8%ae%be%e7%bd%ae%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f" aria-label="{#ARG_366}ARG-设置环境变量">{#ARG_366}ARG-设置环境变量</a></li>
+                <li>
+                    <a href="#workdir-%e6%8c%87%e5%ae%9a%e5%b7%a5%e4%bd%9c%e7%9b%ae%e5%bd%95" aria-label="WORKDIR-指定工作目录">WORKDIR-指定工作目录</a></li>
+                <li>
+                    <a href="#volume-%e5%ae%9a%e4%b9%89%e5%8c%bf%e5%90%8d%e6%95%b0%e6%8d%ae%e5%8d%b7" aria-label="VOLUME-定义匿名数据卷">VOLUME-定义匿名数据卷</a></li>
+                <li>
+                    <a href="#user-%e6%8c%87%e5%ae%9a%e6%89%a7%e8%a1%8c%e5%90%8e%e7%bb%ad%e5%91%bd%e4%bb%a4%e7%9a%84%e7%94%a8%e6%88%b7%e5%92%8c%e7%94%a8%e6%88%b7%e7%bb%84" aria-label="USER-指定执行后续命令的用户和用户组">USER-指定执行后续命令的用户和用户组</a></li>
+                <li>
+                    <a href="#onbuild-%e7%94%a8%e4%ba%8e%e5%bb%b6%e8%bf%9f%e6%9e%84%e5%bb%ba%e5%91%bd%e4%bb%a4%e7%9a%84%e6%89%a7%e8%a1%8c" aria-label="ONBUILD-用于延迟构建命令的执行">ONBUILD-用于延迟构建命令的执行</a></li>
+                <li>
+                    <a href="#stopsignal" aria-label="STOPSIGNAL">STOPSIGNAL</a></li>
+                <li>
+                    <a href="#healthcheck-%e5%ae%b9%e5%99%a8%e5%81%a5%e5%ba%b7%e7%8a%b6%e5%86%b5%e6%a3%80%e6%9f%a5" aria-label="HEALTHCHECK-容器健康状况检查">HEALTHCHECK-容器健康状况检查</a></li>
+                <li>
+                    <a href="#shell-%e9%87%8d%e5%86%99xxx%e6%8c%87%e4%bb%a4%e7%9a%84shell%e6%a0%bc%e5%bc%8f%e6%89%80%e4%bd%bf%e7%94%a8%e7%9a%84%e9%bb%98%e8%ae%a4shell" aria-label="SHELL-重写xxx指令的shell格式所使用的默认shell">SHELL-重写xxx指令的shell格式所使用的默认shell</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        if (elements) {
+            activeElement = Array.from(elements).find((element) => {
+                if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                    (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                    return element;
+                }
+            }) || activeElement
+
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                if (element === activeElement){
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+                }
+            })
+        }
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h3 id="什么是-dockerfile">什么是 Dockerfile？<a hidden class="anchor" aria-hidden="true" href="#什么是-dockerfile">#</a></h3>
+<p>Dockerfile 是一个用来构建镜像的文本文件，文本内容包含了一条条构建镜像所需的指令和说明。使用<code>docker build</code>命令，用户可以创建基于基础镜像的自定义镜像。</p>
+<h3 id="dockerfile格式">Dockerfile格式<a hidden class="anchor" aria-hidden="true" href="#dockerfile格式">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> Comment 
+</span></span><span style="display:flex;"><span>INSTRUCTION arguments  <span style="color:#960050;background-color:#1e0010">#</span> INSTRUCTION表示指令<span style="color:#960050;background-color:#1e0010">（</span>不止一条<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span></code></pre></div><h3 id="dockerfile指令详解">Dockerfile指令详解<a hidden class="anchor" aria-hidden="true" href="#dockerfile指令详解">#</a></h3>
+<h4 id="from-指定基础镜像">FROM-指定基础镜像<a hidden class="anchor" aria-hidden="true" href="#from-指定基础镜像">#</a></h4>
+<p>指定基础镜像，并且Dockerfile中第一条指令必须是FROM指令，且在同一个Dockerfile中创建多个镜像时，可以使用多个FROM指令。</p>
+<p>语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>FROM <span style="color:#f92672">&lt;</span>image<span style="color:#f92672">&gt;</span> 
+</span></span><span style="display:flex;"><span>FROM <span style="color:#f92672">&lt;</span>image<span style="color:#f92672">&gt;</span>:<span style="color:#f92672">&lt;</span>tag<span style="color:#f92672">&gt;</span> 
+</span></span></code></pre></div><p>其中<code>&lt;tag&gt;</code>是可选项，如果没有选择，那么默认值为<code>latest</code>。</p>
+<p>如果不以任何镜像为基础，那么写法为：<code>FROM scratch</code>。</p>
+<h4 id="run-运行指定的命令">RUN-运行指定的命令<a hidden class="anchor" aria-hidden="true" href="#run-运行指定的命令">#</a></h4>
+<p>运行指定的命令。</p>
+<p>包含两种语法格式，如下所示：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> shell格式<span style="color:#960050;background-color:#1e0010">：</span>就像在命令行中输入的Shell脚本命令一样<span style="color:#960050;background-color:#1e0010">。</span>
+</span></span><span style="display:flex;"><span>RUN <span style="color:#f92672">&lt;</span>command<span style="color:#f92672">&gt;</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> exec格式<span style="color:#960050;background-color:#1e0010">：</span>就像是函数调用的格式<span style="color:#960050;background-color:#1e0010">。</span>
+</span></span><span style="display:flex;"><span>RUN <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;executable&#34;</span>, <span style="color:#e6db74">&#34;param1&#34;</span>, <span style="color:#e6db74">&#34;param2&#34;</span><span style="color:#f92672">]</span> 
+</span></span></code></pre></div><p>第一种后边直接跟shell命令。</p>
+<ul>
+<li>在linux操作系统上默认为<code>/bin/sh -c</code></li>
+<li>在windows操作系统上默认为<code>cmd /S /C</code></li>
+</ul>
+<p>第二种是类似于函数调用。可将executable理解成为可执行文件，后面就是两个参数。</p>
+<p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>RUN <span style="color:#f92672">/</span>bin<span style="color:#f92672">/</span>bash <span style="color:#f92672">-</span>c <span style="color:#960050;background-color:#1e0010">&#39;</span>source $HOME<span style="color:#f92672">/</span>.<span style="color:#a6e22e">bashrc</span>; echo $HOME<span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>RUN <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/bin/bash&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;echo hello&#34;</span><span style="color:#f92672">]</span> 
+</span></span></code></pre></div><blockquote>
+<p>注意：</p>
+<p>多行命令不要写多个RUN，原因是Dockerfile中每一个指令都会建立一层。多少个RUN就构建了多少层镜像，会造成镜像的臃肿、多层，不仅仅增加了构件部署的时间，还容易出错。RUN书写时的换行符是<code>\</code></p>
+</blockquote>
+<h4 id="cmd-容器启动时要运行的命令">CMD-容器启动时要运行的命令<a hidden class="anchor" aria-hidden="true" href="#cmd-容器启动时要运行的命令">#</a></h4>
+<p>容器启动时要运行的命令。</p>
+<p>包含三种语法格式，如下所示：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 第一种就是shell这种执行方式和写法
+</span></span><span style="display:flex;"><span>CMD command param1 param2
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 第二种是可执行文件加上参数的形式<span style="color:#960050;background-color:#1e0010">（</span>推荐<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;executable&#34;</span>,<span style="color:#e6db74">&#34;param1&#34;</span>,<span style="color:#e6db74">&#34;param2&#34;</span><span style="color:#f92672">]</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 该写法是为 ENTRYPOINT 指令指定的程序提供默认参数
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;&lt;param1&gt;&#34;</span>,<span style="color:#e6db74">&#34;&lt;param2&gt;&#34;</span>,...<span style="color:#f92672">]</span>  
+</span></span></code></pre></div><p>推荐使用第二种格式，执行过程比较明确。第一种格式实际上在运行的过程中也会自动转换成第二种格式运行，并且默认可执行文件是<code>sh</code>。</p>
+<p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;sh&#34;</span>, <span style="color:#e6db74">&#34;-c&#34;</span>, <span style="color:#e6db74">&#34;echo $HOME&#34;</span> <span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span> <span style="color:#e6db74">&#34;echo&#34;</span>, <span style="color:#e6db74">&#34;$HOME&#34;</span> <span style="color:#f92672">]</span> 
+</span></span></code></pre></div><blockquote>
+<p>注意：</p>
+<p>这里边包括参数的一定要用双引号,不能是单引号。千万不能写成单引号。原因是参数传递后，docker解析的是一个JSON array.</p>
+</blockquote>
+<h4 id="entrypoint-为容器指定默认运行程序">ENTRYPOINT-为容器指定默认运行程序<a hidden class="anchor" aria-hidden="true" href="#entrypoint-为容器指定默认运行程序">#</a></h4>
+<p>类似CMD指令的功能，用于为容器指定默认运行程序，从而使得容器像是一个单独的可执行程序。</p>
+<p>在写Dockerfile时, ENTRYPOINT或者CMD指令会自动覆盖之前的ENTRYPOINT或者CMD指令。即ENTRYPOINT或者CMD指令只能写一条，如果写了多条，那么，ENTRYPOINT或者CMD都只有最后一条生效。</p>
+<p>在Docker镜像运行时, 用户也可以在命令行指定具体命令, 覆盖在Dockerfile里的命令。</p>
+<p>与CMD不同的是，由ENTRYPOINT启动的程序不会被<code>docker run</code>命令行指定的参数所覆盖，而且，这些<strong>命令行参数会被当作参数传递给ENTRYPOINT指令指定的程序</strong> ，不过，<code>docker run</code>命令的<code>--entrypoint</code>选项的参数可覆盖ENTRYPOINT指令指定的程序。</p>
+<p>其语法如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> exec格式<span style="color:#960050;background-color:#1e0010">（</span>推荐<span style="color:#960050;background-color:#1e0010">）</span>
+</span></span><span style="display:flex;"><span>ENTRYPOINT <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;executable&#34;</span>, <span style="color:#e6db74">&#34;param1&#34;</span>, <span style="color:#e6db74">&#34;param2&#34;</span><span style="color:#f92672">]</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> shell格式
+</span></span><span style="display:flex;"><span>ENTRYPOINT command param1 param2
+</span></span></code></pre></div><p>第一种就是可执行文件加参数。与<code>CMD</code>指令一样，<code>ENTRYPOINT</code>也更加推荐使用<code>exec</code>格式。</p>
+<p>第二种就是shell格式。</p>
+<p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>FROM ubuntu 
+</span></span><span style="display:flex;"><span>RUN apt<span style="color:#f92672">-</span>get update <span style="color:#f92672">&amp;&amp;</span> apt<span style="color:#f92672">-</span>get install <span style="color:#f92672">-</span>y curl <span style="color:#f92672">&amp;&amp;</span> rm <span style="color:#f92672">-</span>rf <span style="color:#f92672">/</span>var<span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>apt<span style="color:#f92672">/</span>lists<span style="color:#f92672">/*</span> 
+</span></span><span style="display:flex;"><span>ENTRYPOINT <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;curl&#34;</span>, <span style="color:#e6db74">&#34;-s&#34;</span>, <span style="color:#e6db74">&#34;http://ip.cn&#34;</span><span style="color:#f92672">]</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 将其构建成镜像ubuntu:v1.<span style="color:#a6e22e">2</span><span style="color:#960050;background-color:#1e0010">，</span>下面我们创建并启动容器<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>docker run <span style="color:#f92672">-</span>it ubuntu:v1.<span style="color:#a6e22e">2</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 将会在控制台输出我们相应的公网IP信息<span style="color:#960050;background-color:#1e0010">！</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 此时<span style="color:#960050;background-color:#1e0010">，</span>如果我们还需要获取HTTP头信息时<span style="color:#960050;background-color:#1e0010">，</span>我们可以这样<span style="color:#960050;background-color:#1e0010">：</span>
+</span></span><span style="display:flex;"><span>docker run <span style="color:#f92672">-</span>it ubuntu:v1.<span style="color:#a6e22e">2</span> <span style="color:#f92672">-</span>i
+</span></span></code></pre></div><h5 id="cmd与entrypoint的异同点">CMD与ENTRYPOINT的异同点<a hidden class="anchor" aria-hidden="true" href="#cmd与entrypoint的异同点">#</a></h5>
+<p>这俩命令非常像，而且还可以配合使用。</p>
+<p>相同点：</p>
+<ul>
+<li>只能写一条，如果写了多条，那么只有最后一条生效。</li>
+<li>容器启动时才运行，运行时机相同。</li>
+</ul>
+<p>不同点：</p>
+<ul>
+<li>ENTRYPOINT不会被运行的command覆盖，而CMD则会被覆盖。</li>
+<li>如果我们在Dockerfile中同时写了ENTRYPOINT和CMD，并且CMD指令不是一个完整的可执行命令，那么CMD指定的内容将会作为ENTRYPOINT的参数。如下所示：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>FROM ubuntu 
+</span></span><span style="display:flex;"><span>ENTRYPOINT <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;rm&#34;</span>, <span style="color:#e6db74">&#34;docker2&#34;</span><span style="color:#f92672">]</span> 
+</span></span><span style="display:flex;"><span>CMD <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;-rf&#34;</span><span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>它真正执行的命令将会是：<code>rm docker2 -rf</code>。</p>
+<ul>
+<li>如果我们在Dockerfile种同时写了ENTRYPOINT和CMD，并且CMD是一个完整的指令，那么它们两个会互相覆盖，谁在最后谁生效。如下所示：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>FROM ubuntu
+</span></span><span style="display:flex;"><span>ENTRYPOINT <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;top&#34;</span>, <span style="color:#e6db74">&#34;-b&#34;</span><span style="color:#f92672">]</span>  
+</span></span><span style="display:flex;"><span>CMD ls <span style="color:#f92672">-</span>al
+</span></span></code></pre></div><p>那么将执行<code>ls -al</code>,<code>top -b</code>不会执行。</p>
+<p>下表显示了针对不同的ENTRYPOINT/CMD进行组合后执行的命令：</p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>No ENTRYPOINT</th>
+          <th>ENTRYPOINT exec_entry p1_entry</th>
+          <th>ENTRYPOINT [&ldquo;exec_entry&rdquo;, &ldquo;p1_entry&rdquo;]</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><strong>No CMD</strong></td>
+          <td><em>error, not allowed</em></td>
+          <td>/bin/sh -c exec_entry p1_entry</td>
+          <td>exec_entry p1_entry</td>
+      </tr>
+      <tr>
+          <td><strong>CMD [&ldquo;exec_cmd&rdquo;, &ldquo;p1_cmd&rdquo;]</strong></td>
+          <td>exec_cmd p1_cmd</td>
+          <td>~/bin/sh -c exec_entry p1_entry~</td>
+          <td>exec_entry p1_entry exec_cmd p1_cmd</td>
+      </tr>
+      <tr>
+          <td><strong>CMD [&ldquo;p1_cmd&rdquo;, &ldquo;p2_cmd&rdquo;]</strong></td>
+          <td>p1_cmd p2_cmd</td>
+          <td>~/bin/sh -c exec_entry p1_entry~</td>
+          <td>exec_entry p1_entry p1_cmd p2_cmd</td>
+      </tr>
+      <tr>
+          <td><strong>CMD exec_cmd p1_cmd</strong></td>
+          <td>/bin/sh -c exec_cmd p1_cmd</td>
+          <td>~/bin/sh -c exec_entry p1_entry~</td>
+          <td>~exec_entry p1_entry /bin/sh -c exec_cmd p1_cmd~</td>
+      </tr>
+  </tbody>
+</table>
+<p>虽然这2个指令功能类似，但是这两个指令不是互斥的. 在很多情况下, 你可以组合ENTRYPOINT和CMD指令, 提升最终用户的体验。同时我们从上表也发现<strong>在使用SHELL去执行ENTRYPOINT时，ENTRYPOINT会无视从CMD传来的任何参数，所以CMD只传参数是无效的。</strong></p>
+<blockquote>
+<p>组合ENTRYPOINT和CMD指令的最佳实践：</p>
+<p>组合使用ENTRYPOINT和CMD命令式, 确保你一定用的是exec表示法. 如果有其中一个用的是shell表示法, 或者一个是shell表示法, 另一个是exec表示法, 你永远得不到你预期的效果。只有当ENTRYPOINT和CMD都用exec表示法, 才能得到预期的效果。</p>
+</blockquote>
+<h4 id="copy-复制文件或者目录到容器里指定路径">COPY-复制文件或者目录到容器里指定路径<a hidden class="anchor" aria-hidden="true" href="#copy-复制文件或者目录到容器里指定路径">#</a></h4>
+<p>从上下文目录中复制文件或者目录到容器里指定路径。</p>
+<p>语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>COPY <span style="color:#f92672">[--</span>chown<span style="color:#f92672">=&lt;</span>user<span style="color:#f92672">&gt;</span>:<span style="color:#f92672">&lt;</span>group<span style="color:#f92672">&gt;]</span> <span style="color:#f92672">&lt;</span>src<span style="color:#f92672">&gt;</span>... <span style="color:#f92672">&lt;</span>dest<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>COPY <span style="color:#f92672">[--</span>chown<span style="color:#f92672">=&lt;</span>user<span style="color:#f92672">&gt;</span>:<span style="color:#f92672">&lt;</span>group<span style="color:#f92672">&gt;]</span> <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;&lt;src&gt;&#34;</span>,... <span style="color:#e6db74">&#34;&lt;dest&gt;&#34;</span><span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>参数说明：</p>
+<ul>
+<li><strong>[&ndash;chown=:]</strong> ：可选参数，用户改变复制到容器内文件的拥有者和属组。</li>
+<li><strong>&lt;源路径&gt;</strong> ：源文件或者源目录，这里可以是通配符表达式，其通配符规则要满足 Go 的 filepath.Match 规则。例如：<code>COPY hom* /mydir/</code>，<code>COPY hom?.txt /mydir/</code>。源路径必须是build上下文中的路径，不能是其父目录中的文件。如果源路径是目录，则其内部文件或子目录会被递归复制，但<strong>源路径目录自身不会被复制</strong> 。如果指定了多个源路径，或在源路径中使用了通配符，则目标路径必须是一个目录，且必须以<code>/</code>结尾。</li>
+<li><strong>&lt;目标路径&gt;</strong> ：容器内的指定路径，建议为目标路径使用绝对路径，否则，COPY指令则以WORKDIR为其起始路径；<strong>如果目标路径事先不存在，它将会被自动创建</strong>，这包括其父目录路径。</li>
+</ul>
+<p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 复制宿主机文件index.<span style="color:#a6e22e">html到容器</span><span style="color:#f92672">/</span>data<span style="color:#f92672">/</span>html<span style="color:#f92672">/</span>index.<span style="color:#a6e22e">html</span>
+</span></span><span style="display:flex;"><span>COPY index.<span style="color:#a6e22e">html</span> <span style="color:#f92672">/</span>data<span style="color:#f92672">/</span>html<span style="color:#f92672">/</span>index.<span style="color:#a6e22e">html</span>   
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 复制宿主机data目录下文件<span style="color:#960050;background-color:#1e0010">（</span>包括子目录<span style="color:#960050;background-color:#1e0010">）</span>到容器<span style="color:#f92672">/</span>data<span style="color:#f92672">/</span>目录下<span style="color:#960050;background-color:#1e0010">，</span>并不会复制目录本身
+</span></span><span style="display:flex;"><span>COPY data  <span style="color:#f92672">/</span>data<span style="color:#f92672">/</span>    
+</span></span></code></pre></div><h4 id="add-复制文件或者目录到容器里指定路径">ADD-复制文件或者目录到容器里指定路径<a hidden class="anchor" aria-hidden="true" href="#add-复制文件或者目录到容器里指定路径">#</a></h4>
+<p>ADD 指令和 COPY 的使用类似 <strong>（同样需求下，官方推荐使用 COPY）</strong> ，功能也类似。除此之外，ADD还支持使用TAR文件和URL路径，并且会将tar压缩文件（gzip, bzip2以及 xz格式）解压缩，如果指定的是url，会从指定的url下载文件放到目录中（ 如果url下载的文件为tar文件，则不会展开）。</p>
+<p>其语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ADD <span style="color:#f92672">[--</span>chown<span style="color:#f92672">=&lt;</span>user<span style="color:#f92672">&gt;</span>:<span style="color:#f92672">&lt;</span>group<span style="color:#f92672">&gt;]</span> <span style="color:#f92672">&lt;</span>src<span style="color:#f92672">&gt;</span>... <span style="color:#f92672">&lt;</span>dest<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>ADD <span style="color:#f92672">[--</span>chown<span style="color:#f92672">=&lt;</span>user<span style="color:#f92672">&gt;</span>:<span style="color:#f92672">&lt;</span>group<span style="color:#f92672">&gt;]</span> <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;&lt;src&gt;&#34;</span>,... <span style="color:#e6db74">&#34;&lt;dest&gt;&#34;</span><span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ADD <span style="color:#f92672">/</span>data<span style="color:#f92672">/</span>src<span style="color:#f92672">/</span>nginx<span style="color:#f92672">-</span>1.<span style="color:#a6e22e">14</span>.<span style="color:#a6e22e">0</span>.<span style="color:#a6e22e">tar</span>.<span style="color:#a6e22e">gz</span> <span style="color:#f92672">/</span>data<span style="color:#f92672">/</span>src<span style="color:#f92672">/</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 构建镜像
+</span></span><span style="display:flex;"><span>docker build <span style="color:#f92672">-</span>t nginx:v1.<span style="color:#a6e22e">1</span>  .
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 创建容器
+</span></span><span style="display:flex;"><span>docker run <span style="color:#f92672">--</span>rm <span style="color:#f92672">--</span>name nginx <span style="color:#f92672">-</span>it  nginx:v1.<span style="color:#a6e22e">1</span>  ls <span style="color:#f92672">/</span>data<span style="color:#f92672">/</span>src
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 我们可以发现已经解压了nginx<span style="color:#f92672">-</span>1.<span style="color:#a6e22e">14</span>.<span style="color:#a6e22e">0</span>.<span style="color:#a6e22e">tar</span>.<span style="color:#a6e22e">gz文件</span>
+</span></span></code></pre></div><h4 id="label-为镜像指定标签">LABEL-为镜像指定标签<a hidden class="anchor" aria-hidden="true" href="#label-为镜像指定标签">#</a></h4>
+<p>为镜像指定标签，其格式为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>LABEL <span style="color:#f92672">&lt;</span>key1<span style="color:#f92672">&gt;=&lt;</span>value1<span style="color:#f92672">&gt;</span> <span style="color:#f92672">&lt;</span>key2<span style="color:#f92672">&gt;=&lt;</span>value2<span style="color:#f92672">&gt;</span> ...
+</span></span></code></pre></div><p><code>LABEL</code>后面是键值对，多个键值对以空格进行隔开，如果value中包含空格，请使用<code>&quot;&quot;</code>将value进行圈起来。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 如果太长需要换行的话<span style="color:#960050;background-color:#1e0010">，</span>则使用<span style="color:#960050;background-color:#1e0010">\</span>符号
+</span></span><span style="display:flex;"><span>LABEL name<span style="color:#f92672">=</span>test <span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span>  description<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;a container is used to test&#34;</span>
+</span></span></code></pre></div><p>我们可以使用<code>docker inspect</code>命令，来查看镜像的标签：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>docker inspect <span style="color:#f92672">--</span>format <span style="color:#960050;background-color:#1e0010">&#39;</span>{{json .<span style="color:#a6e22e">Config</span>.<span style="color:#a6e22e">Labels</span>}}<span style="color:#960050;background-color:#1e0010">&#39;</span> test <span style="color:#f92672">|</span> python3 <span style="color:#f92672">-</span>m json.<span style="color:#a6e22e">tool</span>
+</span></span></code></pre></div><p>其中，&ldquo;test&quot;为容器名称，&ldquo;python3 -m json.tool&quot;为将其格式化为JSON输出。</p>
+<h4 id="maintainer-指定生成镜像的作者名称">MAINTAINER-指定生成镜像的作者名称<a hidden class="anchor" aria-hidden="true" href="#maintainer-指定生成镜像的作者名称">#</a></h4>
+<p>用于指定生成镜像的作者名称，其格式为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>MAINTAINER <span style="color:#f92672">&lt;</span>name<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p><code>MAINTAINER</code>指令已经被弃用，可以使用<code>LABEL</code>指令进行替代，样例如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>LABEL maintainer<span style="color:#f92672">=</span><span style="color:#960050;background-color:#1e0010">&#39;</span>Stephen Chow<span style="color:#960050;background-color:#1e0010">&#39;</span>
+</span></span></code></pre></div><blockquote>
+<p>说明：</p>
+<p>LABEL会继承基础镜像中的LABEL，如遇到key相同，则值覆盖。</p>
+</blockquote>
+<h4 id="expose-为容器打开指定要监听的端口以实现与外部通信">EXPOSE-为容器打开指定要监听的端口以实现与外部通信<a hidden class="anchor" aria-hidden="true" href="#expose-为容器打开指定要监听的端口以实现与外部通信">#</a></h4>
+<p>用于为容器打开指定要监听的端口以实现与外部通信，这个只是声明，真正要暴露这个端口需要再构建容器的时候使用&rdquo;-P&quot;选项。其格式为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>EXPOSE <span style="color:#f92672">&lt;</span>port<span style="color:#f92672">&gt;</span> <span style="color:#f92672">[&lt;</span>port<span style="color:#f92672">&gt;/&lt;</span>protocol<span style="color:#f92672">&gt;</span>...<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>示例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>EXPOSE 80<span style="color:#f92672">/</span>tcp
+</span></span><span style="display:flex;"><span>EXPOSE 80<span style="color:#f92672">/</span>udp
+</span></span></code></pre></div><p>如果想使得容器与主机的端口有映射关系，需要在启动容器时指定<code>-P</code>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 这里的<span style="color:#e6db74">&#34;-P&#34;</span>选项是关键<span style="color:#960050;background-color:#1e0010">，</span>在启动容器的使用使用<span style="color:#f92672">-</span>P<span style="color:#960050;background-color:#1e0010">，</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> Docker会自动分配一个端口和转发指定的端口<span style="color:#960050;background-color:#1e0010">，</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 使用<span style="color:#f92672">-</span>p可以具体指定使用哪个本地的端口来映射对外开放的端口<span style="color:#960050;background-color:#1e0010">。</span>
+</span></span><span style="display:flex;"><span>docker run <span style="color:#f92672">--</span>rm <span style="color:#f92672">--</span>name nginx <span style="color:#f92672">-</span>itd <span style="color:#f92672">-</span>P nginx:v1.<span style="color:#a6e22e">4</span>
+</span></span></code></pre></div><h4 id="env-设置环境变量">ENV-设置环境变量<a hidden class="anchor" aria-hidden="true" href="#env-设置环境变量">#</a></h4>
+<p>设置环境变量，无论是接下来的指令（如<code>ENV</code>、<code>ADD</code>、<code>COPY</code>等，其调用格式为<code>$variable_name</code>或<code>${variable_name}</code>），还是在容器中运行的程序，都可以使用这里定义的环境变量。</p>
+<p>它有两种语法格式，如下所示：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ENV <span style="color:#f92672">&lt;</span>key<span style="color:#f92672">&gt;</span> <span style="color:#f92672">&lt;</span>value<span style="color:#f92672">&gt;</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ENV <span style="color:#f92672">&lt;</span>key1<span style="color:#f92672">&gt;=&lt;</span>value1<span style="color:#f92672">&gt;</span> <span style="color:#f92672">&lt;</span>key2<span style="color:#f92672">&gt;=&lt;</span>value2<span style="color:#f92672">&gt;</span> ... 
+</span></span></code></pre></div><p>两者的区别就是第一种是一次设置一个，第二种是一次设置多个。</p>
+<p>示例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ENV word hello
+</span></span><span style="display:flex;"><span>ENV guodong xxxx    
+</span></span><span style="display:flex;"><span>ENV name1<span style="color:#f92672">=</span>ping name2<span style="color:#f92672">=</span>on_ip
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>RUN echo $word
+</span></span></code></pre></div><blockquote>
+<p>注意：</p>
+<p>如果你想通过CMD或者ENTRYPOINT指令的exec格式来打印环境，就像下面这样：</p>
+<p><code>CMD [&quot;echo&quot;, $MODE]</code></p>
+<p><code>CMD [&quot;echo&quot;, &quot;$MODE&quot;]</code></p>
+<p>这样都是不能正确输出环境变量的值的，你可以改成<code>exec格式</code>来执行<code>shell命令</code>，如下所示：</p>
+<p><code>CMD [&quot;sh&quot;, &quot;-c&quot;, &quot;echo $MODE&quot;]</code></p>
+<p>如此，就能正确输出环境变量的值了！</p>
+</blockquote>
+<h4 id="arg_366arg-设置环境变量">{#ARG_366}ARG-设置环境变量<a hidden class="anchor" aria-hidden="true" href="#arg_366arg-设置环境变量">#</a></h4>
+<p>构建参数<code>ARG</code>和<code>ENV</code>指令一样，都是设置环境变量。不过作用域不一样。ARG 设置的环境变量仅对 Dockerfile 内有效，也就是说只有 <code>docker build</code> 的过程中有效，构建好的镜像内不存在此环境变量。即在将来容器运行时是不会存在这些环境变量的。但是不要因此就用<code>ARG</code>来保存密码之类的信息，因为通过<code>docker history</code>还是能够看得到的。</p>
+<p>ARG构建命令在<code>docker build</code> 中可以用 <code>--build-arg &lt;参数名&gt;=&lt;值&gt;</code> 来覆盖。</p>
+<p>语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ARG <span style="color:#f92672">&lt;</span>参数名<span style="color:#f92672">&gt;[=&lt;</span>默认值<span style="color:#f92672">&gt;]</span>
+</span></span></code></pre></div><p>示例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>FROM ubuntu:16.<span style="color:#a6e22e">04</span>
+</span></span><span style="display:flex;"><span>ARG app<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;python-pip&#34;</span>
+</span></span><span style="display:flex;"><span>RUN apt<span style="color:#f92672">-</span>get update <span style="color:#f92672">&amp;&amp;</span> apt<span style="color:#f92672">-</span>get install <span style="color:#f92672">-</span>y $app <span style="color:#f92672">&amp;&amp;</span> rm <span style="color:#f92672">-</span>rf <span style="color:#f92672">/</span>var<span style="color:#f92672">/</span>lib<span style="color:#f92672">/</span>apt<span style="color:#f92672">/</span>lists<span style="color:#f92672">/*</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 我们可以定义多个参数
+</span></span><span style="display:flex;"><span>FROM busybox
+</span></span><span style="display:flex;"><span>ARG user1
+</span></span><span style="display:flex;"><span>ARG buildno
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 也可以给参数一个默认值
+</span></span><span style="display:flex;"><span>FROM busybox
+</span></span><span style="display:flex;"><span>ARG user1<span style="color:#f92672">=</span>someuser
+</span></span><span style="display:flex;"><span>ARG buildno<span style="color:#f92672">=</span>1
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 如果我们给ARG定义了参数默认值<span style="color:#960050;background-color:#1e0010">，</span>那么当build镜像时<span style="color:#960050;background-color:#1e0010">，</span>如果没有指定参数值<span style="color:#960050;background-color:#1e0010">，</span>将会使用这个默认值<span style="color:#960050;background-color:#1e0010">。</span>
+</span></span></code></pre></div><h4 id="workdir-指定工作目录">WORKDIR-指定工作目录<a hidden class="anchor" aria-hidden="true" href="#workdir-指定工作目录">#</a></h4>
+<p>用于为Dockerfile中所有的RUN、CMD、ENTRYPOINT、COPY和ADD指令设定工作目录。用 WORKDIR 指定的工作目录，会在构建镜像的每一层中都存在。（WORKDIR 指定的工作目录，必须是提前创建好的）。</p>
+<p><code>docker build</code> 构建镜像过程中的，每一个 RUN 命令都是新建的一层。只有通过 WORKDIR 创建的目录才会一直存在。</p>
+<p>在Dockerfile文件中，WORKDIR指令可出现多次，其路径也可以为相对路径，不过，它的路径是相对此前一个WORKDIR指令指定的路径。另外，WORKDIR也可调用由ENV指定定义的变量。</p>
+<p>格式：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>WORKDIR <span style="color:#f92672">&lt;</span>工作目录路径<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>WORKDIR <span style="color:#f92672">/</span>var<span style="color:#f92672">/</span>log 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 解析环境变量
+</span></span><span style="display:flex;"><span>ENV DIRPATH <span style="color:#f92672">/</span>path
+</span></span><span style="display:flex;"><span>WORKDIR $DIRPATH
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 也可以设置多次
+</span></span><span style="display:flex;"><span>WORKDIR <span style="color:#f92672">/</span>a
+</span></span><span style="display:flex;"><span>WORKDIR b
+</span></span><span style="display:flex;"><span>WORKDIR c
+</span></span><span style="display:flex;"><span>RUN pwd
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> pwd执行的结果是<span style="color:#f92672">/</span>a<span style="color:#f92672">/</span>b<span style="color:#f92672">/</span>c
+</span></span></code></pre></div><h4 id="volume-定义匿名数据卷">VOLUME-定义匿名数据卷<a hidden class="anchor" aria-hidden="true" href="#volume-定义匿名数据卷">#</a></h4>
+<p>定义匿名数据卷，可实现挂载功能，可以将内地文件夹或者其他容器中得文件夹挂在到这个容器中。在启动容器时忘记挂载数据卷，会自动挂载到匿名卷。</p>
+<p>作用：</p>
+<ul>
+<li>避免重要的数据，因容器重启而丢失，这是非常致命的。（容器使用的是AUFS，这种文件系统不能持久化数据，当容器关闭后，所有的更改都会丢失。）</li>
+<li>避免容器不断变大。</li>
+</ul>
+<p>语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>VOLUME <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;&lt;路径1&gt;&#34;</span>, <span style="color:#e6db74">&#34;&lt;路径2&gt;&#34;</span>...<span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>VOLUME <span style="color:#f92672">&lt;</span>路径<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>在启动容器 docker run 的时候，我们可以通过 -v 参数修改挂载点。</p>
+<p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 定义一个匿名卷
+</span></span><span style="display:flex;"><span>FROM ubuntu:16.<span style="color:#a6e22e">04</span>
+</span></span><span style="display:flex;"><span>VOLUME <span style="color:#f92672">/</span>data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 定义多个匿名卷
+</span></span><span style="display:flex;"><span>FROM ubuntu:16.<span style="color:#a6e22e">04</span>
+</span></span><span style="display:flex;"><span>VOLUME <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;/data&#34;</span>, <span style="color:#e6db74">&#34;/command&#34;</span><span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>这里的<code>/data</code>和<code>/command</code>目录在容器运行时会自动挂载为匿名卷，任何向<code>/data</code>和<code>/command</code>目录中写入的信息都不会记录进容器存储层，从而保证了容器存储层的无状态化！容器匿名卷目录指定可以通过<code>docker run</code>命令中指定<code>-v</code>参数来进行覆盖。</p>
+<h4 id="user-指定执行后续命令的用户和用户组">USER-指定执行后续命令的用户和用户组<a hidden class="anchor" aria-hidden="true" href="#user-指定执行后续命令的用户和用户组">#</a></h4>
+<p>用于指定执行后续命令的用户和用户组，这里只是切换后续命令执行的用户（用户和用户组必须提前已经存在）。在USER命令之前可以使用RUN命令创建需要的用户。</p>
+<p>默认情况下，容器的运行身份为root用户。</p>
+<p>语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 可以指定用户名或者UID<span style="color:#960050;background-color:#1e0010">，</span>组名或者GID
+</span></span><span style="display:flex;"><span>USER <span style="color:#f92672">&lt;</span>user<span style="color:#f92672">&gt;[</span>:<span style="color:#f92672">&lt;</span>group<span style="color:#f92672">&gt;]</span>
+</span></span><span style="display:flex;"><span>USER <span style="color:#f92672">&lt;</span>UID<span style="color:#f92672">&gt;[</span>:<span style="color:#f92672">&lt;</span>GID<span style="color:#f92672">&gt;]</span>
+</span></span></code></pre></div><p><code>USER</code>指令还可以在<code>docker run</code>命令中使用<code>-u</code>参数进行覆盖。</p>
+<p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>RUN groupadd <span style="color:#f92672">-</span>r docker <span style="color:#f92672">&amp;&amp;</span> useradd <span style="color:#f92672">-</span>r <span style="color:#f92672">-</span>g docker docker
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>USER docker
+</span></span></code></pre></div><h4 id="onbuild-用于延迟构建命令的执行">ONBUILD-用于延迟构建命令的执行<a hidden class="anchor" aria-hidden="true" href="#onbuild-用于延迟构建命令的执行">#</a></h4>
+<p>用于延迟构建命令的执行。简单的说，就是 Dockerfile 里用 ONBUILD 指定的命令，在本次构建镜像的过程中不会执行（假设镜像为 test-build）。当有新的 Dockerfile 使用了之前构建的镜像 <code>FROM test-build</code> ，这时执行新镜像的 Dockerfile 构建时候，会执行 test-build 的 Dockerfile 里的 ONBUILD 指定的命令。</p>
+<p><code>ONBUILD</code>是一个特殊的指令，它后面跟着的是其他指令，比如<code>COPY</code>、<code>RUN</code>等，而这些命令在当前镜像被构建时，并不会被执行。只有以当前镜像为基础镜像去构建下一级镜像时，才会被执行。</p>
+<p><code>Dockerfile</code>中的其他指令都是为了构建当前镜像准备的，只有<code>ONBUILD</code>指令是为了帮助别人定制而准备的。</p>
+<p>语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>ONBUILD <span style="color:#f92672">&lt;</span>其他指令<span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>from ubuntu:16.<span style="color:#a6e22e">04</span>
+</span></span><span style="display:flex;"><span>WORKDIR <span style="color:#f92672">/</span>data
+</span></span><span style="display:flex;"><span>ONBUILD RUN mkdir test
+</span></span></code></pre></div><h4 id="stopsignal">STOPSIGNAL<a hidden class="anchor" aria-hidden="true" href="#stopsignal">#</a></h4>
+<p>设置<strong>将发送到容器以退出</strong> 的系统调用信号。这个信号可以是一个有效的无符号数字，与内核的<code>syscall</code>表中的位置相匹配，如<code>9</code>，或者是<code>SIGNAME</code>格式的信号名，如<code>SIGKILL</code>。</p>
+<p>语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>STOPSIGNAL signal
+</span></span></code></pre></div><p>默认的停止信号是<code>SIGTERM</code>，在<code>docker stop</code>的时候会给容器内PID为1的进程发送这个signal，通过<code>--stop-signal</code>可以设置自己需要的signal，主要的目的是为了让容器内的应用程序在接收到signal之后可以先做一些事情，实现容器的平滑退出。如果不做任何处理，容器将在一段时间之后强制退出，会造成业务的强制中断，这个时间默认是10s。</p>
+<h4 id="healthcheck-容器健康状况检查">HEALTHCHECK-容器健康状况检查<a hidden class="anchor" aria-hidden="true" href="#healthcheck-容器健康状况检查">#</a></h4>
+<p>用于指定某个程序或者指令来监控 docker 容器服务的运行状态是否正常。</p>
+<p>语法格式如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 设置检查容器健康状况的命令
+</span></span><span style="display:flex;"><span>HEALTHCHECK <span style="color:#f92672">[</span>OPTIONS<span style="color:#f92672">]</span> CMD <span style="color:#f92672">&lt;</span>命令<span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> 如果基础镜像有健康检查指令<span style="color:#960050;background-color:#1e0010">，</span>使用这行可以屏蔽掉其健康检查指令
+</span></span><span style="display:flex;"><span>HEALTHCHECK NONE
+</span></span></code></pre></div><p>OPTIONS参数说明：</p>
+<ul>
+<li><strong>&ndash;interval=&lt;间隔&gt;</strong> ：两次检查的时间间隔，默认为30s</li>
+<li><strong>&ndash;timeout=&lt;时长&gt;</strong> ：健康检查命令运行超时时间，如果超过这个时间，本次健康检查将会判定为失败，默认为30s</li>
+<li><strong>&ndash;retries=&lt;次数&gt;</strong> ：当连续失败指定次数之后，则将容器状态视为<code>unhealthy</code>，默认为3次。</li>
+<li><strong>&ndash;start-period=DURATION</strong> ：启动时间，默认为0s， 如果指定这个参数， 则必须大于 0s ；<code>--start-period</code> 为需要启动的容器提供了初始化的时间段， 在这个时间段内如果检查失败， 则不会记录失败次数。 如果在启动时间内成功执行了健康检查， 则容器将被视为已经启动， 如果在启动时间内<strong>再次</strong>出现检查失败， 则会记录失败次数。</li>
+</ul>
+<p>在 <code>CMD</code> 关键字之后的 <code>command</code> 可以是一个 shell 命令（例如： <code>HEALTHCHECK CMD /bin/check-running</code>）或者一个 exec 数组（与其它 Dockerfile 命令相同， 参考 [ENTRYPOINT]）。</p>
+<p>该命令的返回值说明了容器的状态， 可能是值为：</p>
+<ul>
+<li>0: healthy - 容器健康，可以使用；</li>
+<li>1: unhealthy - 容器工作不正常，需要诊断；</li>
+<li>2: reserved - 保留，不要使用这个返回值；</li>
+</ul>
+<p>当容器的健康状态发生变化时，会生成一个带有新状态的 <code>health_status</code> 事件。</p>
+<p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>HEALTHCHECK <span style="color:#f92672">--</span>interval<span style="color:#f92672">=</span>5m <span style="color:#f92672">--</span>timeout<span style="color:#f92672">=</span>3s <span style="color:#960050;background-color:#1e0010">\</span>
+</span></span><span style="display:flex;"><span>  CMD curl <span style="color:#f92672">-</span>f http:<span style="color:#75715e">//localhost/ || exit 1</span>
+</span></span></code></pre></div><blockquote>
+<p>注意：</p>
+<p>和<code>CMD</code>、<code>NETRYPOINT</code>一样，<code>HEALTHCHECK</code>指令只可以出现一次，如果有多个<code>HEALTHCHECK</code>指令，那么只有最后一个才会生效！</p>
+</blockquote>
+<h4 id="shell-重写xxx指令的shell格式所使用的默认shell">SHELL-重写xxx指令的shell格式所使用的默认shell<a hidden class="anchor" aria-hidden="true" href="#shell-重写xxx指令的shell格式所使用的默认shell">#</a></h4>
+<p><code>SHELL</code>指令允许重写xxx指令的shell格式所使用的默认shell。关于默认的<code>shell</code>，<code>Linux</code>是<code>[&quot;/bin/sh&quot;, &quot;-c&quot;]</code>，<code>Windows</code>是<code>[&quot;cmd&quot;, &quot;/S&quot;, &quot;/C&quot;]</code>。</p>
+<p><code>SHELL</code> 指令必须在<code>dockerfile</code>中以<code>JSON</code>格式编写。</p>
+<p><code>SHELL</code> 指令在 Windows 上特别有用，Windows 有两种常用且截然不同的本机 shell：<code>cmd</code> 和 <code>powershell</code>，以及可用的备用 shell，包括 <code>sh</code>。</p>
+<p><code>SHELL</code> 指令可以出现多次。 每条 SHELL 指令都会覆盖所有先前的 <code>SHELL</code> 指令，并影响所有后续指令。</p>
+<p>样例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span>FROM microsoft<span style="color:#f92672">/</span>windowsservercore
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> Executed as cmd <span style="color:#f92672">/</span>S <span style="color:#f92672">/</span>C echo <span style="color:#66d9ef">default</span>
+</span></span><span style="display:flex;"><span>RUN echo <span style="color:#66d9ef">default</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> Executed as cmd <span style="color:#f92672">/</span>S <span style="color:#f92672">/</span>C powershell <span style="color:#f92672">-</span>command Write<span style="color:#f92672">-</span>Host <span style="color:#66d9ef">default</span>
+</span></span><span style="display:flex;"><span>RUN powershell <span style="color:#f92672">-</span>command Write<span style="color:#f92672">-</span>Host <span style="color:#66d9ef">default</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> Executed as powershell <span style="color:#f92672">-</span>command Write<span style="color:#f92672">-</span>Host hello
+</span></span><span style="display:flex;"><span>SHELL <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;powershell&#34;</span>, <span style="color:#e6db74">&#34;-command&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>RUN Write<span style="color:#f92672">-</span>Host hello
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">#</span> Executed as cmd <span style="color:#f92672">/</span>S <span style="color:#f92672">/</span>C echo hello
+</span></span><span style="display:flex;"><span>SHELL <span style="color:#f92672">[</span><span style="color:#e6db74">&#34;cmd&#34;</span>, <span style="color:#e6db74">&#34;/S&#34;</span>, <span style="color:#e6db74">&#34;/C&#34;</span><span style="color:#f92672">]</span>
+</span></span><span style="display:flex;"><span>RUN echo hello
+</span></span></code></pre></div>
+
+        </div>
+        <div class="post-reward">
+            <div style="padding: 0 0 0 0; margin: 0 0 0 0; width: 100%; font-size:16px; text-align: center;">
+                <div id="QR" style="opacity: 0;">
+                    <div id="wechat" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="wechat_qr" src="https://www.heiok.top/img/thinks.jpg" alt="wechat_pay"></a>
+                        <p>微信</p>
+                    </div>
+                    <div id="alipay" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="alipay_qr" src="https://www.heiok.top/img/thinks.jpg" alt="alipay"></a>
+                        <p>支付宝</p>
+                    </div>
+                </div>
+                <button id="rewardButton"
+                        onclick="
+                    var qr = document.getElementById('QR');
+                    if (qr.style.opacity === '0') {
+                        qr.style.opacity='1';
+                    } else {
+                        qr.style.opacity='0'
+                    }"
+                >
+                    <span>🧧 鼓励</span>
+                </button>
+            </div>
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://www.heiok.top/posts/tutorial/aspnet-core-%E4%B8%AD%E9%97%B4%E4%BB%B6-%E4%B8%AD%E9%97%B4%E4%BB%B6middleware%E5%92%8C%E8%BF%87%E6%BB%A4%E5%99%A8filter%E7%9A%84%E5%8C%BA%E5%88%AB/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>ASP.NET Core 中间件 中间件（Middleware）和过滤器（Filter）的区别</span>
+  </a>
+  <a class="next" href="https://www.heiok.top/posts/tutorial/docker-%E5%AE%89%E8%A3%85-nginx-%E5%AE%B9%E5%99%A8-%E5%AE%8C%E6%95%B4%E8%AF%A6%E7%BB%86%E7%89%88/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Docker 安装 Nginx 容器 (完整详细版)</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Docker Dockerfile指令大全 on twitter"
+       href="https://twitter.com/intent/tweet/?text=Docker%20Dockerfile%e6%8c%87%e4%bb%a4%e5%a4%a7%e5%85%a8&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdocker-dockerfile%25E6%258C%2587%25E4%25BB%25A4%25E5%25A4%25A7%25E5%2585%25A8%2f&amp;hashtags=">
+    <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Docker Dockerfile指令大全 on linkedin"
+       href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdocker-dockerfile%25E6%258C%2587%25E4%25BB%25A4%25E5%25A4%25A7%25E5%2585%25A8%2f&amp;title=Docker%20Dockerfile%e6%8c%87%e4%bb%a4%e5%a4%a7%e5%85%a8&amp;summary=Docker%20Dockerfile%e6%8c%87%e4%bb%a4%e5%a4%a7%e5%85%a8&amp;source=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdocker-dockerfile%25E6%258C%2587%25E4%25BB%25A4%25E5%25A4%25A7%25E5%2585%25A8%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Docker Dockerfile指令大全 on reddit"
+       href="https://reddit.com/submit?url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdocker-dockerfile%25E6%258C%2587%25E4%25BB%25A4%25E5%25A4%25A7%25E5%2585%25A8%2f&title=Docker%20Dockerfile%e6%8c%87%e4%bb%a4%e5%a4%a7%e5%85%a8">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Docker Dockerfile指令大全 on facebook"
+       href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdocker-dockerfile%25E6%258C%2587%25E4%25BB%25A4%25E5%25A4%25A7%25E5%2585%25A8%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Docker Dockerfile指令大全 on whatsapp"
+       href="https://api.whatsapp.com/send?text=Docker%20Dockerfile%e6%8c%87%e4%bb%a4%e5%a4%a7%e5%85%a8%20-%20https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdocker-dockerfile%25E6%258C%2587%25E4%25BB%25A4%25E5%25A4%25A7%25E5%2585%25A8%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Docker Dockerfile指令大全 on telegram"
+       href="https://telegram.me/share/url?text=Docker%20Dockerfile%e6%8c%87%e4%bb%a4%e5%a4%a7%e5%85%a8&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fdocker-dockerfile%25E6%258C%2587%25E4%25BB%25A4%25E5%25A4%25A7%25E5%2585%25A8%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+        </footer>
+    </div>
+
+<style>
+    .comments_details summary::marker {
+        font-size: 20px;
+        content: '👉展开评论';
+        color: var(--content);
+    }
+    .comments_details[open] summary::marker{
+        font-size: 20px;
+        content: '👇关闭评论';
+        color: var(--content);
+    }
+</style>
+
+
+<div>
+    <details class="comments_details">
+        <summary style="cursor: pointer; margin: 50px 0 20px 0;width: 130px;">
+            <span style="font-size: 20px;color: var(--content);">...</span>
+        </summary>
+        <div id="tcomment"></div>
+    </details>
+    <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js">
+    </script>
+    <script>
+        twikoo.init({
+            envId:  null ,
+        el: "#tcomment",
+            lang: 'zh-CN',
+            region:  null ,
+        path: window.TWIKOO_MAGIC_PATH||window.location.pathname,
+        })
+    </script>
+</div>
+</article>
+</main>
+
+<footer class="footer">
+    <span>
+        Copyright
+        &copy;
+        2020-2026
+        <a href="https://www.heiok.top/" style="color:#939393;">wait`s blog</a>
+        All Rights Reserved
+    </span>
+    <a href="https://beian.miit.gov.cn/" target="_blank" style="color:#939393;">蜀ICP备2023024013号</a>&nbsp;
+    <span>
+        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=null"
+           style="display:inline-block;text-decoration:none;height:20px;color:#939393;">
+            <img src="" style="float:left;margin: 0px 5px 0px 0px;"/>
+            
+        </a>
+    </span>
+    <span id="busuanzi_container">
+        <span class="fa fa-user"></span> <span id="busuanzi_value_site_uv"></span>
+        <span class="fa fa-eye"></span> <span id="busuanzi_value_site_pv"></span>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '复制';
+
+        function copyingDone() {
+            copybutton.innerText = '已复制！';
+            setTimeout(() => {
+                copybutton.innerText = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<meta name="referrer" content="no-referrer">
+<title>Linux基础命令 | wait`s blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="linux命令
+ps -ef|grep详解
+ps命令将某个进程显示出来
+grep命令是查找
+中间的|是管道命令 是指ps命令与grep同时执行
+PS是LINUX下最常用的也是非常强大的进程查看命令
+grep命令是查找，是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。
+grep全称是Global Regular Expression Print，表示全局正则表达式版本，它的使用权限是所有用户。">
+<meta name="author" content="wait">
+<link rel="canonical" href="https://www.heiok.top/posts/tutorial/linux%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="apple-touch-icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="mask-icon" href="https://www.heiok.top/img/thinks.jpg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://www.heiok.top/posts/tutorial/linux%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="Linux基础命令" />
+<meta property="og:description" content="linux命令
+ps -ef|grep详解
+ps命令将某个进程显示出来
+grep命令是查找
+中间的|是管道命令 是指ps命令与grep同时执行
+PS是LINUX下最常用的也是非常强大的进程查看命令
+grep命令是查找，是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。
+grep全称是Global Regular Expression Print，表示全局正则表达式版本，它的使用权限是所有用户。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.heiok.top/posts/tutorial/linux%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-01-08T16:37:49+08:00" />
+<meta property="article:modified_time" content="2026-01-08T16:37:49+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Linux基础命令"/>
+<meta name="twitter:description" content="linux命令
+ps -ef|grep详解
+ps命令将某个进程显示出来
+grep命令是查找
+中间的|是管道命令 是指ps命令与grep同时执行
+PS是LINUX下最常用的也是非常强大的进程查看命令
+grep命令是查找，是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。
+grep全称是Global Regular Expression Print，表示全局正则表达式版本，它的使用权限是所有用户。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://www.heiok.top/posts/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Linux基础命令",
+      "item": "https://www.heiok.top/posts/tutorial/linux%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Linux基础命令",
+  "name": "Linux基础命令",
+  "description": "linux命令 ps -ef|grep详解 ps命令将某个进程显示出来\ngrep命令是查找\n中间的|是管道命令 是指ps命令与grep同时执行\nPS是LINUX下最常用的也是非常强大的进程查看命令\ngrep命令是查找，是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。\ngrep全称是Global Regular Expression Print，表示全局正则表达式版本，它的使用权限是所有用户。\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "linux命令 ps -ef|grep详解 ps命令将某个进程显示出来\ngrep命令是查找\n中间的|是管道命令 是指ps命令与grep同时执行\nPS是LINUX下最常用的也是非常强大的进程查看命令\ngrep命令是查找，是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹配的行打印出来。\ngrep全称是Global Regular Expression Print，表示全局正则表达式版本，它的使用权限是所有用户。\n以下这条命令是检查java 进程是否存在：ps -ef |grep java\n字段含义如下： UID PID PPID C STIME TTY TIME CMD\nzzw 14124 13991 0 00:38 pts/0 00:00:00 grep –color=auto dae\ncd，ls命令使用 ls\n-a列出目录下的所有文件，包括以 . 开头的隐含文件。\n-A 显示指定目录下所有的子目录及文件包括隐藏文件，但不显示\".\",\"..\"\n-c 文件修改时间排序\n列出 usr目录下的所有文件\nls -a /usr 多个命令接上参数即可\n文件夹命令 1.mkdir命令 命令格式：mkdir [选项] 目录…；\n命令功能：通过mkdir命令可以实现在指定位置创建以 (指定的文件名)命名的文件夹或目录，要创建文件夹或目录的用户必须对所创建的文件夹的父文件夹具有写权限；\n-m 创建文件夹得同时设定权限\n在usr文件夹内创建文件夹aaa\nmkdir -m usr/aaa -p 新建多级文件夹，当路径中摸个目录文件夹存在时，跳过该目录继续创建下一级目录\n-v 显示创建目录的过程信息\n2.rm命令 删除当前目录下的文件夹\nrmdir aaa 3.cp 复制文件命令\n复制文件test.txt到/usr/local目录 cp test.txt /usr/local 复制文件夹 yyTest到/usr/local目录 cp -r yyTest/ /usr/local 再次复制文件test.txt到/usr/local目录，强制覆盖 cp -f test.txt /usr/local 复制文件tests.txt到/usr/local目录，并把修改时间和访问权限也复制 cp -p test.txt /usr/local 4.ping命令 发送10个数据包 ping ip -c count count指定数据包数量 追踪路由信息 traceroute -4 iPv4 -6 ipv6 查看路由信息 netstat -r 和 route -v 浏览文件类命令 1.cat命令 用于滚动显示文件内容或者将多个文件合并成一个文件\ncat [参数] 文件名 -b 对输出内容非空行标注行号\n-n 对所有行标注行号·\n还可以用于合并多个文件夹 2.more命令 使用cat命令时，由于文件过长只能看到文件的最后一部分，可以使用more命令分页查看\n进入more命令后，enter向下移动，使用空格翻页\n参数 -num：指定分页时每页显示的行数\n+num：指定文件从第num行开始显示\ncat -n docker.sh | more +232 查看docker.sh文件，从第232行开始分页查看 3.less命令 用法和more基本相同，但是支持向上向下翻页\nb按键向上移动一页\nq键退出less命令\n还支持查找功能，先按/ ,再输入要查找的字符，会在文本中查找，并且把找到的第一个目标高亮，再次查找按下/再次输入字符\n4.head命令 5.tail命令 目录操作类命令 1.mkdir命令 创建一个目录\n—make directory\nmkdir [参数] 目录名 -p 如果创建文件的父目录不存在，创建该目录时，同时创建父级目录\n2.rmkdir –remove directory\n删除空目录\nrmkdir [参数] 目录名 -p删除目录时连同父级目录一起删除，必须保证父级目录中没有其他目录及文件\n3.cp命令 主要用于复制文件或目录的复制\ncp [参数] 源文件 目标文件 -a 将文件状态，权限等都尽可能全部复制\n-f 如果目标文件或者目录存在，则覆盖目标文件\n-i 提示是否覆盖文件\n-r递归复制目录，包含目录下的子文件\n在复制时，要保证目标文件的父级目录存在 [root@iZf8z2hzdbx98heub8antpZ ~]# cp -r ./git /home 复制文件到home目录下 [root@iZf8z2hzdbx98heub8antpZ ~]# ls -l /root/git drwxr-xr-x 2 root root 4096 4月 6 14:45 conf -rw-r--r-- 1 root root 5713067 4月 6 14:43 linux_amd64_server.tar.gz -rwxr-xr-x 1 1001 121 12308480 4月 8 2021 nps drwxr-xr-x 4 root root 4096 4月 6 14:45 web [root@iZf8z2hzdbx98heub8antpZ ~]# ls -l /home/git drwxr-xr-x 2 root root 4096 4月 10 16:43 conf -rw-r--r-- 1 root root 5713067 4月 10 16:43 linux_amd64_server.tar.gz -rwxr-xr-x 1 root root 12308480 4月 10 16:43 nps drwxr-xr-x 4 root root 4096 4月 10 16:43 web cp -r ./git /home/bor 移动文件到home目录下并更名为bor 文件操作类命令 1.mv命令 移动文件或者目录\nmv [参数] 源文件或目录 目标文件或目录 参数\n-i 如果目标文件或者目录存在提示是否覆盖\n-f 直接覆盖不提示\n2.rm 删除文件或者目录\nrm [参数] 文件名或路径名 参数\n-i 删除文件目录时提示用户 -f强制删除，不提示 -r递归删除目录，如果要删除的目录中有1万个子目录或子文件，那么普通的rm删除最少需要确认1万次。所以，在真正删除文件的时候，我们会选择强制删除 rm -fr cptest 组合命令 递归强制删除\n[root@iZf8z2hzdbx98heub8antpZ ~]# cp -r ./git /home/cptest [root@iZf8z2hzdbx98heub8antpZ ~]# cd /home [root@iZf8z2hzdbx98heub8antpZ home]# ls cptest git [root@iZf8z2hzdbx98heub8antpZ home]# rm -fr cptest [root@iZf8z2hzdbx98heub8antpZ home]# ls git 3.touch命令 建立文件或者更新文件的修改日期\n4.ln命令 用于建立两个文件之间的链接关系\n-s 建立（符号）软连接\n不使用参数默认硬链接\nin [参数] 源文件或目录 连接名 硬链接 [root@iZf8z2hzdbx98heub8antpZ ~]# ln aa.txt cc.txt [root@iZf8z2hzdbx98heub8antpZ ~]# ls aa.txt bb.txt cc.txt git Pager 执行命令后会建立一个文件cc.txt文件，修改aa.txt内容cc.txt的内容一会随着改变\n[root@iZf8z2hzdbx98heub8antpZ ~]# ll aa.txt -rw-r--r-- 2 root root 7 4月 11 15:46 aa.txt [root@iZf8z2hzdbx98heub8antpZ ~]# ll cc.txt -rw-r--r-- 2 root root 7 4月 11 15:46 cc.txt 建立链接后，aa，cc的链接数都变成了2，表示这块硬盘空间有aa，bb指向它\n只能对文件建立硬链接，目录不行\n软连接 一个文件指向另一个文件的文件名\n首先查看bb.txt信息\n[root@iZf8z2hzdbx98heub8antpZ ~]# ll bb.txt -rw-r--r-- 1 root root 7 4月 11 15:42 bb.txt [root@iZf8z2hzdbx98heub8antpZ ~]# ln -s bb.txt dd.txt [root@iZf8z2hzdbx98heub8antpZ ~]# ls aa.txt bb.txt cc.txt dd.txt git Pager [root@iZf8z2hzdbx98heub8antpZ ~]# ll bb.txt dd.txt -rw-r--r-- 1 root root 7 4月 11 15:42 bb.txt lrwxrwxrwx 1 root root 6 4月 11 15:59 dd.txt -\u003e bb.txt 可以看出dd文件是指向bb文件的一个符号链接，而指向储存bb文件内容的那块银蓝空间的文件仍然只有bb一个文件，dd文件只不过是指向了bb的文件名而已，所以bb文件的文件连接数还是1\n可以对文件或者目录创建软连接 [root@iZf8z2hzdbx98heub8antpZ ~]# cat dd.txt bbbbbb 使用cat命令查看dd.txt文件的内容时，发现dd.txt文件是一个符号链接文件，就可以根据dd文件查找到bb文件\n然后将bb文件的内容显示出来\n5.gzip和gunzip命令 对文件进行压缩，生成以.gz结尾的压缩包，而gunzip是对压缩包进行解压\ngzip -v 文件名 gunzip -v 文件名 -v 显示被压缩文件的压缩比或解压时的信息 [root@iZf8z2hzdbx98heub8antpZ test]# gzip -v bb.txt bb.txt: 14.3% -- replaced with bb.txt.gz [root@iZf8z2hzdbx98heub8antpZ test]# ls aa.txt bb.txt.gz cc.txt dd.txt [root@iZf8z2hzdbx98heub8antpZ test]# gunzip -v bb.txt.gz bb.txt.gz: 14.3% -- replaced with bb.txt [root@iZf8z2hzdbx98heub8antpZ test]# ls aa.txt bb.txt cc.txt dd.txt 6.tar命令 tar [参数] 档案文件 文件列表 -c 生成档案文件 -v 列出解档归档详细过程 -f 指定档案文件名称 -r 将文件追加到档案文件末尾 -z 以gzip格式压缩或者解压缩文件 -j 以bzip2格式压缩或解压缩文件 -d 比较档案与当前目录中的文件 -x 解开档案文件 将文件zz.tar.gz 解压到 /root/test1目录下 [root@iZf8z2hzdbx98heub8antpZ home]# tar -xzvf zz.tar.gz -C /root/test1 7.rpm命令 用于对rpm包进行管理\nrpm [参数] 软件包名 -q 查询 指定软件包是否已安装，-qa（q +all）查看所有的软件包\n-i 用于安装指定的rpm包（安装时需要接上后缀名.rpm）\n-e 删除指定的软件包，（卸载时不用接后缀.rpm）\n-h 显示进度\n可以和之前的命令链接\neg\nrpm -qa | cat -b | less -20 查看系统中安装的所有软件包，显示行数，并且分页显示，每页显示20行\n8.whereis 9.find命令 用于文件查找\nfind [路径] [匹配表达式] 参数\n-name filename 查找指定名称的文件 -user username 查找指定用户的文件 -group grpname 查找指定组的文件 -print 显示查找结果 使用类命令 1.nohup 后台运行命令，并且指定日志输出路径\nnohup [command] [args…] \u0026 \u003ehello.log \u0026\n参数说明\ncommand ：需要执行的命令\nargs:一些参数，可以指定文件输出的位置\n\u0026：使命令后台运行\n",
+  "wordCount" : "2776",
+  "inLanguage": "zh",
+  "datePublished": "2026-01-08T16:37:49+08:00",
+  "dateModified": "2026-01-08T16:37:49+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "wait"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.heiok.top/posts/tutorial/linux%E5%9F%BA%E7%A1%80%E5%91%BD%E4%BB%A4/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wait`s blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.heiok.top/img/thinks.jpg"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://www.heiok.top/" accesskey="h" title="wait`s blog (Alt + H)">
+            <img src="https://www.heiok.top/img/Q.gif" alt="logo" aria-label="logo"
+                 height="35">wait`s blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://www.heiok.top/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/posts" title="📚 文章">
+                <span>📚 文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/archives/" title="⏱️ 时间轴">
+                <span>⏱️ 时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/about" title="🙋🏻‍♂️ 关于">
+                <span>🙋🏻‍♂️ 关于</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/links" title="🤝 友链">
+                <span>🤝 友链</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            <div class="breadcrumbs"><a href="https://www.heiok.top/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://www.heiok.top/posts/">📚文章</a></div>
+            <h1 class="post-title">
+                Linux基础命令
+            </h1>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2026-01-08
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>2776字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>6分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>wait
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    <span id="post_meta_style_8">
+                        <span class="fa fa-commenting-o"></span>
+                        <span>
+                            <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js"></script>
+                            <script>
+                                let url = document.documentURI
+                                
+                                let dnsUrl = "https://www.heiok.top/"
+                                let urlSplit = url.split(dnsUrl)
+                                let finalUrl = urlSplit[1]
+                                if (finalUrl[0] !== '/') {
+                                    finalUrl = '/'+finalUrl
+                                }
+                                twikoo.getCommentsCount({
+                                    envId:  null , 
+                                region:  null , 
+                                urls: [ 
+                                    
+                                    finalUrl,
+                                ],
+                                    includeReply: false 
+                                }).then(function (res) {
+                                    let count = res[0].count
+                                    const obj = document.getElementById("comment_count");
+                                    obj.innerText = count
+                                    
+                                    
+                                    
+                                }).catch(function (err) {
+                                    
+                                    console.error(err);
+                                });
+                            </script>
+                            <span id="comment_count"></span>
+                        </span>
+                    </span>
+                </span>
+
+</div>
+        </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#linux%e5%91%bd%e4%bb%a4" aria-label="linux命令">linux命令</a><ul>
+                        
+                <li>
+                    <a href="#ps--efgrep%e8%af%a6%e8%a7%a3" aria-label="ps -ef|grep详解">ps -ef|grep详解</a></li>
+                <li>
+                    <a href="#cdls%e5%91%bd%e4%bb%a4%e4%bd%bf%e7%94%a8" aria-label="cd，ls命令使用">cd，ls命令使用</a></li>
+                <li>
+                    <a href="#%e6%96%87%e4%bb%b6%e5%a4%b9%e5%91%bd%e4%bb%a4" aria-label="文件夹命令">文件夹命令</a><ul>
+                        
+                <li>
+                    <a href="#1mkdir%e5%91%bd%e4%bb%a4" aria-label="1.mkdir命令">1.mkdir命令</a></li>
+                <li>
+                    <a href="#2rm%e5%91%bd%e4%bb%a4" aria-label="2.rm命令">2.rm命令</a></li>
+                <li>
+                    <a href="#3cp" aria-label="3.cp">3.cp</a></li>
+                <li>
+                    <a href="#4ping%e5%91%bd%e4%bb%a4" aria-label="4.ping命令">4.ping命令</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e6%b5%8f%e8%a7%88%e6%96%87%e4%bb%b6%e7%b1%bb%e5%91%bd%e4%bb%a4" aria-label="浏览文件类命令">浏览文件类命令</a><ul>
+                        
+                <li>
+                    <a href="#1cat%e5%91%bd%e4%bb%a4" aria-label="1.cat命令">1.cat命令</a></li>
+                <li>
+                    <a href="#2more%e5%91%bd%e4%bb%a4" aria-label="2.more命令">2.more命令</a></li>
+                <li>
+                    <a href="#3less%e5%91%bd%e4%bb%a4" aria-label="3.less命令">3.less命令</a></li>
+                <li>
+                    <a href="#4head%e5%91%bd%e4%bb%a4" aria-label="4.head命令">4.head命令</a></li>
+                <li>
+                    <a href="#5tail%e5%91%bd%e4%bb%a4" aria-label="5.tail命令">5.tail命令</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e7%9b%ae%e5%bd%95%e6%93%8d%e4%bd%9c%e7%b1%bb%e5%91%bd%e4%bb%a4" aria-label="目录操作类命令">目录操作类命令</a><ul>
+                        
+                <li>
+                    <a href="#1mkdir%e5%91%bd%e4%bb%a4-1" aria-label="1.mkdir命令">1.mkdir命令</a></li>
+                <li>
+                    <a href="#2rmkdir" aria-label="2.rmkdir">2.rmkdir</a></li>
+                <li>
+                    <a href="#3cp%e5%91%bd%e4%bb%a4" aria-label="3.cp命令">3.cp命令</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e6%96%87%e4%bb%b6%e6%93%8d%e4%bd%9c%e7%b1%bb%e5%91%bd%e4%bb%a4" aria-label="文件操作类命令">文件操作类命令</a><ul>
+                        
+                <li>
+                    <a href="#1mv%e5%91%bd%e4%bb%a4" aria-label="1.mv命令">1.mv命令</a></li>
+                <li>
+                    <a href="#2rm" aria-label="2.rm">2.rm</a></li>
+                <li>
+                    <a href="#3touch%e5%91%bd%e4%bb%a4" aria-label="3.touch命令">3.touch命令</a></li>
+                <li>
+                    <a href="#4ln%e5%91%bd%e4%bb%a4" aria-label="4.ln命令">4.ln命令</a></li>
+                <li>
+                    <a href="#5gzip%e5%92%8cgunzip%e5%91%bd%e4%bb%a4" aria-label="5.gzip和gunzip命令">5.gzip和gunzip命令</a></li>
+                <li>
+                    <a href="#6tar%e5%91%bd%e4%bb%a4" aria-label="6.tar命令">6.tar命令</a></li>
+                <li>
+                    <a href="#7rpm%e5%91%bd%e4%bb%a4" aria-label="7.rpm命令">7.rpm命令</a></li>
+                <li>
+                    <a href="#8whereis" aria-label="8.whereis">8.whereis</a></li>
+                <li>
+                    <a href="#9find%e5%91%bd%e4%bb%a4" aria-label="9.find命令">9.find命令</a></li></ul>
+                </li>
+                <li>
+                    <a href="#%e4%bd%bf%e7%94%a8%e7%b1%bb%e5%91%bd%e4%bb%a4" aria-label="使用类命令">使用类命令</a><ul>
+                        
+                <li>
+                    <a href="#1nohup" aria-label="1.nohup">1.nohup</a>
+                </li>
+            </ul>
+            </li>
+            </ul>
+            </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        if (elements) {
+            activeElement = Array.from(elements).find((element) => {
+                if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                    (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                    return element;
+                }
+            }) || activeElement
+
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                if (element === activeElement){
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+                }
+            })
+        }
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h1 id="linux命令">linux命令<a hidden class="anchor" aria-hidden="true" href="#linux命令">#</a></h1>
+<h2 id="ps--efgrep详解">ps -ef|grep详解<a hidden class="anchor" aria-hidden="true" href="#ps--efgrep详解">#</a></h2>
+<p>ps命令将某个进程显示出来</p>
+<p>grep命令是查找</p>
+<p>中间的|是管道命令 是指ps命令与grep同时执行</p>
+<p>PS是LINUX下最常用的也是非常强大的进程查看命令</p>
+<p>grep命令是查找，是一种强大的文本搜索工具，它能<a href="https://www.baidu.com/s?wd=%E4%BD%BF%E7%94%A8%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F&amp;tn=44039180_cpr&amp;fenlei=mv6quAkxTZn0IZRqIHckPjm4nH00T1d9uWD3PhP9n1b4m1nduAcz0ZwV5Hcvrjm3rH6sPfKWUMw85HfYnjn4nH6sgvPsT6KdThsqpZwYTjCEQLGCpyw9Uz4Bmy-bIi4WUvYETgN-TLwGUv3EPjfvrHnzPWT3">使用正则表达式</a>搜索文本，并把匹配的行打印出来。</p>
+<p>grep全称是Global Regular Expression Print，表示全局正则表达式版本，它的使用权限是所有用户。</p>
+<p>以下这条命令是检查java 进程是否存在：ps -ef |grep java</p>
+<p>字段含义如下：
+UID    PID    PPID    C   STIME   TTY    TIME     CMD</p>
+<p>zzw   14124  13991   0   00:38   pts/0   00:00:00  grep &ndash;color=auto dae</p>
+<h2 id="cdls命令使用">cd，ls命令使用<a hidden class="anchor" aria-hidden="true" href="#cdls命令使用">#</a></h2>
+<p>ls</p>
+<p><strong>-a</strong>列出目录下的所有文件，包括以 . 开头的隐含文件。</p>
+<p><strong>-A</strong> 显示指定目录下所有的子目录及文件包括隐藏文件，但不显示&quot;.&quot;,&quot;..&quot;</p>
+<p><strong>-c</strong> 文件修改时间排序</p>
+<p>列出 usr目录下的所有文件</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>ls -a /usr
+</span></span></code></pre></div><p><img loading="lazy" src="https://file.heiok.top/note/202405072158346.png" alt="image-20230410150003090"  />
+</p>
+<p>多个命令接上参数即可</p>
+<h2 id="文件夹命令">文件夹命令<a hidden class="anchor" aria-hidden="true" href="#文件夹命令">#</a></h2>
+<h3 id="1mkdir命令">1.mkdir命令<a hidden class="anchor" aria-hidden="true" href="#1mkdir命令">#</a></h3>
+<p>命令格式：mkdir [选项] 目录&hellip;；</p>
+<p>命令功能：通过mkdir命令可以实现在指定位置创建以 (指定的文件名)命名的文件夹或目录，要创建文件夹或目录的用户必须对所创建的文件夹的父文件夹具有写权限；</p>
+<p>-m 创建文件夹得同时设定权限</p>
+<p>在usr文件夹内创建文件夹aaa</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>mkdir -m usr/aaa
+</span></span></code></pre></div><p>-p 新建多级文件夹，当路径中摸个目录文件夹存在时，跳过该目录继续创建下一级目录</p>
+<p>-v 显示创建目录的过程信息</p>
+<h3 id="2rm命令">2.rm命令<a hidden class="anchor" aria-hidden="true" href="#2rm命令">#</a></h3>
+<p>删除当前目录下的文件夹</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>rmdir aaa
+</span></span></code></pre></div><h3 id="3cp">3.cp<a hidden class="anchor" aria-hidden="true" href="#3cp">#</a></h3>
+<p>复制文件命令</p>
+<ul>
+<li>复制文件test.txt到/usr/local目录</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cp test.txt /usr/local
+</span></span></code></pre></div><ul>
+<li>复制文件夹 yyTest到/usr/local目录</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cp -r yyTest/ /usr/local
+</span></span></code></pre></div><ul>
+<li>再次复制文件test.txt到/usr/local目录，强制覆盖</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cp -f test.txt /usr/local
+</span></span></code></pre></div><ul>
+<li>复制文件tests.txt到/usr/local目录，并把修改时间和访问权限也复制</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cp -p test.txt /usr/local
+</span></span></code></pre></div><h3 id="4ping命令">4.ping命令<a hidden class="anchor" aria-hidden="true" href="#4ping命令">#</a></h3>
+<ul>
+<li>发送10个数据包</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>ping ip -c count count指定数据包数量
+</span></span></code></pre></div><ul>
+<li>追踪路由信息</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>traceroute
+</span></span><span style="display:flex;"><span>-4 iPv4
+</span></span><span style="display:flex;"><span>-6 ipv6
+</span></span></code></pre></div><ul>
+<li>查看路由信息</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> netstat -r
+</span></span><span style="display:flex;"><span>和
+</span></span><span style="display:flex;"><span>route -v
+</span></span></code></pre></div><h2 id="浏览文件类命令">浏览文件类命令<a hidden class="anchor" aria-hidden="true" href="#浏览文件类命令">#</a></h2>
+<h3 id="1cat命令">1.cat命令<a hidden class="anchor" aria-hidden="true" href="#1cat命令">#</a></h3>
+<p>用于滚动显示文件内容或者将多个文件合并成一个文件</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cat [参数] 文件名
+</span></span></code></pre></div><p>-b 对输出内容非空行标注行号</p>
+<p>-n 对所有行标注行号·</p>
+<p><img loading="lazy" src="https://file.heiok.top/note/202405072159886.png" alt="image-20230410150831015"  />
+</p>
+<ul>
+<li>还可以用于合并多个文件夹</li>
+</ul>
+<h3 id="2more命令">2.more命令<a hidden class="anchor" aria-hidden="true" href="#2more命令">#</a></h3>
+<p>使用cat命令时，由于文件过长只能看到文件的最后一部分，可以使用more命令分页查看</p>
+<p>进入more命令后，<strong>enter</strong>向下移动，使用<strong>空格</strong>翻页</p>
+<ul>
+<li>参数</li>
+</ul>
+<p>-num：指定分页时每页显示的行数</p>
+<p>+num：指定文件从第num行开始显示</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span> cat -n docker.sh | more +232
+</span></span><span style="display:flex;"><span> 查看docker.sh文件，从第232行开始分页查看
+</span></span></code></pre></div><h3 id="3less命令">3.less命令<a hidden class="anchor" aria-hidden="true" href="#3less命令">#</a></h3>
+<p>用法和more基本相同，但是支持向上向下翻页</p>
+<p><strong>b按键</strong>向上移动一页</p>
+<p><strong>q键</strong>退出less命令</p>
+<p>还支持查找功能，先按/ ,再输入要查找的字符，会在文本中查找，并且把找到的第一个目标高亮，再次查找按下/再次输入字符</p>
+<h3 id="4head命令">4.head命令<a hidden class="anchor" aria-hidden="true" href="#4head命令">#</a></h3>
+<h3 id="5tail命令">5.tail命令<a hidden class="anchor" aria-hidden="true" href="#5tail命令">#</a></h3>
+<h2 id="目录操作类命令">目录操作类命令<a hidden class="anchor" aria-hidden="true" href="#目录操作类命令">#</a></h2>
+<h3 id="1mkdir命令-1">1.mkdir命令<a hidden class="anchor" aria-hidden="true" href="#1mkdir命令-1">#</a></h3>
+<p>创建一个目录</p>
+<p>&mdash;make directory</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>mkdir [参数] 目录名
+</span></span></code></pre></div><p>-p 如果创建文件的父目录不存在，创建该目录时，同时创建父级目录</p>
+<h3 id="2rmkdir">2.rmkdir<a hidden class="anchor" aria-hidden="true" href="#2rmkdir">#</a></h3>
+<p>&ndash;remove directory</p>
+<p>删除空目录</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>rmkdir [参数] 目录名
+</span></span></code></pre></div><p>-p删除目录时连同父级目录一起删除，必须保证父级目录中没有其他目录及文件</p>
+<h3 id="3cp命令">3.cp命令<a hidden class="anchor" aria-hidden="true" href="#3cp命令">#</a></h3>
+<p>主要用于复制文件或目录的复制</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>cp [参数] 源文件 目标文件
+</span></span></code></pre></div><p>-a 将文件状态，权限等都尽可能全部复制</p>
+<p>-f 如果目标文件或者目录存在，则覆盖目标文件</p>
+<p>-i 提示是否覆盖文件</p>
+<p>-r递归复制目录，包含目录下的子文件</p>
+<ul>
+<li>在复制时，要保证目标文件的父级目录存在</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># cp -r ./git /home</span>
+</span></span><span style="display:flex;"><span>复制文件到home目录下
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># ls -l /root/git</span>
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">2</span> root root     <span style="color:#ae81ff">4096</span> 4月   <span style="color:#ae81ff">6</span> 14:45 conf
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">1</span> root root  <span style="color:#ae81ff">5713067</span> 4月   <span style="color:#ae81ff">6</span> 14:43 linux_amd64_server.tar.gz
+</span></span><span style="display:flex;"><span>-rwxr-xr-x <span style="color:#ae81ff">1</span> <span style="color:#ae81ff">1001</span>  <span style="color:#ae81ff">121</span> <span style="color:#ae81ff">12308480</span> 4月   <span style="color:#ae81ff">8</span> <span style="color:#ae81ff">2021</span> nps
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">4</span> root root     <span style="color:#ae81ff">4096</span> 4月   <span style="color:#ae81ff">6</span> 14:45 web
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># ls -l /home/git</span>
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">2</span> root root     <span style="color:#ae81ff">4096</span> 4月  <span style="color:#ae81ff">10</span> 16:43 conf
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">1</span> root root  <span style="color:#ae81ff">5713067</span> 4月  <span style="color:#ae81ff">10</span> 16:43 linux_amd64_server.tar.gz
+</span></span><span style="display:flex;"><span>-rwxr-xr-x <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">12308480</span> 4月  <span style="color:#ae81ff">10</span> 16:43 nps
+</span></span><span style="display:flex;"><span>drwxr-xr-x <span style="color:#ae81ff">4</span> root root     <span style="color:#ae81ff">4096</span> 4月  <span style="color:#ae81ff">10</span> 16:43 web
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>cp -r ./git /home/bor
+</span></span><span style="display:flex;"><span>移动文件到home目录下并更名为bor
+</span></span></code></pre></div><h2 id="文件操作类命令">文件操作类命令<a hidden class="anchor" aria-hidden="true" href="#文件操作类命令">#</a></h2>
+<h3 id="1mv命令">1.mv命令<a hidden class="anchor" aria-hidden="true" href="#1mv命令">#</a></h3>
+<p>移动文件或者目录</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>mv [参数] 源文件或目录 目标文件或目录
+</span></span></code></pre></div><p>参数</p>
+<p>-i 如果目标文件或者目录存在提示是否覆盖</p>
+<p>-f 直接覆盖不提示</p>
+<h3 id="2rm">2.rm<a hidden class="anchor" aria-hidden="true" href="#2rm">#</a></h3>
+<p>删除文件或者目录</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>rm [参数] 文件名或路径名
+</span></span></code></pre></div><p>参数</p>
+<ul>
+<li>-i 删除文件目录时提示用户</li>
+<li>-f强制删除，不提示</li>
+<li>-r递归删除目录，如果要删除的目录中有1万个子目录或子文件，那么普通的rm删除最少需要确认1万次。所以，在真正删除文件的时候，我们会选择强制删除</li>
+</ul>
+<p>rm -fr cptest 组合命令 递归强制删除</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># cp -r ./git /home/cptest</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># cd /home</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ home<span style="color:#f92672">]</span><span style="color:#75715e"># ls</span>
+</span></span><span style="display:flex;"><span>cptest  git
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ home<span style="color:#f92672">]</span><span style="color:#75715e"># rm -fr cptest</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ home<span style="color:#f92672">]</span><span style="color:#75715e"># ls git</span>
+</span></span></code></pre></div><h3 id="3touch命令">3.touch命令<a hidden class="anchor" aria-hidden="true" href="#3touch命令">#</a></h3>
+<p>建立文件或者更新文件的修改日期</p>
+<h3 id="4ln命令">4.ln命令<a hidden class="anchor" aria-hidden="true" href="#4ln命令">#</a></h3>
+<p>用于建立两个文件之间的链接关系</p>
+<p>-s 建立（符号）软连接</p>
+<p>不使用参数默认硬链接</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>in [参数]  源文件或目录 连接名
+</span></span></code></pre></div><ul>
+<li>硬链接</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[root@iZf8z2hzdbx98heub8antpZ ~]# ln aa.txt cc.txt
+</span></span><span style="display:flex;"><span>[root@iZf8z2hzdbx98heub8antpZ ~]# ls
+</span></span><span style="display:flex;"><span>aa.txt  bb.txt  cc.txt  git  Pager
+</span></span></code></pre></div><p>执行命令后会建立一个文件cc.txt文件，修改aa.txt内容cc.txt的内容一会随着改变</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># ll aa.txt</span>
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">2</span> root root <span style="color:#ae81ff">7</span> 4月  <span style="color:#ae81ff">11</span> 15:46 aa.txt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># ll cc.txt</span>
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">2</span> root root <span style="color:#ae81ff">7</span> 4月  <span style="color:#ae81ff">11</span> 15:46 cc.txt
+</span></span></code></pre></div><p>建立链接后，aa，cc的链接数都变成了2，表示这块硬盘空间有aa，bb指向它</p>
+<p><strong>只能对文件建立硬链接，目录不行</strong></p>
+<ul>
+<li>软连接</li>
+</ul>
+<p>一个文件指向另一个文件的文件名</p>
+<p>首先查看bb.txt信息</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># ll bb.txt</span>
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">7</span> 4月  <span style="color:#ae81ff">11</span> 15:42 bb.txt
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># ln -s bb.txt dd.txt</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># ls</span>
+</span></span><span style="display:flex;"><span>aa.txt  bb.txt  cc.txt  dd.txt  git  Pager
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># ll bb.txt dd.txt</span>
+</span></span><span style="display:flex;"><span>-rw-r--r-- <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">7</span> 4月  <span style="color:#ae81ff">11</span> 15:42 bb.txt
+</span></span><span style="display:flex;"><span>lrwxrwxrwx <span style="color:#ae81ff">1</span> root root <span style="color:#ae81ff">6</span> 4月  <span style="color:#ae81ff">11</span> 15:59 dd.txt -&gt; bb.txt
+</span></span></code></pre></div><p>可以看出dd文件是指向bb文件的一个符号链接，而指向储存bb文件内容的那块银蓝空间的文件仍然只有bb一个文件，dd文件只不过是指向了bb的文件名而已，所以bb文件的文件连接数还是1</p>
+<ul>
+<li>可以对文件或者目录创建软连接</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ ~<span style="color:#f92672">]</span><span style="color:#75715e"># cat dd.txt</span>
+</span></span><span style="display:flex;"><span>bbbbbb
+</span></span></code></pre></div><p>使用cat命令查看dd.txt文件的内容时，发现dd.txt文件是一个符号链接文件，就可以根据dd文件查找到bb文件</p>
+<p>然后将bb文件的内容显示出来</p>
+<h3 id="5gzip和gunzip命令">5.gzip和gunzip命令<a hidden class="anchor" aria-hidden="true" href="#5gzip和gunzip命令">#</a></h3>
+<p>对文件进行压缩，生成以.gz结尾的压缩包，而gunzip是对压缩包进行解压</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>gzip -v  文件名
+</span></span><span style="display:flex;"><span>gunzip -v 文件名
+</span></span></code></pre></div><ul>
+<li>-v 显示被压缩文件的压缩比或解压时的信息</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ test<span style="color:#f92672">]</span><span style="color:#75715e"># gzip -v bb.txt</span>
+</span></span><span style="display:flex;"><span>bb.txt:  14.3% -- replaced with bb.txt.gz
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ test<span style="color:#f92672">]</span><span style="color:#75715e"># ls</span>
+</span></span><span style="display:flex;"><span>aa.txt  bb.txt.gz  cc.txt  dd.txt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ test<span style="color:#f92672">]</span><span style="color:#75715e"># gunzip -v bb.txt.gz</span>
+</span></span><span style="display:flex;"><span>bb.txt.gz:       14.3% -- replaced with bb.txt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ test<span style="color:#f92672">]</span><span style="color:#75715e"># ls</span>
+</span></span><span style="display:flex;"><span>aa.txt  bb.txt  cc.txt  dd.txt
+</span></span></code></pre></div><h3 id="6tar命令">6.tar命令<a hidden class="anchor" aria-hidden="true" href="#6tar命令">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>tar <span style="color:#f92672">[</span>参数<span style="color:#f92672">]</span> 档案文件 文件列表
+</span></span></code></pre></div><ul>
+<li>-c 生成档案文件</li>
+<li>-v 列出解档归档详细过程</li>
+<li>-f 指定档案文件名称</li>
+<li>-r 将文件追加到档案文件末尾</li>
+<li>-z 以gzip格式压缩或者解压缩文件</li>
+<li>-j 以bzip2格式压缩或解压缩文件</li>
+<li>-d 比较档案与当前目录中的文件</li>
+<li>-x 解开档案文件</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>将文件zz.tar.gz 解压到 /root/test1目录下
+</span></span><span style="display:flex;"><span><span style="color:#f92672">[</span>root@iZf8z2hzdbx98heub8antpZ home<span style="color:#f92672">]</span><span style="color:#75715e"># tar -xzvf zz.tar.gz  -C /root/test1</span>
+</span></span></code></pre></div><h3 id="7rpm命令">7.rpm命令<a hidden class="anchor" aria-hidden="true" href="#7rpm命令">#</a></h3>
+<p>用于对rpm包进行管理</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>rpm [参数] 软件包名
+</span></span></code></pre></div><ul>
+<li>
+<p>-q 查询 指定软件包是否已安装，-qa（q +all）查看所有的软件包</p>
+</li>
+<li>
+<p>-i 用于安装指定的rpm包（安装时需要接上后缀名.rpm）</p>
+</li>
+<li>
+<p>-e 删除指定的软件包，（卸载时不用接后缀.rpm）</p>
+</li>
+<li>
+<p>-h 显示进度</p>
+</li>
+</ul>
+<p>可以和之前的命令链接</p>
+<p>eg</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>rpm -qa | cat -b | less -20
+</span></span></code></pre></div><p>查看系统中安装的所有软件包，显示行数，并且分页显示，每页显示20行</p>
+<h3 id="8whereis">8.whereis<a hidden class="anchor" aria-hidden="true" href="#8whereis">#</a></h3>
+<h3 id="9find命令">9.find命令<a hidden class="anchor" aria-hidden="true" href="#9find命令">#</a></h3>
+<p>用于文件查找</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>find <span style="color:#f92672">[</span>路径<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>匹配表达式<span style="color:#f92672">]</span>
+</span></span></code></pre></div><p>参数</p>
+<ul>
+<li>-name filename 查找指定名称的文件</li>
+<li>-user username 查找指定用户的文件</li>
+<li>-group grpname 查找指定组的文件</li>
+<li>-print 显示查找结果</li>
+<li></li>
+</ul>
+<h2 id="使用类命令">使用类命令<a hidden class="anchor" aria-hidden="true" href="#使用类命令">#</a></h2>
+<h3 id="1nohup">1.nohup<a hidden class="anchor" aria-hidden="true" href="#1nohup">#</a></h3>
+<p>后台运行命令，并且指定日志输出路径</p>
+<p>nohup [command] [args&hellip;] &amp; &gt;hello.log &amp;</p>
+<p>参数说明</p>
+<p>command ：需要执行的命令</p>
+<p>args:一些参数，可以指定文件输出的位置</p>
+<p>&amp;：使命令后台运行</p>
+
+
+        </div>
+        <div class="post-reward">
+            <div style="padding: 0 0 0 0; margin: 0 0 0 0; width: 100%; font-size:16px; text-align: center;">
+                <div id="QR" style="opacity: 0;">
+                    <div id="wechat" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="wechat_qr" src="https://www.heiok.top/img/thinks.jpg" alt="wechat_pay"></a>
+                        <p>微信</p>
+                    </div>
+                    <div id="alipay" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="alipay_qr" src="https://www.heiok.top/img/thinks.jpg" alt="alipay"></a>
+                        <p>支付宝</p>
+                    </div>
+                </div>
+                <button id="rewardButton"
+                        onclick="
+                    var qr = document.getElementById('QR');
+                    if (qr.style.opacity === '0') {
+                        qr.style.opacity='1';
+                    } else {
+                        qr.style.opacity='0'
+                    }"
+                >
+                    <span>🧧 鼓励</span>
+                </button>
+            </div>
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://www.heiok.top/posts/tutorial/jenkins%E8%87%AA%E5%8A%A8%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>Jenkins自动部署教程</span>
+  </a>
+  <a class="next" href="https://www.heiok.top/posts/tutorial/mysql-%E5%85%B3%E9%94%AE%E5%AD%97%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>MySQL 关键字执行顺序</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Linux基础命令 on twitter"
+       href="https://twitter.com/intent/tweet/?text=Linux%e5%9f%ba%e7%a1%80%e5%91%bd%e4%bb%a4&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2flinux%25E5%259F%25BA%25E7%25A1%2580%25E5%2591%25BD%25E4%25BB%25A4%2f&amp;hashtags=">
+    <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Linux基础命令 on linkedin"
+       href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2flinux%25E5%259F%25BA%25E7%25A1%2580%25E5%2591%25BD%25E4%25BB%25A4%2f&amp;title=Linux%e5%9f%ba%e7%a1%80%e5%91%bd%e4%bb%a4&amp;summary=Linux%e5%9f%ba%e7%a1%80%e5%91%bd%e4%bb%a4&amp;source=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2flinux%25E5%259F%25BA%25E7%25A1%2580%25E5%2591%25BD%25E4%25BB%25A4%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Linux基础命令 on reddit"
+       href="https://reddit.com/submit?url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2flinux%25E5%259F%25BA%25E7%25A1%2580%25E5%2591%25BD%25E4%25BB%25A4%2f&title=Linux%e5%9f%ba%e7%a1%80%e5%91%bd%e4%bb%a4">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Linux基础命令 on facebook"
+       href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2flinux%25E5%259F%25BA%25E7%25A1%2580%25E5%2591%25BD%25E4%25BB%25A4%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Linux基础命令 on whatsapp"
+       href="https://api.whatsapp.com/send?text=Linux%e5%9f%ba%e7%a1%80%e5%91%bd%e4%bb%a4%20-%20https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2flinux%25E5%259F%25BA%25E7%25A1%2580%25E5%2591%25BD%25E4%25BB%25A4%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Linux基础命令 on telegram"
+       href="https://telegram.me/share/url?text=Linux%e5%9f%ba%e7%a1%80%e5%91%bd%e4%bb%a4&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2flinux%25E5%259F%25BA%25E7%25A1%2580%25E5%2591%25BD%25E4%25BB%25A4%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+        </footer>
+    </div>
+
+<style>
+    .comments_details summary::marker {
+        font-size: 20px;
+        content: '👉展开评论';
+        color: var(--content);
+    }
+    .comments_details[open] summary::marker{
+        font-size: 20px;
+        content: '👇关闭评论';
+        color: var(--content);
+    }
+</style>
+
+
+<div>
+    <details class="comments_details">
+        <summary style="cursor: pointer; margin: 50px 0 20px 0;width: 130px;">
+            <span style="font-size: 20px;color: var(--content);">...</span>
+        </summary>
+        <div id="tcomment"></div>
+    </details>
+    <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js">
+    </script>
+    <script>
+        twikoo.init({
+            envId:  null ,
+        el: "#tcomment",
+            lang: 'zh-CN',
+            region:  null ,
+        path: window.TWIKOO_MAGIC_PATH||window.location.pathname,
+        })
+    </script>
+</div>
+</article>
+</main>
+
+<footer class="footer">
+    <span>
+        Copyright
+        &copy;
+        2020-2026
+        <a href="https://www.heiok.top/" style="color:#939393;">wait`s blog</a>
+        All Rights Reserved
+    </span>
+    <a href="https://beian.miit.gov.cn/" target="_blank" style="color:#939393;">蜀ICP备2023024013号</a>&nbsp;
+    <span>
+        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=null"
+           style="display:inline-block;text-decoration:none;height:20px;color:#939393;">
+            <img src="" style="float:left;margin: 0px 5px 0px 0px;"/>
+            
+        </a>
+    </span>
+    <span id="busuanzi_container">
+        <span class="fa fa-user"></span> <span id="busuanzi_value_site_uv"></span>
+        <span class="fa fa-eye"></span> <span id="busuanzi_value_site_pv"></span>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '复制';
+
+        function copyingDone() {
+            copybutton.innerText = '已复制！';
+            setTimeout(() => {
+                copybutton.innerText = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+</body>
+
+</html>

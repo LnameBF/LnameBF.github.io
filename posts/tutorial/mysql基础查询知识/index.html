@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="zh" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<meta name="referrer" content="no-referrer">
+<title>Mysql基础查询知识 | wait`s blog</title>
+<meta name="keywords" content="">
+<meta name="description" content="排除非空的字段
+is not null 和 is null 而不是 ！=null
+模糊查询
+不包含和包含 not like 和 like
+请编写一条 SQL 查询语句，从名为 student 的数据表中选择出所有学生的姓名（name）和成绩（score），要求姓名（name）不包含 &#34;李&#34; 这个字。
+
+select name,score from student where name not like &#39;%李%&#39;
+逻辑运算
+逻辑运算是一种在条件查询中使用的运算符，它允许我们结合多个条件来过滤出符合特定条件的数据。">
+<meta name="author" content="wait">
+<link rel="canonical" href="https://www.heiok.top/posts/tutorial/mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E7%9F%A5%E8%AF%86/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.css" rel="preload stylesheet" as="style">
+<script defer crossorigin="anonymous" src="/assets/js/highlight.js" onload="hljs.initHighlightingOnLoad();"></script>
+<link rel="icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="16x16" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="icon" type="image/png" sizes="32x32" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="apple-touch-icon" href="https://www.heiok.top/img/thinks.jpg">
+<link rel="mask-icon" href="https://www.heiok.top/img/thinks.jpg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="zh" href="https://www.heiok.top/posts/tutorial/mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E7%9F%A5%E8%AF%86/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --hljs-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
+
+
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = ""; 
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+<meta property="og:title" content="Mysql基础查询知识" />
+<meta property="og:description" content="排除非空的字段
+is not null 和 is null 而不是 ！=null
+模糊查询
+不包含和包含 not like 和 like
+请编写一条 SQL 查询语句，从名为 student 的数据表中选择出所有学生的姓名（name）和成绩（score），要求姓名（name）不包含 &#34;李&#34; 这个字。
+
+select name,score from student where name not like &#39;%李%&#39;
+逻辑运算
+逻辑运算是一种在条件查询中使用的运算符，它允许我们结合多个条件来过滤出符合特定条件的数据。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://www.heiok.top/posts/tutorial/mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E7%9F%A5%E8%AF%86/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2026-01-08T16:37:49+08:00" />
+<meta property="article:modified_time" content="2026-01-08T16:37:49+08:00" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Mysql基础查询知识"/>
+<meta name="twitter:description" content="排除非空的字段
+is not null 和 is null 而不是 ！=null
+模糊查询
+不包含和包含 not like 和 like
+请编写一条 SQL 查询语句，从名为 student 的数据表中选择出所有学生的姓名（name）和成绩（score），要求姓名（name）不包含 &#34;李&#34; 这个字。
+
+select name,score from student where name not like &#39;%李%&#39;
+逻辑运算
+逻辑运算是一种在条件查询中使用的运算符，它允许我们结合多个条件来过滤出符合特定条件的数据。"/>
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+
+        {
+          "@type": "ListItem",
+          "position":  1 ,
+          "name": "📚文章",
+          "item": "https://www.heiok.top/posts/"
+        }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Mysql基础查询知识",
+      "item": "https://www.heiok.top/posts/tutorial/mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E7%9F%A5%E8%AF%86/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Mysql基础查询知识",
+  "name": "Mysql基础查询知识",
+  "description": "排除非空的字段 is not null 和 is null 而不是 ！=null\n模糊查询 不包含和包含 not like 和 like\n请编写一条 SQL 查询语句，从名为 student 的数据表中选择出所有学生的姓名（name）和成绩（score），要求姓名（name）不包含 \u0026#34;李\u0026#34; 这个字。 select name,score from student where name not like \u0026#39;%李%\u0026#39; 逻辑运算 逻辑运算是一种在条件查询中使用的运算符，它允许我们结合多个条件来过滤出符合特定条件的数据。\n",
+  "keywords": [
+    
+  ],
+  "articleBody": "排除非空的字段 is not null 和 is null 而不是 ！=null\n模糊查询 不包含和包含 not like 和 like\n请编写一条 SQL 查询语句，从名为 student 的数据表中选择出所有学生的姓名（name）和成绩（score），要求姓名（name）不包含 \"李\" 这个字。 select name,score from student where name not like '%李%' 逻辑运算 逻辑运算是一种在条件查询中使用的运算符，它允许我们结合多个条件来过滤出符合特定条件的数据。\n在逻辑运算中，常用的运算符有：\nAND：表示逻辑与，要求同时满足多个条件，才返回 true。 OR：表示逻辑或，要求满足其中任意一个条件，就返回 true。 NOT：表示逻辑非，用于否定一个条件（本来是 true，用了 not 后转为 false） 去重 distinct\n排序 order by desc 降序 asc 升序\n分页 limit 1,3 注意，第一条数据的下标就是0，和数组类似\n条件分支 case when 支持同时指定多个分支，示例语法如下： CASE WHEN (条件1) THEN 结果1 WHEN (条件2) THEN 结果2 ... ELSE 其他结果 END 题目 假设有一个学生表 student，包含以下字段：name（姓名）、age（年龄）。请你编写一个 SQL 查询，将学生按照年龄划分为三个年龄等级（age_level）：60 岁以上为 \"老同学\"，20 岁以上（不包括 60 岁以上）为 \"年轻\"，20 岁以下为 \"小同学\"。 返回结果应包含学生的姓名（name）和年龄等级（age_level），并按姓名升序排序。 SELECT name, CASE WHEN (age \u003e 60) THEN '老同学' WHEN (age \u003e 20) THEN '年轻' ELSE '小同学' END AS age_level FROM student ORDER BY name asc; 时间函数 在 SQL 中，时间函数是用于处理日期和时间的特殊函数。它们允许我们在查询中操作和处理日期、时间、日期时间数据，从而使得在数据库中进行时间相关的操作变得更加方便和灵活。\n常用的时间函数有：\nDATE：获取当前日期 DATETIME：获取当前日期时间 TIME：获取当前时间 示例\n假设有一个订单表 orders，包含以下字段：order_id（订单号）、order_date（下单日期）、order_time（下单时间）。数据如下：\norder_id order_date order_time 1 2023-08-01 12:30:45 2 2023-08-01 14:20:10 3 2023-08-02 09:15:00 4 2023-08-02 18:05:30 使用时间函数获取当前日期、当前日期时间和当前时间：\n-- 获取当前日期 SELECT DATE() AS current_date; -- 获取当前日期时间 SELECT DATETIME() AS current_datetime; -- 获取当前时间 SELECT TIME() AS current_time; 字符串处理 upper 将字符串转成大写\nlength 计算长度\nlower 小写\n聚合函数 max\nmin\ncount\navg\nsum\n分组聚合 - 单字段分组 假设有一个学生表 student，包含以下字段：id（学号）、name（姓名）、class_id（班级编号）、score（成绩）。请你编写一个 SQL 查询，统计学生表中每个班级的平均成绩（avg_score）。\nselect class_id, avg(score) as avg_score from student group by class_id 分组聚合 - 多字段分组 分组聚合 - having 子句 HAVING 子句与条件查询 WHERE 子句的区别在于，WHERE 子句用于在 分组之前 进行过滤，而 HAVING 子句用于在 分组之后 进行过滤。\n假设有一个学生表 student，包含以下字段：id（学号）、name（姓名）、class_id（班级编号）、score（成绩）。请你编写一个 SQL 查询，统计学生表中班级的总成绩超过 150 分的班级编号（class_id）和总成绩（total_score）。\n-- 请在此处输入 SQL select class_id,sum(score) as total_score from student group by class_id having total_score\u003e150 查询进阶 - 关联查询 - cross join 假设有一个学生表 student ，包含以下字段：id（学号）、name（姓名）、age（年龄）、class_id（班级编号）；还有一个班级表 class ，包含以下字段：id（班级编号）、name（班级名称）。\n请你编写一个 SQL 查询，将学生表和班级表的所有行组合在一起，并返回学生姓名（student_name）、学生年龄（student_age）、班级编号（class_id）以及班级名称（class_name）。\n-- 请在此处输入 SQL select s.name as student_name, s.age as student_age,s.class_id as class_id,c.name as class_name from student s join class c 查询进阶 - 子查询 子查询是指在一个查询语句内部 嵌套 另一个完整的查询语句，内层查询被称为子查询。子查询可以用于获取更复杂的查询结果或者用于过滤数据。\n当执行包含子查询的查询语句时，数据库引擎会首先执行子查询，然后将其结果作为条件或数据源来执行外层查询。\n打个比方，子查询就像是在一个盒子中的盒子，外层查询是大盒子，内层查询是小盒子。执行查询时，我们首先打开小盒子获取结果，然后将小盒子的结果放到大盒子中继续处理。\n假设有一个学生表 student，包含以下字段：id（学号）、name（姓名）、age（年龄）、score（分数）、class_id（班级编号）。还有一个班级表 class，包含以下字段：id（班级编号）、name（班级名称）。\n请你编写一个 SQL 查询，使用子查询的方式来获取存在对应班级的学生的所有数据，返回学生姓名（name）、分数（score）、班级编号（class_id）字段。\nselect name,score, class_id from student where student.class_id in (select distinct id from class) 查询进阶 - 子查询 - exists 之前的教程讲到，子查询是一种强大的查询工具，它可以嵌套在主查询中，帮助我们进行更复杂的条件过滤和数据检索。\n其中，子查询中的一种特殊类型是 “exists” 子查询，用于检查主查询的结果集是否存在满足条件的记录，它返回布尔值（True 或 False），而不返回实际的数据。\n假设有一个学生表 student，包含以下字段：id（学号）、name（姓名）、age（年龄）、score（分数）、class_id（班级编号）。还有一个班级表 class，包含以下字段：id（班级编号）、name（班级名称）。\n请你编写一个 SQL 查询，使用 exists 子查询的方式来获取 不存在对应班级的 学生的所有数据，返回学生姓名（name）、年龄（age）、班级编号（class_id）字段。\n-- 请在此处输入 SQL select name,age,class_id from student where not exists (select id from class where student.class_id = class.id) 查询进阶 - 组合查询 在 SQL 中，组合查询是一种将多个 SELECT 查询结果合并在一起的查询操作。\n包括两种常见的组合查询操作：UNION 和 UNION ALL。\nUNION 操作：它用于将两个或多个查询的结果集合并， 并去除重复的行 。即如果两个查询的结果有相同的行，则只保留一行。 UNION ALL 操作：它也用于将两个或多个查询的结果集合并， 但不去除重复的行 。即如果两个查询的结果有相同的行，则全部保留。 假设有一个学生表 student，包含以下字段：id（学号）、name（姓名）、age（年龄）、score（分数）、class_id（班级编号）。还有一个新学生表 student_new，包含的字段和学生表完全一致。\n请编写一条 SQL 语句，获取所有学生表和新学生表的学生姓名（name）、年龄（age）、分数（score）、班级编号（class_id）字段，要求保留重复的学生记录。\n-- 请在此处输入 SQL select name,age,score,class_id from student union all select name,age,score,class_id from student_new 查询进阶 - 开窗函数 - sum over 在 SQL 中，开窗函数是一种强大的查询工具，它允许我们在查询中进行对分组数据进行计算、 同时保留原始行的详细信息 。\n开窗函数可以与聚合函数（如 SUM、AVG、COUNT 等）结合使用，但与普通聚合函数不同，开窗函数不会导致结果集的行数减少。\n打个比方，可以将开窗函数想象成一种 “透视镜”，它能够将我们聚焦在某个特定的分组，同时还能看到整体的全景。\n本节我们先讲第一个开窗函数：sum over。\n该函数用法为：\nSUM(计算字段名) OVER (PARTITION BY 分组字段名) 假设有一个学生表 student，包含以下字段：id（学号）、name（姓名）、age（年龄）、score（分数）、class_id（班级编号）。\n请你编写一个 SQL 查询，返回每个学生的详细信息（字段顺序和原始表的字段顺序一致），并计算每个班级的学生平均分（class_avg_score）。\n-- 请在此处输入 SQL select id, name, age, score, class_id , avg(score) over (partition by class_id) as class_avg_score from student 查询进阶 - 开窗函数 - sum over order by 之前的教程中，我们讲到了 sum over 开窗函数，并且用它实现了分组统计。\n本节教程我们将学习 sum over 函数的另一种用法：sum over order by，可以实现同组内数据的 累加求和 。\n示例用法如下：\nSUM(计算字段名) OVER (PARTITION BY 分组字段名 ORDER BY 排序字段 排序规则) 举一个应用场景：老师在每个班级里依次点名，每点到一个学生，老师都会记录当前已点到的学生们的分数总和。\n假设有一个学生表 student，包含以下字段：id（学号）、name（姓名）、age（年龄）、score（分数）、class_id（班级编号）。\n请你编写一个 SQL 查询，返回每个学生的详细信息（字段顺序和原始表的字段顺序一致），并且按照分数升序的方式累加计算每个班级的学生总分（class_sum_score）。\n-- 请在此处输入 SQL select id,name,age,score,class_id ,sum(score) over (partition by class_id order by score asc) as class_sum_score from student 查询进阶 - 开窗函数 - rank 查询进阶 - 开窗函数 - row_number Row_Number 开窗函数是 SQL 中的一种用于为查询结果集中的每一行 分配唯一连续排名 的开窗函数。\n它与之前讲到的 Rank 函数，Row_Number 函数为每一行都分配一个唯一的整数值，不管是否存在并列（相同排序值）的情况。每一行都有一个唯一的行号，从 1 开始连续递增。\nRow_Number 开窗函数的语法如下（几乎和 Rank 函数一模一样）：\nROW_NUMBER() OVER ( PARTITION BY column1, column2, ... -- 可选，用于指定分组列 ORDER BY column3 [ASC|DESC], column4 [ASC|DESC], ... -- 用于指定排序列及排序方式 ) AS row_number_column 其中，PARTITION BY子句可选，用于指定分组列，将结果集按照指定列进行分组。ORDER BY 子句用于指定排序列及排序方式，决定了计算 Row_Number 时的排序规则。AS row_number_column 用于指定生成的行号列的别名。\neg\n假设有一个学生表 student，包含以下字段：id（学号）、name（姓名）、age（年龄）、score（分数）、class_id（班级编号）。\n请你编写一个 SQL 查询，返回每个学生的详细信息（字段顺序和原始表的字段顺序一致），并且按照分数降序的方式给每个班级内的学生分配一个编号（row_number）。\n-- 请在此处输入 SQL select id,name,age,score,class_id,Row_number() over (partition by class_id order by score desc) as row_number from student 查询进阶 - 开窗函数 - lag / lead ",
+  "wordCount" : "3876",
+  "inLanguage": "zh",
+  "datePublished": "2026-01-08T16:37:49+08:00",
+  "dateModified": "2026-01-08T16:37:49+08:00",
+  "author":[{
+    "@type": "Person",
+    "name": "wait"
+  }],
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.heiok.top/posts/tutorial/mysql%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2%E7%9F%A5%E8%AF%86/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "wait`s blog",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.heiok.top/img/thinks.jpg"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    (function () {
+        let  arr,reg = new RegExp("(^| )"+"change-themes"+"=([^;]*)(;|$)");
+        if(arr = document.cookie.match(reg)) {
+        } else {
+            if (new Date().getHours() >= 19 || new Date().getHours() < 6) {
+                document.body.classList.add('dark');
+                localStorage.setItem("pref-theme", 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem("pref-theme", 'light');
+            }
+        }
+    })()
+
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://www.heiok.top/" accesskey="h" title="wait`s blog (Alt + H)">
+            <img src="https://www.heiok.top/img/Q.gif" alt="logo" aria-label="logo"
+                 height="35">wait`s blog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                <ul class="lang-switch"><li>|</li>
+                </ul>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://www.heiok.top/search" title="🔍 搜索 (Alt &#43; /)" accesskey=/>
+                <span>🔍 搜索</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/" title="🏠 主页">
+                <span>🏠 主页</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/posts" title="📚 文章">
+                <span>📚 文章</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/tags" title="🧩 标签">
+                <span>🧩 标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/archives/" title="⏱️ 时间轴">
+                <span>⏱️ 时间轴</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/about" title="🙋🏻‍♂️ 关于">
+                <span>🙋🏻‍♂️ 关于</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://www.heiok.top/links" title="🤝 友链">
+                <span>🤝 友链</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main page">
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+</style>
+
+<article class="post-single">
+    <div id="single-content">
+        <header class="post-header">
+            <div class="breadcrumbs"><a href="https://www.heiok.top/">🏠 主页</a>&nbsp;»&nbsp;<a href="https://www.heiok.top/posts/">📚文章</a></div>
+            <h1 class="post-title">
+                Mysql基础查询知识
+            </h1>
+            <div class="post-meta">
+
+<style>
+    i[id*="post_meta_style"] {
+        display: flex;
+        align-items: center;
+        margin: 0 0 10px 0;
+    }
+
+    .parent-post-meta {
+        display: flex;
+        flex-wrap: wrap;
+        opacity: 0.8;
+    }
+</style>
+
+<span class="parent-post-meta">
+    <span id="post_meta_style_1">
+        <span class="fa fa-calendar-check-o"></span>
+        <span>2026-01-08
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    
+    
+    
+    
+    
+    
+    
+    <span id="post_meta_style_3">
+        <span class="fa fa-file-word-o"></span>
+        <span>3876字
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_4">
+        <span class="fa fa-clock-o"></span>
+        <span>8分钟
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_5">
+        <span class="fa fa-user-o"></span>
+        <span>wait
+            &nbsp;&nbsp;
+        </span>
+    </span>
+    <span id="post_meta_style_6">
+        <span class="fa fa-tags" style="opacity: 0.8"></span>
+        <span>
+        </span>
+    </span>
+</span>
+<span style="opacity: 0.8;">
+                    <span id="post_meta_style_7">
+                        &nbsp;&nbsp;
+                        <span class="fa fa-eye" ></span>
+                        <span>
+                            <span id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv"></span></span>
+                            &nbsp;&nbsp;
+                        </span>
+                    </span>
+                    <span id="post_meta_style_8">
+                        <span class="fa fa-commenting-o"></span>
+                        <span>
+                            <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js"></script>
+                            <script>
+                                let url = document.documentURI
+                                
+                                let dnsUrl = "https://www.heiok.top/"
+                                let urlSplit = url.split(dnsUrl)
+                                let finalUrl = urlSplit[1]
+                                if (finalUrl[0] !== '/') {
+                                    finalUrl = '/'+finalUrl
+                                }
+                                twikoo.getCommentsCount({
+                                    envId:  null , 
+                                region:  null , 
+                                urls: [ 
+                                    
+                                    finalUrl,
+                                ],
+                                    includeReply: false 
+                                }).then(function (res) {
+                                    let count = res[0].count
+                                    const obj = document.getElementById("comment_count");
+                                    obj.innerText = count
+                                    
+                                    
+                                    
+                                }).catch(function (err) {
+                                    
+                                    console.error(err);
+                                });
+                            </script>
+                            <span id="comment_count"></span>
+                        </span>
+                    </span>
+                </span>
+
+</div>
+        </header> <aside id="toc-container" class="toc-container wide">
+    <div class="toc">
+        <details  open>
+        <summary accesskey="c" title="(Alt + C)">
+            <span class="details">目录</span>
+        </summary>
+
+        <div class="inner"><ul>
+                <li>
+                    <a href="#%e6%8e%92%e9%99%a4%e9%9d%9e%e7%a9%ba%e7%9a%84%e5%ad%97%e6%ae%b5" aria-label="排除非空的字段">排除非空的字段</a></li>
+                <li>
+                    <a href="#%e6%a8%a1%e7%b3%8a%e6%9f%a5%e8%af%a2" aria-label="模糊查询">模糊查询</a></li>
+                <li>
+                    <a href="#%e9%80%bb%e8%be%91%e8%bf%90%e7%ae%97" aria-label="逻辑运算">逻辑运算</a></li>
+                <li>
+                    <a href="#%e5%8e%bb%e9%87%8d" aria-label="去重">去重</a></li>
+                <li>
+                    <a href="#%e6%8e%92%e5%ba%8f" aria-label="排序">排序</a></li>
+                <li>
+                    <a href="#%e5%88%86%e9%a1%b5" aria-label="分页">分页</a></li>
+                <li>
+                    <a href="#%e6%9d%a1%e4%bb%b6%e5%88%86%e6%94%af" aria-label="条件分支">条件分支</a></li>
+                <li>
+                    <a href="#%e6%97%b6%e9%97%b4%e5%87%bd%e6%95%b0" aria-label="时间函数">时间函数</a></li>
+                <li>
+                    <a href="#%e5%ad%97%e7%ac%a6%e4%b8%b2%e5%a4%84%e7%90%86" aria-label="字符串处理">字符串处理</a></li>
+                <li>
+                    <a href="#%e8%81%9a%e5%90%88%e5%87%bd%e6%95%b0" aria-label="聚合函数">聚合函数</a></li>
+                <li>
+                    <a href="#%e5%88%86%e7%bb%84%e8%81%9a%e5%90%88---%e5%8d%95%e5%ad%97%e6%ae%b5%e5%88%86%e7%bb%84" aria-label="分组聚合 - 单字段分组">分组聚合 - 单字段分组</a></li>
+                <li>
+                    <a href="#%e5%88%86%e7%bb%84%e8%81%9a%e5%90%88---%e5%a4%9a%e5%ad%97%e6%ae%b5%e5%88%86%e7%bb%84" aria-label="分组聚合 - 多字段分组">分组聚合 - 多字段分组</a></li>
+                <li>
+                    <a href="#%e5%88%86%e7%bb%84%e8%81%9a%e5%90%88---having-%e5%ad%90%e5%8f%a5" aria-label="分组聚合 - having 子句">分组聚合 - having 子句</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e5%85%b3%e8%81%94%e6%9f%a5%e8%af%a2---cross-join" aria-label="查询进阶 - 关联查询 - cross join">查询进阶 - 关联查询 - cross join</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e5%ad%90%e6%9f%a5%e8%af%a2" aria-label="查询进阶 - 子查询">查询进阶 - 子查询</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e5%ad%90%e6%9f%a5%e8%af%a2---exists" aria-label="查询进阶 - 子查询 - exists">查询进阶 - 子查询 - exists</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e7%bb%84%e5%90%88%e6%9f%a5%e8%af%a2" aria-label="查询进阶 - 组合查询">查询进阶 - 组合查询</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e5%bc%80%e7%aa%97%e5%87%bd%e6%95%b0---sum-over" aria-label="查询进阶 - 开窗函数 - sum over">查询进阶 - 开窗函数 - sum over</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e5%bc%80%e7%aa%97%e5%87%bd%e6%95%b0---sum-over-order-by" aria-label="查询进阶 - 开窗函数 - sum over order by">查询进阶 - 开窗函数 - sum over order by</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e5%bc%80%e7%aa%97%e5%87%bd%e6%95%b0---rank" aria-label="查询进阶 - 开窗函数 - rank">查询进阶 - 开窗函数 - rank</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e5%bc%80%e7%aa%97%e5%87%bd%e6%95%b0---row_number" aria-label="查询进阶 - 开窗函数 - row_number">查询进阶 - 开窗函数 - row_number</a></li>
+                <li>
+                    <a href="#%e6%9f%a5%e8%af%a2%e8%bf%9b%e9%98%b6---%e5%bc%80%e7%aa%97%e5%87%bd%e6%95%b0---lag--lead" aria-label="查询进阶 - 开窗函数 - lag / lead">查询进阶 - 开窗函数 - lag / lead</a>
+                </li>
+            </ul>
+        </div>
+        </details>
+    </div>
+</aside>
+<script>
+    let activeElement;
+    let elements;
+    window.addEventListener('DOMContentLoaded', function (event) {
+        checkTocPosition();
+
+        elements = document.querySelectorAll('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]');
+        
+        activeElement = elements[0];
+        const id = encodeURI(activeElement.getAttribute('id')).toLowerCase();
+        document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+    }, false);
+
+    window.addEventListener('resize', function(event) {
+        checkTocPosition();
+    }, false);
+
+    window.addEventListener('scroll', () => {
+        
+        if (elements) {
+            activeElement = Array.from(elements).find((element) => {
+                if ((getOffsetTop(element) - window.pageYOffset) > 0 &&
+                    (getOffsetTop(element) - window.pageYOffset) < window.innerHeight/2) {
+                    return element;
+                }
+            }) || activeElement
+
+            elements.forEach(element => {
+                const id = encodeURI(element.getAttribute('id')).toLowerCase();
+                if (element === activeElement){
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.add('active');
+                } else {
+                    document.querySelector(`.inner ul li a[href="#${id}"]`).classList.remove('active');
+                }
+            })
+        }
+    }, false);
+
+    const main = parseInt(getComputedStyle(document.body).getPropertyValue('--article-width'), 10);
+    const toc = parseInt(getComputedStyle(document.body).getPropertyValue('--toc-width'), 10);
+    const gap = parseInt(getComputedStyle(document.body).getPropertyValue('--gap'), 10);
+
+    function checkTocPosition() {
+        const width = document.body.scrollWidth;
+        if (width - main - (toc * 2) - (gap * 4) > 0) {
+            document.getElementById("toc-container").classList.add("wide");
+        } else {
+            document.getElementById("toc-container").classList.remove("wide");
+        }
+    }
+
+    function getOffsetTop(element) {
+        if (!element.getClientRects().length) {
+            return 0;
+        }
+        let rect = element.getBoundingClientRect();
+        let win = element.ownerDocument.defaultView;
+        return rect.top + win.pageYOffset;
+    }
+</script>
+        <div class="post-content"><h3 id="排除非空的字段">排除非空的字段<a hidden class="anchor" aria-hidden="true" href="#排除非空的字段">#</a></h3>
+<p>is not null 和 is null 而不是 ！=null</p>
+<h3 id="模糊查询">模糊查询<a hidden class="anchor" aria-hidden="true" href="#模糊查询">#</a></h3>
+<p>不包含和包含 not like 和 like</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>请编写一条 SQL 查询语句，从名为 student 的数据表中选择出所有学生的姓名（name）和成绩（score），要求姓名（name）不包含 &#34;李&#34; 这个字。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>select name,score from student where name not like &#39;%李%&#39;
+</span></span></code></pre></div><h3 id="逻辑运算">逻辑运算<a hidden class="anchor" aria-hidden="true" href="#逻辑运算">#</a></h3>
+<p>逻辑运算是一种在条件查询中使用的运算符，它允许我们结合多个条件来过滤出符合特定条件的数据。</p>
+<p>在逻辑运算中，常用的运算符有：</p>
+<ul>
+<li>AND：表示逻辑与，要求同时满足多个条件，才返回 true。</li>
+<li>OR：表示逻辑或，要求满足其中任意一个条件，就返回 true。</li>
+<li>NOT：表示逻辑非，用于否定一个条件（本来是 true，用了 not 后转为 false）</li>
+</ul>
+<h3 id="去重">去重<a hidden class="anchor" aria-hidden="true" href="#去重">#</a></h3>
+<p>distinct</p>
+<h3 id="排序">排序<a hidden class="anchor" aria-hidden="true" href="#排序">#</a></h3>
+<p>order by desc 降序 asc 升序</p>
+<h3 id="分页">分页<a hidden class="anchor" aria-hidden="true" href="#分页">#</a></h3>
+<p>limit 1,3 注意，第一条数据的下标就是0，和数组类似</p>
+<h3 id="条件分支">条件分支<a hidden class="anchor" aria-hidden="true" href="#条件分支">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>case when 支持同时指定多个分支，示例语法如下：
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CASE WHEN (条件1) THEN 结果1
+</span></span><span style="display:flex;"><span>	   WHEN (条件2) THEN 结果2
+</span></span><span style="display:flex;"><span>	   ...
+</span></span><span style="display:flex;"><span>	   ELSE 其他结果 END
+</span></span><span style="display:flex;"><span>	   
+</span></span><span style="display:flex;"><span>题目
+</span></span><span style="display:flex;"><span>假设有一个学生表 student，包含以下字段：name（姓名）、age（年龄）。请你编写一个 SQL 查询，将学生按照年龄划分为三个年龄等级（age_level）：60 岁以上为 &#34;老同学&#34;，20 岁以上（不包括 60 岁以上）为 &#34;年轻&#34;，20 岁以下为 &#34;小同学&#34;。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>返回结果应包含学生的姓名（name）和年龄等级（age_level），并按姓名升序排序。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>SELECT name, CASE WHEN (age &gt; 60) THEN &#39;老同学&#39; WHEN (age &gt; 20) THEN &#39;年轻&#39; ELSE &#39;小同学&#39; END AS age_level FROM student ORDER BY name asc;
+</span></span></code></pre></div><p><img loading="lazy" src="https://file.heiok.top/note/202405102057340.png" alt="image-20240510205743265"  />
+</p>
+<h3 id="时间函数">时间函数<a hidden class="anchor" aria-hidden="true" href="#时间函数">#</a></h3>
+<p>在 SQL 中，时间函数是用于处理日期和时间的特殊函数。它们允许我们在查询中操作和处理日期、时间、日期时间数据，从而使得在数据库中进行时间相关的操作变得更加方便和灵活。</p>
+<p>常用的时间函数有：</p>
+<ul>
+<li>DATE：获取当前日期</li>
+<li>DATETIME：获取当前日期时间</li>
+<li>TIME：获取当前时间</li>
+</ul>
+<p>示例</p>
+<p>假设有一个订单表 <code>orders</code>，包含以下字段：<code>order_id</code>（订单号）、<code>order_date</code>（下单日期）、<code>order_time</code>（下单时间）。数据如下：</p>
+<table>
+  <thead>
+      <tr>
+          <th>order_id</th>
+          <th>order_date</th>
+          <th>order_time</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>2023-08-01</td>
+          <td>12:30:45</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>2023-08-01</td>
+          <td>14:20:10</td>
+      </tr>
+      <tr>
+          <td>3</td>
+          <td>2023-08-02</td>
+          <td>09:15:00</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>2023-08-02</td>
+          <td>18:05:30</td>
+      </tr>
+  </tbody>
+</table>
+<p>使用时间函数获取当前日期、当前日期时间和当前时间：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 获取当前日期
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> DATE() <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">current_date</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 获取当前日期时间
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> DATETIME() <span style="color:#66d9ef">AS</span> current_datetime;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">-- 获取当前时间
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">SELECT</span> TIME() <span style="color:#66d9ef">AS</span> <span style="color:#66d9ef">current_time</span>;
+</span></span></code></pre></div><h3 id="字符串处理">字符串处理<a hidden class="anchor" aria-hidden="true" href="#字符串处理">#</a></h3>
+<p>upper 将字符串转成大写</p>
+<p>length 计算长度</p>
+<p>lower 小写</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"></code></pre></div><h3 id="聚合函数">聚合函数<a hidden class="anchor" aria-hidden="true" href="#聚合函数">#</a></h3>
+<p>max</p>
+<p>min</p>
+<p>count</p>
+<p>avg</p>
+<p>sum</p>
+<h3 id="分组聚合---单字段分组">分组聚合 - 单字段分组<a hidden class="anchor" aria-hidden="true" href="#分组聚合---单字段分组">#</a></h3>
+<p>假设有一个学生表 <code>student</code>，包含以下字段：<code>id</code>（学号）、<code>name</code>（姓名）、<code>class_id</code>（班级编号）、<code>score</code>（成绩）。请你编写一个 SQL 查询，统计学生表中每个班级的平均成绩（avg_score）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span> class_id, <span style="color:#66d9ef">avg</span>(score) <span style="color:#66d9ef">as</span> avg_score <span style="color:#66d9ef">from</span> student <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> class_id
+</span></span></code></pre></div><h3 id="分组聚合---多字段分组">分组聚合 - 多字段分组<a hidden class="anchor" aria-hidden="true" href="#分组聚合---多字段分组">#</a></h3>
+<h3 id="分组聚合---having-子句">分组聚合 - having 子句<a hidden class="anchor" aria-hidden="true" href="#分组聚合---having-子句">#</a></h3>
+<blockquote>
+<p>HAVING 子句与条件查询 WHERE 子句的区别在于，WHERE 子句用于在 <strong>分组之前</strong> 进行过滤，而 HAVING 子句用于在 <strong>分组之后</strong> 进行过滤。</p>
+</blockquote>
+<p>假设有一个学生表 <code>student</code>，包含以下字段：<code>id</code>（学号）、<code>name</code>（姓名）、<code>class_id</code>（班级编号）、<code>score</code>（成绩）。请你编写一个 SQL 查询，统计学生表中班级的总成绩超过 150 分的班级编号（class_id）和总成绩（total_score）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 请在此处输入 SQL
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> class_id,<span style="color:#66d9ef">sum</span>(score) <span style="color:#66d9ef">as</span> total_score <span style="color:#66d9ef">from</span> student <span style="color:#66d9ef">group</span> <span style="color:#66d9ef">by</span> class_id <span style="color:#66d9ef">having</span> total_score<span style="color:#f92672">&gt;</span><span style="color:#ae81ff">150</span>
+</span></span></code></pre></div><h3 id="查询进阶---关联查询---cross-join">查询进阶 - 关联查询 - cross join<a hidden class="anchor" aria-hidden="true" href="#查询进阶---关联查询---cross-join">#</a></h3>
+<p>假设有一个学生表 <code>student</code> ，包含以下字段：id（学号）、name（姓名）、age（年龄）、class_id（班级编号）；还有一个班级表 <code>class</code> ，包含以下字段：id（班级编号）、name（班级名称）。</p>
+<p>请你编写一个 SQL 查询，将学生表和班级表的所有行组合在一起，并返回学生姓名（student_name）、学生年龄（student_age）、班级编号（class_id）以及班级名称（class_name）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 请在此处输入 SQL
+</span></span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> s.name <span style="color:#66d9ef">as</span> student_name, s.age <span style="color:#66d9ef">as</span> student_age,s.class_id <span style="color:#66d9ef">as</span> class_id,<span style="color:#66d9ef">c</span>.name  <span style="color:#66d9ef">as</span> class_name <span style="color:#66d9ef">from</span> student s <span style="color:#66d9ef">join</span> <span style="color:#66d9ef">class</span> <span style="color:#66d9ef">c</span>
+</span></span></code></pre></div><h3 id="查询进阶---子查询">查询进阶 - 子查询<a hidden class="anchor" aria-hidden="true" href="#查询进阶---子查询">#</a></h3>
+<blockquote>
+<p>子查询是指在一个查询语句内部 <strong>嵌套</strong> 另一个完整的查询语句，内层查询被称为子查询。子查询可以用于获取更复杂的查询结果或者用于过滤数据。</p>
+<p>当执行包含子查询的查询语句时，数据库引擎会首先执行子查询，然后将其结果作为条件或数据源来执行外层查询。</p>
+<p>打个比方，子查询就像是在一个盒子中的盒子，外层查询是大盒子，内层查询是小盒子。执行查询时，我们首先打开小盒子获取结果，然后将小盒子的结果放到大盒子中继续处理。</p>
+</blockquote>
+<p>假设有一个学生表 <code>student</code>，包含以下字段：<code>id</code>（学号）、<code>name</code>（姓名）、<code>age</code>（年龄）、<code>score</code>（分数）、<code>class_id</code>（班级编号）。还有一个班级表 <code>class</code>，包含以下字段：<code>id</code>（班级编号）、<code>name</code>（班级名称）。</p>
+<p>请你编写一个 SQL 查询，使用子查询的方式来获取存在对应班级的学生的所有数据，返回学生姓名（<code>name</code>）、分数（<code>score</code>）、班级编号（<code>class_id</code>）字段。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">select</span> name,score, class_id <span style="color:#66d9ef">from</span> student <span style="color:#66d9ef">where</span> student.class_id <span style="color:#66d9ef">in</span> (<span style="color:#66d9ef">select</span> <span style="color:#66d9ef">distinct</span> id <span style="color:#66d9ef">from</span> <span style="color:#66d9ef">class</span>) 
+</span></span></code></pre></div><h3 id="查询进阶---子查询---exists">查询进阶 - 子查询 - exists<a hidden class="anchor" aria-hidden="true" href="#查询进阶---子查询---exists">#</a></h3>
+<blockquote>
+<p>之前的教程讲到，子查询是一种强大的查询工具，它可以嵌套在主查询中，帮助我们进行更复杂的条件过滤和数据检索。</p>
+<p>其中，子查询中的一种特殊类型是 &ldquo;exists&rdquo; 子查询，用于检查主查询的结果集是否存在满足条件的记录，它返回布尔值（True 或 False），而不返回实际的数据。</p>
+</blockquote>
+<p>假设有一个学生表 <code>student</code>，包含以下字段：<code>id</code>（学号）、<code>name</code>（姓名）、<code>age</code>（年龄）、<code>score</code>（分数）、<code>class_id</code>（班级编号）。还有一个班级表 <code>class</code>，包含以下字段：<code>id</code>（班级编号）、<code>name</code>（班级名称）。</p>
+<p>请你编写一个 SQL 查询，使用 exists 子查询的方式来获取 <strong>不存在对应班级的</strong> 学生的所有数据，返回学生姓名（<code>name</code>）、年龄（<code>age</code>）、班级编号（<code>class_id</code>）字段。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 请在此处输入 SQL
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> name,age,class_id <span style="color:#66d9ef">from</span> student <span style="color:#66d9ef">where</span> <span style="color:#66d9ef">not</span> <span style="color:#66d9ef">exists</span> (<span style="color:#66d9ef">select</span> id <span style="color:#66d9ef">from</span> <span style="color:#66d9ef">class</span> <span style="color:#66d9ef">where</span> student.class_id <span style="color:#f92672">=</span> <span style="color:#66d9ef">class</span>.id)
+</span></span></code></pre></div><h3 id="查询进阶---组合查询">查询进阶 - 组合查询<a hidden class="anchor" aria-hidden="true" href="#查询进阶---组合查询">#</a></h3>
+<blockquote>
+<p>在 SQL 中，组合查询是一种将多个 SELECT 查询结果合并在一起的查询操作。</p>
+<p>包括两种常见的组合查询操作：UNION 和 UNION ALL。</p>
+<ol>
+<li>UNION 操作：它用于将两个或多个查询的结果集合并， <strong>并去除重复的行</strong> 。即如果两个查询的结果有相同的行，则只保留一行。</li>
+<li>UNION ALL 操作：它也用于将两个或多个查询的结果集合并， <strong>但不去除重复的行</strong> 。即如果两个查询的结果有相同的行，则全部保留。</li>
+</ol>
+</blockquote>
+<p>假设有一个学生表 <code>student</code>，包含以下字段：<code>id</code>（学号）、<code>name</code>（姓名）、<code>age</code>（年龄）、<code>score</code>（分数）、<code>class_id</code>（班级编号）。还有一个新学生表 <code>student_new</code>，包含的字段和学生表完全一致。</p>
+<p>请编写一条 SQL 语句，获取所有学生表和新学生表的学生姓名（<code>name</code>）、年龄（<code>age</code>）、分数（<code>score</code>）、班级编号（<code>class_id</code>）字段，要求保留重复的学生记录。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 请在此处输入 SQL
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> name,age,score,class_id <span style="color:#66d9ef">from</span> student <span style="color:#66d9ef">union</span> <span style="color:#66d9ef">all</span> <span style="color:#66d9ef">select</span> name,age,score,class_id <span style="color:#66d9ef">from</span> student_new
+</span></span></code></pre></div><h3 id="查询进阶---开窗函数---sum-over">查询进阶 - 开窗函数 - sum over<a hidden class="anchor" aria-hidden="true" href="#查询进阶---开窗函数---sum-over">#</a></h3>
+<blockquote>
+<p>在 SQL 中，开窗函数是一种强大的查询工具，它允许我们在查询中进行对分组数据进行计算、 <strong>同时保留原始行的详细信息</strong> 。</p>
+<p>开窗函数可以与聚合函数（如 SUM、AVG、COUNT 等）结合使用，但与普通聚合函数不同，开窗函数不会导致结果集的行数减少。</p>
+<p>打个比方，可以将开窗函数想象成一种 &ldquo;透视镜&rdquo;，它能够将我们聚焦在某个特定的分组，同时还能看到整体的全景。</p>
+<p>本节我们先讲第一个开窗函数：sum over。</p>
+<p>该函数用法为：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SUM</span>(<span style="color:#960050;background-color:#1e0010">计算字段名</span>) OVER (PARTITION <span style="color:#66d9ef">BY</span> <span style="color:#960050;background-color:#1e0010">分组字段名</span>)
+</span></span></code></pre></div></blockquote>
+<p>假设有一个学生表 <code>student</code>，包含以下字段：<code>id</code>（学号）、<code>name</code>（姓名）、<code>age</code>（年龄）、<code>score</code>（分数）、<code>class_id</code>（班级编号）。</p>
+<p>请你编写一个 SQL 查询，返回每个学生的详细信息（字段顺序和原始表的字段顺序一致），并计算每个班级的学生平均分（class_avg_score）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 请在此处输入 SQL
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> id, name, age, score, class_id , <span style="color:#66d9ef">avg</span>(score) over (partition <span style="color:#66d9ef">by</span> class_id) <span style="color:#66d9ef">as</span> class_avg_score <span style="color:#66d9ef">from</span> student
+</span></span></code></pre></div><h3 id="查询进阶---开窗函数---sum-over-order-by">查询进阶 - 开窗函数 - sum over order by<a hidden class="anchor" aria-hidden="true" href="#查询进阶---开窗函数---sum-over-order-by">#</a></h3>
+<blockquote>
+<p>之前的教程中，我们讲到了 sum over 开窗函数，并且用它实现了分组统计。</p>
+<p>本节教程我们将学习 sum over 函数的另一种用法：sum over order by，可以实现同组内数据的 <strong>累加求和</strong> 。</p>
+<p>示例用法如下：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#66d9ef">SUM</span>(<span style="color:#960050;background-color:#1e0010">计算字段名</span>) OVER (PARTITION <span style="color:#66d9ef">BY</span> <span style="color:#960050;background-color:#1e0010">分组字段名</span> <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> <span style="color:#960050;background-color:#1e0010">排序字段</span> <span style="color:#960050;background-color:#1e0010">排序规则</span>)
+</span></span></code></pre></div><p>举一个应用场景：老师在每个班级里依次点名，每点到一个学生，老师都会记录当前已点到的学生们的分数总和。</p>
+</blockquote>
+<p>假设有一个学生表 <code>student</code>，包含以下字段：<code>id</code>（学号）、<code>name</code>（姓名）、<code>age</code>（年龄）、<code>score</code>（分数）、<code>class_id</code>（班级编号）。</p>
+<p>请你编写一个 SQL 查询，返回每个学生的详细信息（字段顺序和原始表的字段顺序一致），并且按照分数升序的方式累加计算每个班级的学生总分（class_sum_score）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 请在此处输入 SQL
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> id,name,age,score,class_id ,<span style="color:#66d9ef">sum</span>(score) over (partition <span style="color:#66d9ef">by</span> class_id <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">by</span> score <span style="color:#66d9ef">asc</span>) <span style="color:#66d9ef">as</span> class_sum_score <span style="color:#66d9ef">from</span> student
+</span></span></code></pre></div><h3 id="查询进阶---开窗函数---rank">查询进阶 - 开窗函数 - rank<a hidden class="anchor" aria-hidden="true" href="#查询进阶---开窗函数---rank">#</a></h3>
+<h3 id="查询进阶---开窗函数---row_number">查询进阶 - 开窗函数 - row_number<a hidden class="anchor" aria-hidden="true" href="#查询进阶---开窗函数---row_number">#</a></h3>
+<p>Row_Number 开窗函数是 SQL 中的一种用于为查询结果集中的每一行 <strong>分配唯一连续排名</strong> 的开窗函数。</p>
+<p>它与之前讲到的 Rank 函数，Row_Number 函数为每一行都分配一个唯一的整数值，不管是否存在并列（相同排序值）的情况。每一行都有一个唯一的行号，从 1 开始连续递增。</p>
+<p>Row_Number 开窗函数的语法如下（几乎和 Rank 函数一模一样）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ROW_NUMBER() OVER (
+</span></span><span style="display:flex;"><span>  PARTITION <span style="color:#66d9ef">BY</span> column1, column2, ... <span style="color:#75715e">-- 可选，用于指定分组列
+</span></span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">ORDER</span> <span style="color:#66d9ef">BY</span> column3 [<span style="color:#66d9ef">ASC</span><span style="color:#f92672">|</span><span style="color:#66d9ef">DESC</span>], column4 [<span style="color:#66d9ef">ASC</span><span style="color:#f92672">|</span><span style="color:#66d9ef">DESC</span>], ... <span style="color:#75715e">-- 用于指定排序列及排序方式
+</span></span></span><span style="display:flex;"><span>) <span style="color:#66d9ef">AS</span> row_number_column
+</span></span></code></pre></div><p>其中，PARTITION BY子句可选，用于指定分组列，将结果集按照指定列进行分组。ORDER BY 子句用于指定排序列及排序方式，决定了计算 Row_Number 时的排序规则。AS row_number_column 用于指定生成的行号列的别名。</p>
+<p><strong>eg</strong></p>
+<p>假设有一个学生表 <code>student</code>，包含以下字段：<code>id</code>（学号）、<code>name</code>（姓名）、<code>age</code>（年龄）、<code>score</code>（分数）、<code>class_id</code>（班级编号）。</p>
+<p>请你编写一个 SQL 查询，返回每个学生的详细信息（字段顺序和原始表的字段顺序一致），并且按照分数降序的方式给每个班级内的学生分配一个编号（row_number）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sql" data-lang="sql"><span style="display:flex;"><span><span style="color:#75715e">-- 请在此处输入 SQL
+</span></span></span><span style="display:flex;"><span><span style="color:#66d9ef">select</span> id,name,age,score,class_id,Row_number() over (partition <span style="color:#66d9ef">by</span> class_id <span style="color:#66d9ef">order</span> <span style="color:#66d9ef">by</span> score <span style="color:#66d9ef">desc</span>) <span style="color:#66d9ef">as</span> row_number <span style="color:#66d9ef">from</span> student
+</span></span></code></pre></div><h3 id="查询进阶---开窗函数---lag--lead">查询进阶 - 开窗函数 - lag / lead<a hidden class="anchor" aria-hidden="true" href="#查询进阶---开窗函数---lag--lead">#</a></h3>
+
+
+        </div>
+        <div class="post-reward">
+            <div style="padding: 0 0 0 0; margin: 0 0 0 0; width: 100%; font-size:16px; text-align: center;">
+                <div id="QR" style="opacity: 0;">
+                    <div id="wechat" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="wechat_qr" src="https://www.heiok.top/img/thinks.jpg" alt="wechat_pay"></a>
+                        <p>微信</p>
+                    </div>
+                    <div id="alipay" style="display: inline-block">
+                        <a class="fancybox" rel="group">
+                            <img id="alipay_qr" src="https://www.heiok.top/img/thinks.jpg" alt="alipay"></a>
+                        <p>支付宝</p>
+                    </div>
+                </div>
+                <button id="rewardButton"
+                        onclick="
+                    var qr = document.getElementById('QR');
+                    if (qr.style.opacity === '0') {
+                        qr.style.opacity='1';
+                    } else {
+                        qr.style.opacity='0'
+                    }"
+                >
+                    <span>🧧 鼓励</span>
+                </button>
+            </div>
+        </div>
+
+        <footer class="post-footer">
+            
+<nav class="paginav">
+  <a class="prev" href="https://www.heiok.top/posts/tutorial/mysql%E9%94%99%E8%AF%AF%E6%80%BB%E7%BB%93/">
+    <span class="title">« 上一页</span>
+    <br>
+    <span>Mysql错误总结</span>
+  </a>
+  <a class="next" href="https://www.heiok.top/posts/tutorial/mysql%E7%BB%83%E4%B9%A0%E9%A2%98-50/">
+    <span class="title">下一页 »</span>
+    <br>
+    <span>Mysql练习题-50</span>
+  </a>
+</nav>
+
+
+<div class="share-buttons">
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql基础查询知识 on twitter"
+       href="https://twitter.com/intent/tweet/?text=Mysql%e5%9f%ba%e7%a1%80%e6%9f%a5%e8%af%a2%e7%9f%a5%e8%af%86&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E5%259F%25BA%25E7%25A1%2580%25E6%259F%25A5%25E8%25AF%25A2%25E7%259F%25A5%25E8%25AF%2586%2f&amp;hashtags=">
+    <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-253.927,424.544c135.939,0 210.268,-112.643 210.268,-210.268c0,-3.218 0,-6.437 -0.153,-9.502c14.406,-10.421 26.973,-23.448 36.935,-38.314c-13.18,5.824 -27.433,9.809 -42.452,11.648c15.326,-9.196 26.973,-23.602 32.49,-40.92c-14.252,8.429 -30.038,14.56 -46.896,17.931c-13.487,-14.406 -32.644,-23.295 -53.946,-23.295c-40.767,0 -73.87,33.104 -73.87,73.87c0,5.824 0.613,11.494 1.992,16.858c-61.456,-3.065 -115.862,-32.49 -152.337,-77.241c-6.284,10.881 -9.962,23.601 -9.962,37.088c0,25.594 13.027,48.276 32.95,61.456c-12.107,-0.307 -23.448,-3.678 -33.41,-9.196l0,0.92c0,35.862 25.441,65.594 59.311,72.49c-6.13,1.686 -12.72,2.606 -19.464,2.606c-4.751,0 -9.348,-0.46 -13.946,-1.38c9.349,29.426 36.628,50.728 68.965,51.341c-25.287,19.771 -57.164,31.571 -91.8,31.571c-5.977,0 -11.801,-0.306 -17.625,-1.073c32.337,21.15 71.264,33.41 112.95,33.41Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql基础查询知识 on linkedin"
+       href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E5%259F%25BA%25E7%25A1%2580%25E6%259F%25A5%25E8%25AF%25A2%25E7%259F%25A5%25E8%25AF%2586%2f&amp;title=Mysql%e5%9f%ba%e7%a1%80%e6%9f%a5%e8%af%a2%e7%9f%a5%e8%af%86&amp;summary=Mysql%e5%9f%ba%e7%a1%80%e6%9f%a5%e8%af%a2%e7%9f%a5%e8%af%86&amp;source=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E5%259F%25BA%25E7%25A1%2580%25E6%259F%25A5%25E8%25AF%25A2%25E7%259F%25A5%25E8%25AF%2586%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql基础查询知识 on reddit"
+       href="https://reddit.com/submit?url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E5%259F%25BA%25E7%25A1%2580%25E6%259F%25A5%25E8%25AF%25A2%25E7%259F%25A5%25E8%25AF%2586%2f&title=Mysql%e5%9f%ba%e7%a1%80%e6%9f%a5%e8%af%a2%e7%9f%a5%e8%af%86">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql基础查询知识 on facebook"
+       href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E5%259F%25BA%25E7%25A1%2580%25E6%259F%25A5%25E8%25AF%25A2%25E7%259F%25A5%25E8%25AF%2586%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql基础查询知识 on whatsapp"
+       href="https://api.whatsapp.com/send?text=Mysql%e5%9f%ba%e7%a1%80%e6%9f%a5%e8%af%a2%e7%9f%a5%e8%af%86%20-%20https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E5%259F%25BA%25E7%25A1%2580%25E6%259F%25A5%25E8%25AF%25A2%25E7%259F%25A5%25E8%25AF%2586%2f">
+        <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve">
+            <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+        </svg>
+    </a>
+    <a target="_blank" rel="noopener noreferrer" aria-label="share Mysql基础查询知识 on telegram"
+       href="https://telegram.me/share/url?text=Mysql%e5%9f%ba%e7%a1%80%e6%9f%a5%e8%af%a2%e7%9f%a5%e8%af%86&amp;url=https%3a%2f%2fwww.heiok.top%2fposts%2ftutorial%2fmysql%25E5%259F%25BA%25E7%25A1%2580%25E6%259F%25A5%25E8%25AF%25A2%25E7%259F%25A5%25E8%25AF%2586%2f">
+        <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28">
+            <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+        </svg>
+    </a>
+</div>
+
+        </footer>
+    </div>
+
+<style>
+    .comments_details summary::marker {
+        font-size: 20px;
+        content: '👉展开评论';
+        color: var(--content);
+    }
+    .comments_details[open] summary::marker{
+        font-size: 20px;
+        content: '👇关闭评论';
+        color: var(--content);
+    }
+</style>
+
+
+<div>
+    <details class="comments_details">
+        <summary style="cursor: pointer; margin: 50px 0 20px 0;width: 130px;">
+            <span style="font-size: 20px;color: var(--content);">...</span>
+        </summary>
+        <div id="tcomment"></div>
+    </details>
+    <script src="https://cdn.staticfile.org/twikoo/1.5.8/twikoo.all.min.js">
+    </script>
+    <script>
+        twikoo.init({
+            envId:  null ,
+        el: "#tcomment",
+            lang: 'zh-CN',
+            region:  null ,
+        path: window.TWIKOO_MAGIC_PATH||window.location.pathname,
+        })
+    </script>
+</div>
+</article>
+</main>
+
+<footer class="footer">
+    <span>
+        Copyright
+        &copy;
+        2020-2026
+        <a href="https://www.heiok.top/" style="color:#939393;">wait`s blog</a>
+        All Rights Reserved
+    </span>
+    <a href="https://beian.miit.gov.cn/" target="_blank" style="color:#939393;">蜀ICP备2023024013号</a>&nbsp;
+    <span>
+        <a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=null"
+           style="display:inline-block;text-decoration:none;height:20px;color:#939393;">
+            <img src="" style="float:left;margin: 0px 5px 0px 0px;"/>
+            
+        </a>
+    </span>
+    <span id="busuanzi_container">
+        <span class="fa fa-user"></span> <span id="busuanzi_value_site_uv"></span>
+        <span class="fa fa-eye"></span> <span id="busuanzi_value_site_pv"></span>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <span class="topInner">
+        <svg class="topSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+            <path d="M12 6H0l6-6z"/>
+        </svg>
+        <span id="read_progress"></span>
+    </span>
+</a>
+
+<script>
+    document.addEventListener('scroll', function (e) {
+        const readProgress = document.getElementById("read_progress");
+        const scrollHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        readProgress.innerText = ((scrollTop / (scrollHeight - clientHeight)).toFixed(2) * 100).toFixed(0);
+    })
+</script>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+</script>
+<script>
+    let mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        (function() {
+            document.cookie = "change-themes" + "="+ escape ("false");
+        })()
+
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    });
+</script>
+
+<script>
+    document.body.addEventListener('copy', function (e) {
+        if (window.getSelection().toString() && window.getSelection().toString().length > 50) {
+            let clipboardData = e.clipboardData || window.clipboardData;
+            if (clipboardData) {
+                e.preventDefault();
+                let htmlData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                let textData = window.getSelection().toString() +
+                    '\r\n\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                clipboardData.setData('text/html', htmlData);
+                clipboardData.setData('text/plain', textData);
+            }
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerText = '复制';
+
+        function copyingDone() {
+            copybutton.innerText = '已复制！';
+            setTimeout(() => {
+                copybutton.innerText = '复制';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                let text = codeblock.textContent +
+                    '\r\n————————————————\r\n' +
+                    '版权声明：本文为「'+"wait`s blog"+'」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。' +
+                '\r\n原文链接：' + location.href;
+                navigator.clipboard.writeText(text);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) {}
+            selection.removeRange(range);
+        });
+
+        let language = codeblock.className.replaceAll("language-", "")
+        let macTool = document.createElement("div")
+        let macTool1 = document.createElement("div")
+        let macTool2 = document.createElement("div")
+        let macTool3 = document.createElement("div")
+        let languageType = document.createElement("div")
+        languageType.innerText = language
+        macTool.setAttribute('class', 'mac-tool')
+        macTool1.setAttribute('class', 'mac bb1')
+        macTool2.setAttribute('class', 'mac bb2')
+        macTool3.setAttribute('class', 'mac bb3')
+        languageType.setAttribute('class', 'language-type')
+        macTool.appendChild(macTool1)
+        macTool.appendChild(macTool2)
+        macTool.appendChild(macTool3)
+        macTool.appendChild(languageType)
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+            container.appendChild(macTool)
+        }
+    });
+</script>
+</body>
+
+</html>
