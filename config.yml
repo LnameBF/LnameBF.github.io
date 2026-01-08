@@ -137,12 +137,12 @@ params:
     imageWidth: 150
     imageHeight: 150
     buttons:
-      - name: 🧱 建站
-        url: posts/blog
-      - name: 👨🏻‍💻 技术
-        url: posts/tech
       - name: 📕 教程
         url: posts/tutorial
+      - name: 🧱 阅读
+        url: posts/read
+      - name: 👨🏻‍💻 技术
+        url: posts/tech
       - name: 🏖 生活
         url: posts/life
 
