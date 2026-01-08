@@ -1616,27 +1616,25 @@ IConfiguration - 用于读取应用程序的配置设置。&lt;/p&gt;</descripti
       <description>&lt;br /&gt;
 &lt;h4 id=&#34;目录&#34;&gt;目录&lt;/h4&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#_1&#34;&gt;前言&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#nginx_5&#34;&gt;nginx&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;
+&lt;li&gt;&lt;a href=&#34;#_1%E5%89%8D%E8%A8%80-content_views&#34;&gt;{#_1}前言 {#content_views}&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#nginx_5nginx&#34;&gt;{#nginx_5}nginx&lt;/a&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#_11&#34;&gt;反向代理&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#_24&#34;&gt;为什么我们需要用到反向代理？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#_11%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86&#34;&gt;{#_11}反向代理&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#_24%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E9%9C%80%E8%A6%81%E7%94%A8%E5%88%B0%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86&#34;&gt;{#_24}为什么我们需要用到反向代理？&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#_38&#34;&gt;开始配置&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;
+&lt;li&gt;&lt;a href=&#34;#_38%E5%BC%80%E5%A7%8B%E9%85%8D%E7%BD%AE&#34;&gt;{#_38}开始配置&lt;/a&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;#_39&#34;&gt;软件版本&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#SSL_45&#34;&gt;申请SSL证书&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#nginx_53&#34;&gt;首先安装nginx&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#crtkey_57&#34;&gt;上传.crt和.key证书&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#_68&#34;&gt;创建配置文件&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#nginx_106&#34;&gt;验证配置文件并重启nginx服务&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#_39%E8%BD%AF%E4%BB%B6%E7%89%88%E6%9C%AC&#34;&gt;{#_39}软件版本&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#ssl_45%E7%94%B3%E8%AF%B7ssl%E8%AF%81%E4%B9%A6&#34;&gt;{#SSL_45}申请SSL证书&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#nginx_53%E9%A6%96%E5%85%88%E5%AE%89%E8%A3%85nginx&#34;&gt;{#nginx_53}首先安装nginx&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#crtkey_57%E4%B8%8A%E4%BC%A0crt%E5%92%8Ckey%E8%AF%81%E4%B9%A6&#34;&gt;{#crtkey_57}上传.crt和.key证书&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#_68%E5%88%9B%E5%BB%BA%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6&#34;&gt;{#_68}创建配置文件&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#nginx_106%E9%AA%8C%E8%AF%81%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%B9%B6%E9%87%8D%E5%90%AFnginx%E6%9C%8D%E5%8A%A1&#34;&gt;{#nginx_106}验证配置文件并重启nginx服务&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#_120&#34;&gt;成功&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;#_123&#34;&gt;若有帮助，希望可以点赞收藏😁。&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#_120%E6%88%90%E5%8A%9F&#34;&gt;{#_120}成功&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;#_123%E8%8B%A5%E6%9C%89%E5%B8%AE%E5%8A%A9%E5%B8%8C%E6%9C%9B%E5%8F%AF%E4%BB%A5%E7%82%B9%E8%B5%9E%E6%94%B6%E8%97%8F&#34;&gt;{#_123}若有帮助，希望可以点赞收藏😁。&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;br /&gt;
 &lt;h2 id=&#34;content_views&#34;&gt;{#_1}前言&lt;/h2&gt;
@@ -2331,51 +2329,6 @@ Error: failed to start containers:
       <guid>https://www.heiok.top/posts/tutorial/macos_homebrew/</guid>
       <description>&lt;h2 id=&#34;homebrew笔记&#34;&gt;Homebrew笔记&lt;/h2&gt;
 &lt;p&gt;内容&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Mysql</title>
-      <link>https://www.heiok.top/posts/blog/mysql_op_base/</link>
-      <pubDate>Wed, 07 Jan 2026 18:23:26 +0800</pubDate>
-      
-      <guid>https://www.heiok.top/posts/blog/mysql_op_base/</guid>
-      <description>&lt;h1 id=&#34;数据库语法&#34;&gt;数据库语法&lt;/h1&gt;
-&lt;h2 id=&#34;ddl创建表&#34;&gt;DDL&amp;ndash;创建表&lt;/h2&gt;
-&lt;p&gt;操作表也就是对表进行增（Create）删（Retrieve）改（Update）查（Delete）。&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;查询当前数据库下所有表名称&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;show&lt;/span&gt; databases;&lt;span style=&#34;color:#75715e&#34;&gt;--单行注释 /*多行注释*/
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;创建数据库&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;create&lt;/span&gt; databases &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;数据库名称&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;删除&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;drop&lt;/span&gt; databases &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;数据库名称&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;使用数据库&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;select&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;database&lt;/span&gt;();&lt;span style=&#34;color:#75715e&#34;&gt;--查看当前使用的数据库
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;use &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;数据库名称&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;##DDl&amp;ndash;操作表&lt;/p&gt;
-&lt;hr&gt;
-&lt;h3 id=&#34;查询表&#34;&gt;查询表&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;查询当前数据库下所有的表名称&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;show&lt;/span&gt; tables;&lt;span style=&#34;color:#75715e&#34;&gt;--先进入表（use 数据库名称）在使用
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;查询表结构&lt;/p&gt;
-&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;desc&lt;/span&gt; &lt;span style=&#34;color:#960050;background-color:#1e0010&#34;&gt;表结构&lt;/span&gt;;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;创建表&#34;&gt;创建表&lt;/h3&gt;
-&lt;p&gt;最后一行不加逗号&lt;/p&gt;</description>
     </item>
     
     <item>
