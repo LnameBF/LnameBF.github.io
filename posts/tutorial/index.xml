@@ -6,7 +6,39 @@
     <description>Recent content in 🏖 教程 on wait`s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh</language>
-    <lastBuildDate>Thu, 08 Jan 2026 16:37:49 +0800</lastBuildDate><atom:link href="https://www.heiok.top/posts/tutorial/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 12 Feb 2026 09:39:04 +0800</lastBuildDate><atom:link href="https://www.heiok.top/posts/tutorial/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Git Merge 合并分支问题总结</title>
+      <link>https://www.heiok.top/posts/tutorial/git-merge-fast-ward/</link>
+      <pubDate>Thu, 12 Feb 2026 09:39:04 +0800</pubDate>
+      
+      <guid>https://www.heiok.top/posts/tutorial/git-merge-fast-ward/</guid>
+      <description>&lt;h1 id=&#34;git-merge-合并分支问题总结&#34;&gt;Git Merge 合并分支问题总结&lt;/h1&gt;
+&lt;h2 id=&#34;问题描述&#34;&gt;问题描述&lt;/h2&gt;
+&lt;p&gt;执行 &lt;code&gt;git merge fea/douguan&lt;/code&gt; 合并分支时，没有提示解决冲突，提交记录中也没有合并日志。&lt;/p&gt;
+&lt;h2 id=&#34;原因分析&#34;&gt;原因分析&lt;/h2&gt;
+&lt;p&gt;当目标分支（当前分支）没有新的提交时，Git 默认会执行 &lt;strong&gt;快进合并（Fast-forward）&lt;/strong&gt;，直接将指针移动到源分支的最新提交。&lt;/p&gt;
+&lt;h3 id=&#34;快进合并示意图&#34;&gt;快进合并示意图&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;合并前:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;A---B---C  (当前分支)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;         \
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;          D---E  (fea/douguan)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;合并后（直接移动指针，无合并提交）:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;A---B---C---D---E  (当前分支)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;如何验证合并状态&#34;&gt;如何验证合并状态&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 查看当前分支&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git branch
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 查看提交历史&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git log --oneline -10
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 查看图形化提交历史&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git log --oneline --graph -10
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;强制产生合并提交&#34;&gt;强制产生合并提交&lt;/h2&gt;
+&lt;p&gt;使用 &lt;code&gt;--no-ff&lt;/code&gt; 参数禁用快进合并：&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>.NET core 5大核心接口</title>
       <link>https://www.heiok.top/posts/tutorial/net-core-5%E5%A4%A7%E6%A0%B8%E5%BF%83%E6%8E%A5%E5%8F%A3/</link>
